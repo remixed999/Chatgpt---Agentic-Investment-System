@@ -161,4 +161,129 @@ HLD v1.0 §5.1 (R2, R3)
 
 ---
 
-STATUS: DD-01 COMPLETE — Sections 1–3 finalized.
+STATUS: DD-01 COMPLETE — Sections 1–4 finalized.
+
+---
+
+## SECTION 4 — Agent & Registry Schemas (Authoritative)
+
+### 4.1 AgentResult
+
+**Description**
+Standardized agent output envelope for all agent emissions.
+
+**Scope**
+Holding-level and portfolio-level
+
+**Field Table**
+
+| Field | Type | Required | Nullable | Default | Constraints | Notes |
+|-----|-----|-----|-----|-----|-----|-----|
+| agent_name | string | Yes | No | — | — | Canonical agent identifier. |
+| status | string | Yes | No | — | "completed" \| "failed" \| "skipped" | Matches HLD R5. |
+| confidence | float | Yes | No | — | 0.0–1.0 | Required for all agents. |
+| key_findings | dict<string, any> | Yes | No | — | Agent-specific structure | Structured findings per agent. |
+| metrics | list<MetricValue> | Yes | No | — | MetricValue items only | All metrics must carry SourceRef when value present. |
+| suggested_penalties | list<PenaltyItem> | Yes | No | — | PenaltyItem only | Advisory only; enforcement elsewhere. |
+| veto_flags | list<string> | Yes | No | — | — | Advisory-only flags. |
+| counter_case | string | No | No | — | — | Devil’s Advocate narrative only. |
+| notes | string | No | No | — | — | Optional agent notes. |
+
+**Cross-Field Invariants**
+- `confidence` must be within 0.0–1.0 inclusive.
+- `metrics` entries must conform to MetricValue rules (SourceRef required when value present).
+- `suggested_penalties` entries must conform to PenaltyItem.
+
+**Traceability**
+HLD v1.0 §5 (AgentResult R5)
+
+---
+
+### 4.2 PenaltyItem
+
+**Description**
+Advisory penalty item emitted by agents; normalized by Penalty Engine.
+
+**Scope**
+Embedded
+
+**Field Table**
+
+| Field | Type | Required | Nullable | Default | Constraints | Notes |
+|-----|-----|-----|-----|-----|-----|-----|
+| category | string | Yes | No | — | "A" \| "B" \| "C" \| "D" \| "E" \| "F" | Penalty category. |
+| reason | string | Yes | No | — | Stable reason key | Deterministic reasons only. |
+| amount | float | Yes | No | — | Negative values only | Advisory amount. |
+| source_agent | string | Yes | No | — | — | Agent name emitting the item. |
+
+**Traceability**
+HLD v1.0 §5 (PenaltyItem)
+
+---
+
+### 4.3 ConfigSnapshot
+
+**Description**
+Frozen configuration snapshot referenced by DIO and Penalty Engine.
+
+**Scope**
+Portfolio-level
+
+**Field Table**
+
+| Field | Type | Required | Nullable | Default | Constraints | Notes |
+|-----|-----|-----|-----|-----|-----|-----|
+| hard_stop_field_registry | HardStopFieldRegistry | Yes | No | — | — | Hard-stop registry (see 4.4). |
+| penalty_critical_field_registry | PenaltyCriticalFieldRegistry | Yes | No | — | — | Penalty-critical registry (see 4.5). |
+| scoring_rubric_version | string | Yes | No | — | — | Version tag for scorecard/penalty rubric. |
+| agent_prompt_versions | dict<string, string> | Yes | No | — | — | Map of agent_name → version. |
+
+**Traceability**
+HLD v1.0 §5 (ConfigSnapshot R14)
+
+---
+
+### 4.4 HardStopFieldRegistry
+
+**Description**
+Registry of fields that trigger immediate veto when missing.
+
+**Scope**
+Portfolio-level config object
+
+**Field Table**
+
+| Field | Type | Required | Nullable | Default | Constraints | Notes |
+|-----|-----|-----|-----|-----|-----|-----|
+| identity_fields_all_companies | list<string> | Yes | No | — | Must include ticker/exchange/currency | Always required for every holding. |
+| burn_rate_fields_conditional | list<string> | Yes | No | — | cash/runway/burn_rate | Required only when burn-rate classification=true. |
+| portfolio_level_fields | list<string> | Yes | No | — | Must include base_currency | Required at portfolio level. |
+
+**Traceability**
+HLD v1.0 §5 (HardStopFieldRegistry R14)
+
+---
+
+### 4.5 PenaltyCriticalFieldRegistry
+
+**Description**
+Registry of fields that trigger penalties (not vetoes) when missing.
+
+**Scope**
+Portfolio-level config object
+
+**Field Table**
+
+| Field | Type | Required | Nullable | Default | Constraints | Notes |
+|-----|-----|-----|-----|-----|-----|-----|
+| fundamentals | list<string> | Yes | No | — | — | Core fundamentals fields. |
+| fundamentals_conditional_burn_rate | list<string> | Yes | No | — | cash/runway/burn_rate | Penalty-critical when burn-rate=false. |
+| technicals | list<string> | Yes | No | — | — | Core technical fields. |
+| liquidity | list<string> | Yes | No | — | — | Core liquidity fields. |
+| macro_regime | list<string> | Yes | No | — | — | Macro/regime inputs. |
+
+**Cross-Field Invariants**
+- Identity fields (ticker, exchange, currency) MUST NOT appear here; they belong only to HardStopFieldRegistry.
+
+**Traceability**
+HLD v1.0 §5 (PenaltyCriticalFieldRegistry R14)

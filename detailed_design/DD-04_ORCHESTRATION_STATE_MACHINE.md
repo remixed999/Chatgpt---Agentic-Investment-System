@@ -64,7 +64,11 @@ Transitions are evaluated in the order defined below; the first applicable termi
 
 6. **HOLDING_EVALUATION_COMPLETE → AGGREGATION_READY**
    - Trigger: All per-holding outcomes recorded; PSCC executed exactly once; aggregation inputs available.
-   - Partial failure gate: evaluate `run_config.partial_failure_veto_threshold_pct` before aggregation readiness; if exceeded → **VETOED** and aggregation is skipped.
+   - Partial failure gate (R-02): evaluate before aggregation readiness; if exceeded → **VETOED** and aggregation is skipped.
+     - failure_rate_pct = (failed_or_vetoed_count / total_holding_count) * 100.0 with no rounding.
+     - numerator: failed_or_vetoed_count = count of holdings with holding_run_outcome in {FAILED, VETOED}
+     - denominator: total_holding_count = count of holdings in PortfolioSnapshot.holdings
+     - comparison: failure_rate_pct > run_config.partial_failure_veto_threshold_pct triggers VETOED; equality does not.
    - Veto path: portfolio-level veto detected post-holding evaluation (Risk Officer veto) → **VETOED**.
    - Failure path: PSCC failure or aggregation inputs invalid → **FAILED**.
    - Sequencing note: PSCC runs after holding evaluation and before aggregation; final outcome resolution only occurs after aggregation and finalization.
@@ -115,7 +119,7 @@ Terminal states map to output eligibility as follows:
 ### Holding Outcomes
 - **HOLDING_COMPLETED** → emit full HoldingPacket.
 - **HOLDING_VETOED** → emit HoldingPacket with identity + veto reason + limitations; omit recommendations/scorecard per DD-02.
-- **HOLDING_FAILED** → omit HoldingPacket unless it was already emitted prior to failure; outcome recorded in `per_holding_outcomes`.
+- **HOLDING_FAILED** → emit minimal HoldingPacket with holding_id, instrument, holding_run_outcome=FAILED, and limitations containing an error classification entry derived from RunLog.ErrorRecord.error_type; omit scorecard and recommendations.
 - **HOLDING_SHORT_CIRCUITED** → emit HoldingPacket with SHORT_CIRCUITED outcome; no recommendations.
 
 ---

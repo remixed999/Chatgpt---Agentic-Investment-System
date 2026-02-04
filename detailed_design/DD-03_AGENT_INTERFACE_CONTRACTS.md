@@ -16,23 +16,21 @@ All agents MUST emit the common **AgentResult** envelope. This wrapper is requir
 
 ### 2.1 AgentResult Envelope (Required Fields)
 - **agent_name**
-- **agent_version**
-- **scope**: `holding` | `portfolio`
 - **status**: `completed` | `failed` | `skipped`
 - **confidence**: 0.0–1.0
-- **outputs**: agent-specific payload only
+- **key_findings**: agent-specific structured findings
+- **metrics**: list of MetricValue entries
+- **suggested_penalties**: list of PenaltyItem entries
 - **veto_flags**: advisory-only flags (if applicable)
-- **limitations**: explicit known limitations or gaps
-
-**Deprecated field (non-authoritative):**
-- **source_refs**: optional passthrough only; if present, it MUST mirror MetricValue.SourceRef entries and MUST NOT be treated as authoritative provenance.
+- **counter_case** (optional; Devil’s Advocate only)
+- **notes** (optional)
 
 ### 2.2 Envelope Invariants
 - Agents **never emit final scores**.
 - Agents **never apply penalties**.
 - Agents **never override governance** (veto/short-circuit/caps are enforced elsewhere).
-- Any numeric value in `outputs` requires traceable provenance via **MetricValue.SourceRef**.
-- `source_refs` is deprecated and non-authoritative; provenance validation is based solely on MetricValue.SourceRef.
+- Any numeric value in `key_findings` or `metrics` requires traceable provenance via **MetricValue.SourceRef**.
+- Provenance validation is based solely on MetricValue.SourceRef.
 
 ---
 
@@ -44,36 +42,35 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - HoldingSnapshot
 - Seeded financial data (sourced MetricValue inputs)
 
-**Outputs (within AgentResult.outputs)**
-- `fundamental_metrics` (structured, sourced)
-- `confidence`
+**Outputs (within AgentResult.key_findings + metrics)**
+- `fundamental_metrics` (structured findings)
+- MetricValue entries for fundamentals metrics
 
 ### 3.B Technical Agent (Holding-Scoped)
 **Inputs**
 - Price/volume time series (sourced)
 
-**Outputs (within AgentResult.outputs)**
-- `technical_signals` (structured, sourced)
-- `confidence`
+**Outputs (within AgentResult.key_findings + metrics)**
+- `technical_signals` (structured findings)
+- MetricValue entries for technical metrics
 
 ### 3.C Macro / Regime Inputs (Portfolio-Scoped)
 **Inputs**
 - Portfolio-level macro/regime indicators (sourced)
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (within AgentResult.key_findings + metrics)**
 - `regime_indicators` (signals only; no policy decisions)
-- `confidence`
+- MetricValue entries for regime indicators
 
 ### 3.D Devil’s Advocate (Holding-Scoped)
 **Inputs**
 - HoldingSnapshot
 - All prior analytical outputs (read-only)
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (within AgentResult.key_findings)**
 - `risk_flags`
 - `unresolved_fatal_risk` (boolean)
 - `narrative_limitations`
-- `confidence`
 
 ### 3.E Data Integrity Officer (DIO) (Holding-Scoped + Portfolio-Scoped)
 **Inputs**
@@ -81,7 +78,7 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - All MetricValue-bearing inputs and SourceRefs
 - Registry snapshots (hard-stop vs penalty-critical)
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (AgentResult + DIOOutput fields)**
 - `missing_hard_stop_fields`
 - `missing_penalty_critical_fields`
 - `staleness_flags`
@@ -94,7 +91,7 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - PortfolioSnapshot
 - Regime indicators (sourced)
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (AgentResult + GRRAOutput fields)**
 - `regime_label`
 - `regime_confidence`
 - `do_not_trade_flag`
@@ -104,7 +101,7 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - HoldingSnapshot
 - Liquidity and spread inputs (sourced)
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (AgentResult + LEFOOutput fields)**
 - `liquidity_grade`
 - `hard_override_flags`
 
@@ -114,7 +111,7 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - Holding-level outputs (read-only)
 - PortfolioConfig
 
-**Outputs (within AgentResult.outputs)**
+**Outputs (AgentResult + PSCCOutput fields)**
 - `concentration_breaches`
 - `fx_exposure_flags`
 
@@ -147,8 +144,9 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 - On failure, the agent MUST still emit the AgentResult envelope with:
   - `status = failed`
   - `confidence = 0.0`
-  - `outputs` present but empty or explicitly marked as unavailable
-  - `limitations` describing the failure scope
+  - `key_findings = {}` and `metrics = []`
+  - `suggested_penalties = []` and `veto_flags = []`
+  - `notes` describing the failure scope if available
 - **FAILED** indicates a technical/runtime error in agent execution.
 - **VETOED** is a governance enforcement outcome handled elsewhere; agents do not emit VETOED statuses.
 
