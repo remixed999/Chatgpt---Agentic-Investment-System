@@ -44,18 +44,19 @@ Non-goals:
 ## 3. Authority + precedence (must match HLD)
 Penalty Engine outputs are advisory to the Chair, except where they participate in a Risk Officer veto decision.
 
-**Absolute precedence order (HLD §3.2 + authority split):**
-1. **DIO VETO** (hard-stop integrity/freshness/registry violations)
-2. **GRRA SHORT_CIRCUIT** (do_not_trade)
-3. **Risk Officer VETO** (extreme uncertainty / safety veto at holding scope)
-4. **LEFO hard overrides + liquidity caps**
-5. **PSCC concentration/structure caps**
-6. **Risk Officer PENALTIES** (this engine: Category A–F)
-7. **Chair aggregation**
+Absolute precedence order (HLD §3.2 — veto vs penalties split):
 
-**Invariants:**
-- Penalties must never be applied to a holding or portfolio that is already *VETOED* by DIO (hard-stop supersedes penalty).
-- If Risk Officer issues a holding-level VETO, no further penalties/caps are applied to that holding; the holding is marked VETOED and explanation is recorded.
+1. DIO VETO (hard-stop integrity, freshness, registry violations)
+2. GRRA SHORT_CIRCUIT (do_not_trade policy)
+3. Risk Officer VETO (holding-level extreme uncertainty or safety veto)
+4. LEFO hard overrides and liquidity caps
+5. PSCC concentration and structure caps
+6. Risk Officer PENALTIES (Penalty Engine Category A–F)
+7. Chair aggregation
+
+Invariants:
+- Penalties must never be applied to a holding or portfolio that is already VETOED by DIO (hard-stop supersedes penalty).
+- If the Risk Officer issues a holding-level VETO, no further penalties or caps are applied to that holding; the holding is marked VETOED and the veto reason is recorded.
 
 **Acceptance Criteria:**
 - DD-05 explicitly separates Risk Officer VETO from Risk Officer PENALTIES in precedence.
