@@ -26,14 +26,17 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Entry criteria**
 - All configuration artifacts (RunConfig, ConfigSnapshot, registries, rubric versions) are versioned and frozen for the release.
 - Baseline fixtures from DD-09 are available for deterministic replay.
+- Environment parity is locked: UTC time base, locale-invariant numeric formatting, and deterministic serialization settings are enforced.
 
 **Exit criteria**
 - Version pinning and configuration immutability checks pass.
 - Pre-flight validation confirms no config drift vs. release baseline.
+- Environment parity attestation recorded in the release checklist.
 
 **Blocking conditions**
 - Missing or mismatched ConfigSnapshot/registry versions.
 - Any failure in configuration validation or version pinning.
+- Any deviation from environment parity settings (UTC/locale/serialization) required by DD-07.
 
 **Artifacts produced**
 - Release ConfigSnapshot (versioned)
@@ -43,6 +46,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Test gates required (DD-10)**
 - Contract tests for configuration schemas (blocking). 
 - Fixture compliance checks (blocking).
+- Environment parity checks (blocking).
 
 ---
 
@@ -60,6 +64,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Blocking conditions**
 - Any unit or contract test failure.
 - Any deterministic replay or canonicalization failure.
+- Missing or invalid test artifacts for the phase (reports, hash baselines, and enforcement logs).
 
 **Artifacts produced**
 - Local test reports
@@ -91,6 +96,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Blocking conditions**
 - Any governance precedence violation.
 - Any mismatch in canonical hashes across repeated runs.
+- Missing or invalid test artifacts for the phase (reports, hash baselines, and enforcement logs).
 
 **Artifacts produced**
 - Integration run logs with deterministic hashes
@@ -122,6 +128,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Blocking conditions**
 - Any regression in decision-significant outputs.
 - Any failure in fixture compliance or deterministic replay.
+- Missing or invalid test artifacts for the phase (reports, hash baselines, and enforcement logs).
 
 **Artifacts produced**
 - Staging regression reports
@@ -149,6 +156,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Blocking conditions**
 - Any governance or determinism regression detected during rollout.
 - Any mismatched configuration hash vs release manifest.
+- Missing or invalid test artifacts for the phase (reports, hash baselines, and enforcement logs).
 
 **Artifacts produced**
 - Production deployment log
@@ -175,6 +183,7 @@ This deployment plan defines **authoritative, gated promotion** for the Agentic 
 **Blocking conditions**
 - Any governance violation or determinism drift.
 - Any mismatch in replayed hashes vs release baselines.
+- Missing or invalid test artifacts for the phase (reports, hash baselines, and enforcement logs).
 
 **Artifacts produced**
 - Post-deployment replay reports
@@ -257,10 +266,12 @@ For each phase, the following test categories are required (DD-10):
 **Drift prevention**
 - ConfigSnapshot and registry hashes are compared against release manifests at every phase. 
 - Any hash mismatch is a **blocking failure** and halts promotion.
+- RunConfig, ConfigSnapshot, registries, and rubric versions must match the release manifest; any mismatch blocks execution and promotion.
 
 **Rollback handling**
 - If configuration validation fails, rollback reverts to the last known-good ConfigSnapshot bundle and registry manifest. 
 - Rollback does not alter historical run outputs; it only re-pins configuration for future runs.
+- Rollback is permitted only to a prior, fully validated release manifest; partial or ad-hoc rollbacks are forbidden.
 
 **Version pinning enforcement**
 - Orchestrator must refuse to run if environment configuration hashes do not match the release manifest. 
@@ -294,6 +305,7 @@ Rollback must be **deterministic** and preserve auditability; historical results
 - RunLog with outcome classification and governance decision trail. 
 - Canonical hashes for inputs and decision outputs (when allowed by DD-07). 
 - Guard violation counters per guard (G0–G10). 
+- Release manifest hash attestations and test artifact references (per phase).
 
 **Governance enforcement monitoring**
 - Track counts of VETOED, SHORT_CIRCUITED, FAILED, and COMPLETED outcomes. 
@@ -303,9 +315,14 @@ Rollback must be **deterministic** and preserve auditability; historical results
 - Periodic replay of fixed DD-09 fixtures; hashes must match baselines. 
 - Alert on any hash mismatch or ordering variance.
 
+**Artifact completeness enforcement**
+- Missing RunLogs, hashes, or guard counters are blocking conditions for promotion and continued operation.
+- Emission guards must refuse output when required artifacts are absent (DD-08 G10).
+
 **Replay validation checks post-deployment**
 - Recompute snapshot_hash, config_hash, run_config_hash, and decision_hash for sampled runs. 
 - Validate that emitted hashes match canonical recomputation.
+- Promotion remains blocked until replay validations pass with zero determinism drift.
 
 ---
 

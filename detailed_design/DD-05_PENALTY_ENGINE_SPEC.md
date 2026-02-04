@@ -56,6 +56,9 @@ Absolute precedence order:
 Invariants:
 - Penalties MUST NOT be applied to a holding or portfolio already **VETOED** by DIO.
 - If Risk Officer issues a holding-level **VETO**, no further penalties or caps are applied to that holding.
+- If portfolio_run_outcome is **SHORT_CIRCUITED**, penalties are not computed or applied to any holding.
+- If holding_run_outcome is **SHORT_CIRCUITED**, penalties are not computed or applied to that holding.
+- Penalties are evaluated only after LEFO and PSCC caps are finalized and recorded; penalty computation never precedes cap enforcement.
 
 ---
 
