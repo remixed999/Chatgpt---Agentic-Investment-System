@@ -205,7 +205,7 @@ Implement checks that fail fast if:
 
 ## 9. Versioning
 
-- This specification is versioned as DD-06 v1.0.
+- This specification is versioned as DD-07 v1.0.
 - Any change to canonical rules must increment the version and rebaseline hashes.
 
 ---

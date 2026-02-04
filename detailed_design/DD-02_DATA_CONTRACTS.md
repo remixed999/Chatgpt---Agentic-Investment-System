@@ -92,7 +92,7 @@ This document does NOT define:
 ### 4.3 Holding Input Contract
 - **How InstrumentIdentity is supplied:** As the `instrument` field within each Holding in PortfolioSnapshot; InstrumentIdentity is a required embedded schema for holding-level inputs.  
 - **Holding-level isolation rules:** Each holding is evaluated independently; holding-level outputs must reference their own `holding_id` and `instrument` without dependency on other holdings.  
-- **Identity completeness guarantees:** `ticker`, `exchange`, and `currency` are required for every holding; missing any of these fields constitutes a hard-stop identity failure.  
+- **Identity completeness guarantees:** `ticker`, `exchange`, and `currency` are required for every holding; missing any of these fields constitutes a technical failure (holding_run_outcome=FAILED) per the Outcome Classification Rule below.  
 
 ---
 
@@ -163,10 +163,16 @@ At the contract boundary, a violation is any instance where required fields are 
 - **Semantically invalid contract:** Violates embedded semantic rules (e.g., MetricValue has `value = null`, `not_applicable = false`, and `missing_reason = null`).  
 
 ### Eligibility Mapping (No Enforcement Logic)
-- **FAILED eligibility:** Malformed or semantically invalid contracts that prevent trustworthy interpretation of required fields.  
-- **VETOED eligibility:** Missing identity fields (`ticker`, `exchange`, `currency`) or missing portfolio-level hard-stop fields (`base_currency` when required) as defined by HardStopFieldRegistry.  
+- **FAILED eligibility:** Malformed or semantically invalid contracts that prevent trustworthy interpretation of required fields, including missing holding identity fields (`ticker`, `exchange`, `currency`).  
+- **VETOED eligibility:** Missing portfolio-level hard-stop fields (`base_currency` when required) as defined by HardStopFieldRegistry.  
 
-**DESIGN DECISION:** HLD §5 identifies hard-stop identity and base_currency omissions as veto conditions, but does not explicitly map all malformed/semantic violations to outcomes. This document assigns such violations to FAILED eligibility to preserve schema integrity without defining enforcement behavior.  
+### Outcome Classification Rule (Authoritative)
+Outcome classification for identity and base-currency omissions is defined as follows and must be referenced by guards and orchestration flow documents to avoid drift:
+
+- **Holding identity omissions** (`ticker`, `exchange`, or `currency` missing) are **technical failures** ⇒ `holding_run_outcome=FAILED`.
+- **Portfolio base_currency omission** when PortfolioSnapshot is present is a **governance veto** ⇒ `portfolio_run_outcome=VETOED`.
+
+**DESIGN DECISION:** HLD §5 identifies hard-stop identity and base_currency omissions as veto conditions, but does not explicitly map technical identity omissions versus governance vetoes. This document treats holding identity omissions as FAILED (technical) while retaining portfolio base_currency omission as VETOED, and assigns other malformed/semantic violations to FAILED to preserve schema integrity without defining enforcement behavior.  
 
 ---
 
@@ -194,4 +200,4 @@ This document does NOT cover:
 
 ---
 
-STATUS: DD-02 COMPLETE — Awaiting transition to DD-03 (ORCHESTRATION_FLOW.md)
+STATUS: DD-02 COMPLETE — Awaiting transition to DD-04 (ORCHESTRATION_FLOW.md)
