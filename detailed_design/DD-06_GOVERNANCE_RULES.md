@@ -43,15 +43,7 @@ The Chair has **no override power**.
 
 ## 3. Absolute Precedence Order (AUTHORITATIVE)
 
-Governance decisions MUST be applied in this exact order:
-
-1. **DIO VETO**
-2. **GRRA SHORT_CIRCUIT**
-3. **Risk Officer VETO**
-4. **LEFO hard overrides and liquidity caps**
-5. **PSCC concentration and structure caps**
-6. **Risk Officer PENALTIES** (via DD-04)
-7. **Chair aggregation and recommendation mapping**
+Governance decisions MUST be applied in the exact order defined in Section 8 (Cross-DD Governance & Ordering Reconciliation).
 
 **Invariant:**  
 Lower-numbered rules ALWAYS supersede higher-numbered rules.
@@ -132,7 +124,7 @@ Overrides apply AFTER veto checks but BEFORE penalties and scoring.
 ---
 
 ## 7. Penalty Governance Integration
-(Reference: DD-04 — Penalty Engine)
+(Reference: DD-05 — Penalty Engine Specification)
 
 Rules:
 - penalties apply ONLY if:
@@ -143,7 +135,38 @@ Rules:
 
 ---
 
-## 8. Outcome Resolution Matrix
+## 8. Cross-DD Governance & Ordering Reconciliation
+This section reconciles governance precedence, guard actions, outcomes, and deterministic ordering across DD-04, DD-07, and DD-08 to provide a single authoritative reference point.
+
+### 8.1 Governance Precedence Stack (Authoritative)
+1. **DIO VETO**
+2. **GRRA SHORT_CIRCUIT**
+3. **Risk Officer VETO**
+4. **LEFO hard overrides and liquidity caps**
+5. **PSCC concentration and structure caps**
+6. **Risk Officer PENALTIES** (via DD-05)
+7. **Chair aggregation and recommendation mapping**
+
+### 8.2 Guard Actions → Outcomes → Emission Eligibility
+- **STOP_RUN (portfolio scope)** → `portfolio_run_outcome` is **FAILED** or **VETOED** based on guard classification; emission eligibility follows DD-04/DD-08 (FailedRunPacket only for FAILED; minimal PortfolioCommitteePacket for VETOED).
+- **VETO_HOLDING** → `holding_run_outcome=VETOED`; HoldingPacket emitted with identity + veto reason only.
+- **FAIL_HOLDING** → `holding_run_outcome=FAILED`; HoldingPacket omitted unless already emitted; outcome recorded in `per_holding_outcomes`.
+- **SHORT_CIRCUIT** → `portfolio_run_outcome=SHORT_CIRCUITED`; holdings inherit SHORT_CIRCUITED; emit PortfolioCommitteePacket + HoldingPackets.
+- **CONTINUE_WITH_PENALTY** → outcomes remain **COMPLETED**; penalties applied; full packet emission permitted.
+- **CONTINUE_WITH_WARNING** → outcomes remain **COMPLETED**; no penalties; full packet emission permitted.
+
+### 8.3 Deterministic Ordering Rule (Authoritative)
+- Holdings ordered by `holding_id` (lexicographic).
+- Agents ordered by `agent_name` (lexicographic).
+- Penalties ordered by `category` → `reason` → `source_agent`.
+
+### 8.4 Enforcement References
+- **Governance precedence and outcomes:** DD-04 Orchestration Flow + DD-04 Orchestration State Machine.
+- **Guard action enforcement:** DD-08 Orchestration Guards.
+- **Ordering and hashing:** DD-07 Canonicalization Spec + DD-08 Deterministic Ordering Guard.
+- **Emission eligibility:** DD-04 Orchestration Flow + DD-08 Emission Guards.
+
+## 9. Outcome Resolution Matrix
 
 ### Portfolio-level outcomes:
 - COMPLETED
@@ -165,16 +188,16 @@ Definitions:
 
 ---
 
-## 9. Portfolio vs Holding Escalation
+## 10. Portfolio vs Holding Escalation
 
 Rules:
 - Holding veto does NOT automatically veto portfolio
 - Portfolio veto overrides all holding outcomes
-- Escalation thresholds (e.g., >30% holdings vetoed) are enforced by DD-07 guards
+- Escalation thresholds (e.g., >30% holdings vetoed) are enforced by DD-08 guards
 
 ---
 
-## 10. Determinism and Auditability
+## 11. Determinism and Auditability
 
 Requirements:
 - every veto source recorded
@@ -184,7 +207,7 @@ Requirements:
 
 ---
 
-## 11. Non-Goals
+## 12. Non-Goals
 This document does NOT define:
 - scoring math
 - penalty amounts
@@ -193,7 +216,7 @@ This document does NOT define:
 
 ---
 
-## 12. Acceptance Criteria
+## 13. Acceptance Criteria
 
 This document is complete if:
 - precedence order matches DD-04 exactly

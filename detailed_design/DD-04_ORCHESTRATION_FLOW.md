@@ -205,11 +205,11 @@ This document defines the orchestration flow and state transitions for the syste
 ## 7. Short-Circuit Rules
 
 **VETO eligibility (immediate termination at applicable scope):**
-- Missing hard-stop identity fields in InstrumentIdentity (holding-level).
 - Missing portfolio-level hard-stop fields (e.g., base_currency when required).
 - DIO integrity veto indicators at portfolio or holding scope.
 
 **FAILED eligibility (technical or contract failure):**
+- Missing hard-stop identity fields in InstrumentIdentity (holding-level, technical failure per DD-02 Outcome Classification Rule).
 - Missing or malformed required schema payloads that prevent interpretation.
 - Semantically invalid MetricValue or SourceRef usage per DD-01.
 - Unrecoverable portfolio-level agent or orchestration failure.
@@ -219,6 +219,7 @@ This document defines the orchestration flow and state transitions for the syste
 - Portfolio-level SHORT_CIRCUIT may still emit holding packets marked SHORT_CIRCUITED.
 
 (Eligibility rules only; no enforcement logic.)
+Outcome classification for identity omissions and base currency vetoes is authoritative in DD-02 §7 (Outcome Classification Rule).
 
 ---
 
@@ -278,4 +279,4 @@ This document does NOT define:
 
 ## 12. Status
 
-STATUS: DD-03 COMPLETE — Awaiting transition to DD-04 (STATE_&_AUDIT.md)
+STATUS: DD-04 COMPLETE — Awaiting transition to DD-04_ORCHESTRATION_STATE_MACHINE.md

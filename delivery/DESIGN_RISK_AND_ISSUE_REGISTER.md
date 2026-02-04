@@ -14,6 +14,8 @@ Impact: High
 Risk Rating: High, because the absence of a defined state machine directly undermines deterministic and reproducible orchestration behavior.
 Mitigation Strategy: Replace the placeholder with a complete state machine definition aligned to the orchestration flow, including explicit transitions, terminal outcomes, and mapping to output eligibility.
 Residual Risk after mitigation: Medium, because alignment across multiple DDs still requires verification.
+Status: RESOLVED
+Resolution Notes: Added the deterministic orchestration state machine specification aligned to DD-04 flow, outcomes, and emission rules in DD-04_ORCHESTRATION_STATE_MACHINE.md.
 
 ### R-02
 Risk ID: R-02
@@ -24,6 +26,8 @@ Impact: High
 Risk Rating: High, due to the criticality of precedence order and the number of documents defining enforcement behavior.
 Mitigation Strategy: Introduce a cross-DD precedence reconciliation section that explicitly maps guard actions to governance rules and orchestration terminal outcomes, and require conformance checks in acceptance criteria.
 Residual Risk after mitigation: Medium.
+Status: RESOLVED
+Resolution Notes: Added cross-DD governance reconciliation, precedence stack, and deterministic ordering rules in DD-06_GOVERNANCE_RULES.md with explicit references to DD-04, DD-07, and DD-08.
 
 ### R-03
 Risk ID: R-03
@@ -34,6 +38,8 @@ Impact: High
 Risk Rating: High, because ambiguous outcome classification affects the core governance model and downstream packet eligibility.
 Mitigation Strategy: Align contract failure semantics and guard actions to a single authoritative rule set that clearly distinguishes VETOED from FAILED for identity and schema violations.
 Residual Risk after mitigation: Low to Medium.
+Status: RESOLVED
+Resolution Notes: Standardized identity/base_currency outcome classification in DD-02, aligned DD-08 G1 and DD-04 orchestration flow wording.
 
 ### R-04
 Risk ID: R-04
@@ -44,6 +50,8 @@ Impact: Medium
 Risk Rating: Medium, because inconsistent references can lead to implementation drift and test coverage gaps.
 Mitigation Strategy: Normalize DD numbering references and version identifiers across all documents; add explicit reference mapping in DD-09 test fixtures.
 Residual Risk after mitigation: Low.
+Status: RESOLVED
+Resolution Notes: Corrected DD-07 versioning and updated DD-09 traceability to canonical DD identifiers.
 
 ### R-05
 Risk ID: R-05
@@ -54,6 +62,8 @@ Impact: Medium
 Risk Rating: Medium, because the threshold affects portfolio-level outcomes and determinism across runs.
 Mitigation Strategy: Explicitly bind the threshold to a RunConfig field or ConfigSnapshot registry and ensure deterministic default values are recorded.
 Residual Risk after mitigation: Low.
+Status: RESOLVED
+Resolution Notes: Bound the partial failure threshold to run_config.partial_failure_veto_threshold_pct with default 30.0 in DD-08 and referenced in DD-09 fixtures.
 
 ### R-06
 Risk ID: R-06
@@ -64,6 +74,8 @@ Impact: Medium
 Risk Rating: Medium, due to potential ordering-induced divergence in outputs.
 Mitigation Strategy: Add explicit ordering requirements to the orchestration flow phase definitions and align with canonicalization ordering rules.
 Residual Risk after mitigation: Low.
+Status: RESOLVED
+Resolution Notes: Reinforced deterministic ordering in DD-06 reconciliation section and DD-04 orchestration state machine; aligned guard references in DD-08.
 
 ## 3. Design Issue Log
 
@@ -75,6 +87,8 @@ Severity: High
 Root Cause: Incomplete document content.
 Recommended Design Fix: Provide a full state machine specification that maps to the orchestration flow phases and outcome eligibility matrix.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Replaced the placeholder state machine with a complete, deterministic specification in DD-04_ORCHESTRATION_STATE_MACHINE.md.
 
 ### I-02
 Issue ID: I-02
@@ -84,6 +98,8 @@ Severity: High
 Root Cause: Conflicting outcome classification rules across documents.
 Recommended Design Fix: Standardize identity field omissions to a single outcome classification and update guard actions and contract failure semantics accordingly.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Added authoritative outcome classification rule in DD-02 and aligned G1 in DD-08 plus DD-04 orchestration flow wording.
 
 ### I-03
 Issue ID: I-03
@@ -93,6 +109,8 @@ Severity: Medium
 Root Cause: Document numbering drift.
 Recommended Design Fix: Correct references to the penalty engine specification and verify all cross-DD references.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Corrected penalty engine references to DD-05 in DD-06 and updated traceability where needed.
 
 ### I-04
 Issue ID: I-04
@@ -102,6 +120,8 @@ Severity: Medium
 Root Cause: Inconsistent document version labeling.
 Recommended Design Fix: Align the version reference with the correct DD identifier and update downstream references.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Corrected DD-07 version statement to DD-07 v1.0 in DD-07_CANONICALIZATION_SPEC.md.
 
 ### I-05
 Issue ID: I-05
@@ -111,6 +131,8 @@ Severity: Medium
 Root Cause: Document header not aligned to file identity.
 Recommended Design Fix: Update the document header and references to reflect the correct DD number and maintain consistent traceability.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Updated DD-08 header to match filename and ensured internal references align to DD-08.
 
 ### I-06
 Issue ID: I-06
@@ -120,6 +142,8 @@ Severity: Low
 Root Cause: Status metadata not updated after document restructuring.
 Recommended Design Fix: Correct the status line to reflect the accurate next-phase document and naming.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Corrected DD-04 orchestration flow status line to reference DD-04_ORCHESTRATION_STATE_MACHINE.md.
 
 ### I-07
 Issue ID: I-07
@@ -129,6 +153,8 @@ Severity: Medium
 Root Cause: Traceability section not synchronized with DD numbering.
 Recommended Design Fix: Update traceability references to the correct DD document identifiers to preserve auditability.
 Requires DD Change: Yes
+Status: RESOLVED
+Resolution Notes: Updated DD-09 test matrix traceability to correct DD identifiers and filenames.
 
 ## 4. Required Design Actions
 
@@ -169,10 +195,10 @@ Requires DD Change: Yes
    Summary of required change: Bind the 30% threshold to a named RunConfig or registry field and define deterministic defaults.
 
 ## 5. Assurance Summary
-Overall design risk posture: Medium. The design establishes strong governance and determinism principles, but several documentation inconsistencies and one missing specification materially affect assurance confidence.
+Overall design risk posture: Low to Medium. The design establishes strong governance and determinism principles, and the previously identified documentation inconsistencies and missing specification have been resolved.
 
 Key strengths of the design: The portfolio-first model, explicit governance precedence, and deterministic canonicalization and penalty policies are clearly articulated, which supports auditability and reproducibility when implemented as specified.
 
-Key remaining concerns: The missing state machine, conflicting outcome classifications, and DD reference drift undermine enforceability and test traceability; these must be corrected prior to implementation sign-off.
+Key remaining concerns: Confirm implementation conformance to the updated DD references and deterministic ordering rules during build-out and validation.
 
 Assumptions made during assessment: The assessment assumes HLD v1.0 is authoritative, and that all DD documents are intended to be internally consistent and cross-referenced by their file names.

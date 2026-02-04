@@ -1,4 +1,4 @@
-# DD-07 — Orchestration Guards / Safety Rails (Portfolio-First)
+# DD-08 — Orchestration Guards / Safety Rails (Portfolio-First)
 
 ## 1. Purpose
 Guards are mandatory, deterministic gates that run before and around agent execution to prevent invalid outputs from reaching aggregation, enforce auditability and reproducibility, and ensure consistent portfolio vs holding handling.
@@ -71,6 +71,7 @@ Logged artifacts:
 
 Notes:
 - Exchange is required and treated as free-form string in MVP.
+- Outcome classification is authoritative in DD-02 §7 (Outcome Classification Rule).
 
 ---
 
@@ -156,7 +157,7 @@ Logged artifacts:
 - Per-holding outcomes updated.
 
 Deterministic execution:
-- Agent execution order must be lexicographic by agent_name unless DD-03 flow specifies otherwise.
+- Agent execution order must be lexicographic by agent_name unless DD-04 flow specifies otherwise.
 
 ---
 
@@ -234,12 +235,13 @@ Trigger conditions:
 
 Actions:
 - Maintain per_holding_outcomes map always.
-- Portfolio can be COMPLETED with some VETOED/FAILED holdings if failures ≤30%.
-- If >30% holdings are VETOED or FAILED => portfolio_run_outcome=VETOED (unless already FAILED).
+- Portfolio can be COMPLETED with some VETOED/FAILED holdings if failures ≤ run_config.partial_failure_veto_threshold_pct.
+- If failures exceed run_config.partial_failure_veto_threshold_pct => portfolio_run_outcome=VETOED (unless already FAILED).
 - If portfolio-level DIO veto occurs, ignore holding success and stop.
 
 Logged artifacts:
 - RunLog counts by outcome category and threshold used.
+- run_config.partial_failure_veto_threshold_pct (default 30.0 for v0.1) recorded in RunLog/config snapshot to ensure determinism.
 - Veto flags and limitations when threshold exceeded.
 
 ---
