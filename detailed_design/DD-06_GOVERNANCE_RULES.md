@@ -1,4 +1,4 @@
-# DD-05 — Governance Rules (Portfolio-First)
+# DD-06 — Governance Rules (Portfolio-First)
 
 ## 1. Purpose
 Governance rules arbitrate conflicts between agents, determine veto vs override vs penalty application, enforce safety and integrity constraints, and produce deterministic outcomes.
@@ -201,4 +201,3 @@ This document is complete if:
 - Chair has no override authority
 - no governance conflicts or ambiguities exist
 - deterministic enforcement is guaranteed
-
