@@ -37,6 +37,7 @@ Veto logs and runtime timestamps are explicitly non-decision-significant; orderi
 ## 3. Deterministic Ordering Rules (MANDATORY)
 
 All collections MUST be sorted deterministically before hashing.
+Ordering MUST be derived from stable, non-time-based keys; timestamps are never valid sort keys for canonical payloads or hashes.
 
 ### 3.1 List Ordering
 
@@ -136,6 +137,7 @@ Example:
   - no trailing zeros
   - no exponent notation
 - NaN and Infinity are not allowed in canonical data. They must be mapped to `null` before serialization and excluded from hashing unless explicitly part of a decision.
+Locale-specific numeric formats (commas, spaces, or exponent formatting) are forbidden; serialization is locale-invariant and must behave identically across environments.
 
 ### 5.3 Boolean and Null Values
 - Booleans must be serialized as `true` or `false`.
@@ -195,6 +197,8 @@ To pass replay validation, the following must hold:
 - `decision_hash` matches for identical logical runs
 - `run_hash` is stable across execution environments
 - ordering of any list or map does not affect results
+
+**Environment parity requirement:** canonicalization MUST be executed in a locale- and timezone-stable environment (UTC time base, locale-invariant numeric formatting). Any deviation invalidates replay and blocks promotion per DD-11.
 
 ---
 

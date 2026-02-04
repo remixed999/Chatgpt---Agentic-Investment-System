@@ -198,18 +198,20 @@ This document defines the orchestration flow and state transitions for the syste
 1. **Portfolio Intake Order:** PortfolioSnapshot → PortfolioConfig → RunConfig are required before any portfolio-level agent runs.
 2. **Portfolio-Level Agents:** DIO (portfolio integrity) and GRRA (macro regime) are evaluated before holding-level agents.
 3. **PSCC Timing:** PSCC executes once after all holding-level analytical outputs are complete and before any aggregation; aggregation cannot proceed until PSCCOutput is available.
-4. **Portfolio Failure Impact:**
+4. **Penalty Sequencing:** Penalties are computed only after LEFO and PSCC caps are finalized and only for holdings and portfolios that remain COMPLETED (not VETOED or SHORT_CIRCUITED).
+5. **Portfolio Failure Impact:**
    - Portfolio-level FAILED or VETOED terminates the run and prevents holding-level evaluation outputs from being emitted except where explicitly allowed by DD-02.
    - Portfolio-level SHORT_CIRCUIT ends the run with appropriate packets reflecting short-circuit status.
-5. **Partial Failure Threshold Evaluation (R-02):**
+6. **Partial Failure Threshold Evaluation (R-02):**
    - Evaluated immediately after HOLDING_EVALUATION_COMPLETE and before AGGREGATION_READY.
    - failure_rate_pct = (failed_or_vetoed_count / total_holding_count) * 100.0 with no rounding.
    - If failure_rate_pct > run_config.partial_failure_veto_threshold_pct ⇒ portfolio_run_outcome=VETOED.
    - If failure_rate_pct ≤ threshold ⇒ continue toward aggregation readiness.
-6. **PortfolioCommitteePacket Eligibility:**
+   - total_holding_count is derived solely from PortfolioSnapshot.holdings (post-canonical ordering); no environment-local filtering is permitted.
+7. **PortfolioCommitteePacket Eligibility:**
    - Eligible when portfolio_run_outcome is COMPLETED, VETOED, or SHORT_CIRCUITED.
    - Not eligible when portfolio_run_outcome is FAILED (FailedRunPacket only).
-7. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
+8. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
 
 ---
 

@@ -42,11 +42,13 @@ Trigger conditions:
 - PortfolioSnapshot provided but PortfolioConfig.base_currency missing.
 - RunConfig malformed (e.g., burn_rate_classification conflict).
 - MetricValue has value != None and missing SourceRef.
+- Release manifest hash mismatch for any of: RunConfig, ConfigSnapshot, registries.
 
 Actions:
 - Schema validation failures => STOP_RUN with portfolio_run_outcome=FAILED.
 - Missing base_currency with PortfolioSnapshot => portfolio_run_outcome=VETOED (DIO).
 - MetricValue with value but no SourceRef => portfolio_run_outcome=FAILED (input corruption).
+- Any release manifest hash mismatch => STOP_RUN with portfolio_run_outcome=FAILED and error_type="config_hash_mismatch".
 
 Logged artifacts:
 - Initialize RunLog with input_snapshot_hash.
@@ -181,6 +183,7 @@ Actions:
 - If a holding is VETOED at any veto stage, do not apply caps/penalties/score aggregation.
 - If portfolio is SHORT_CIRCUITED, holdings inherit SHORT_CIRCUITED (unless DIO already vetoed portfolio earlier).
 - Chair cannot override any enforcement.
+- Penalties apply only after LEFO and PSCC caps are finalized and only for holdings with holding_run_outcome=COMPLETED and portfolio_run_outcome=COMPLETED.
 
 Logged artifacts:
 - RunLog.ErrorRecord noting enforcement stage and effect.
@@ -272,6 +275,7 @@ Actions:
   - do NOT emit recommendations or position sizing
 - If FAILED:
   - emit FailedRunPacket + RunLog only
+- Emission is blocked if required artifacts are missing (RunLog, required hashes, guard violation counters). Missing artifacts => portfolio_run_outcome=FAILED with error_type="emission_artifact_missing".
 
 HoldingPacket rules:
 - If holding FAILED, emit a minimal HoldingPacket containing holding_id, instrument, holding_run_outcome=FAILED, and limitations containing an error classification entry derived from RunLog.ErrorRecord.error_type; omit scorecard and recommendations.
