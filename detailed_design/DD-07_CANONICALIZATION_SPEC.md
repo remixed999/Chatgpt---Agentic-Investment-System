@@ -30,6 +30,7 @@ Canonicalization does NOT apply to:
 - runtime execution metadata
 - timestamps used only for logging
 - free-form narrative text
+Veto logs and runtime timestamps are explicitly non-decision-significant; ordering by timestamp is for logging only and MUST NOT affect canonical payloads or hashes.
 
 ---
 
@@ -45,7 +46,7 @@ All collections MUST be sorted deterministically before hashing.
 | Agent outputs | `agent_name` (lexicographic) |
 | Penalty items | `category` → `reason` → `source_agent` |
 | Concentration breaches | `breach_type` → `identifier` |
-| Veto logs | `timestamp` → `agent_name` |
+| Veto logs | Ordering by `timestamp` → `agent_name` for logging only; veto logs are excluded from canonical payloads and hashes |
 
 ### 3.2 Dictionary Ordering
 - All dictionaries MUST be serialized with keys sorted lexicographically.
@@ -64,6 +65,7 @@ These fields must NOT affect the canonical hash:
   - `end_time`
   - `generated_at`
   - `retrieval_timestamp`
+- veto logs and runtime log ordering metadata
 - execution duration fields
 - agent execution timing metadata
 - narrative-only fields:

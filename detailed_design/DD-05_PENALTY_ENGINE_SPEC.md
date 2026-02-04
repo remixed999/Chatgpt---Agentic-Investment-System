@@ -235,7 +235,7 @@ Required reason strings:
 - "unsourced_numbers_detected"
 
 Notes:
-- If `unsourced_numbers_detected=true`, expected outcome is holding VETOED by DIO (integrity). If proceeding in debug mode, still apply the penalty item and log explicit limitation.
+- If `unsourced_numbers_detected=true`, expected outcome is holding VETOED by DIO (integrity). Debug mode may log additional diagnostics but MUST NOT apply penalties or alter the veto outcome.
 
 ### 8.4 Category D — Confidence / Uncertainty (0..-10)
 Trigger sources:

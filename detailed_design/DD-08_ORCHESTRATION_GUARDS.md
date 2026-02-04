@@ -236,10 +236,17 @@ Trigger conditions:
 - Portfolio-level DIO veto occurs.
 
 Actions:
+- Compute failure_rate_pct = (failed_or_vetoed_count / total_holding_count) * 100.0 with no rounding.
+  - numerator: failed_or_vetoed_count = count of holdings with holding_run_outcome in {FAILED, VETOED}
+  - denominator: total_holding_count = count of holdings in PortfolioSnapshot.holdings
+- Compare failure_rate_pct strictly greater than run_config.partial_failure_veto_threshold_pct.
+  - If failure_rate_pct > threshold => portfolio_run_outcome=VETOED.
+  - If failure_rate_pct <= threshold => portfolio_run_outcome may remain COMPLETED (subject to other guards).
 - Maintain per_holding_outcomes map always.
 - Portfolio can be COMPLETED with some VETOED/FAILED holdings if failures ≤ run_config.partial_failure_veto_threshold_pct.
 - If failures exceed run_config.partial_failure_veto_threshold_pct => portfolio_run_outcome=VETOED (unless already FAILED).
 - If portfolio-level DIO veto occurs, ignore holding success and stop.
+- Timing: evaluate this guard immediately after HOLDING_EVALUATION_COMPLETE and before AGGREGATION_READY (DD-04).
 
 Logged artifacts:
 - RunLog counts by outcome category and threshold used.
@@ -267,7 +274,7 @@ Actions:
   - emit FailedRunPacket + RunLog only
 
 HoldingPacket rules:
-- If holding FAILED, omit HoldingPacket (default).
+- If holding FAILED, emit a minimal HoldingPacket containing holding_id, instrument, holding_run_outcome=FAILED, and limitations containing an error classification entry derived from RunLog.ErrorRecord.error_type; omit scorecard and recommendations.
 - If holding VETOED, emit HoldingPacket with veto reason and limitations, no recommendation.
 
 Logged artifacts:

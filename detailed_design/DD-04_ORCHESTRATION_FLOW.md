@@ -201,10 +201,15 @@ This document defines the orchestration flow and state transitions for the syste
 4. **Portfolio Failure Impact:**
    - Portfolio-level FAILED or VETOED terminates the run and prevents holding-level evaluation outputs from being emitted except where explicitly allowed by DD-02.
    - Portfolio-level SHORT_CIRCUIT ends the run with appropriate packets reflecting short-circuit status.
-5. **PortfolioCommitteePacket Eligibility:**
+5. **Partial Failure Threshold Evaluation (R-02):**
+   - Evaluated immediately after HOLDING_EVALUATION_COMPLETE and before AGGREGATION_READY.
+   - failure_rate_pct = (failed_or_vetoed_count / total_holding_count) * 100.0 with no rounding.
+   - If failure_rate_pct > run_config.partial_failure_veto_threshold_pct ⇒ portfolio_run_outcome=VETOED.
+   - If failure_rate_pct ≤ threshold ⇒ continue toward aggregation readiness.
+6. **PortfolioCommitteePacket Eligibility:**
    - Eligible when portfolio_run_outcome is COMPLETED, VETOED, or SHORT_CIRCUITED.
    - Not eligible when portfolio_run_outcome is FAILED (FailedRunPacket only).
-6. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
+7. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
 
 ---
 
@@ -214,7 +219,8 @@ This document defines the orchestration flow and state transitions for the syste
 2. **Holding Short-Circuit Rules:**
    - A holding may be SHORT_CIRCUITED due to portfolio-level short-circuiting, or due to holding-level veto conditions.
 3. **Partial HoldingPacket Population:**
-   - When holding_run_outcome is FAILED or VETOED, HoldingPacket includes required identity fields and outcome, and omits scorecard/recommendation fields per DD-02.
+   - When holding_run_outcome is FAILED, HoldingPacket includes required identity fields, holding_run_outcome, and limitations containing an error classification entry derived from RunLog.ErrorRecord.error_type; it omits scorecard/recommendation fields per DD-02.
+   - When holding_run_outcome is VETOED, HoldingPacket includes required identity fields and outcome, and omits scorecard/recommendation fields per DD-02.
 4. **Isolation Guarantees:**
    - No holding’s outcome may mutate or invalidate another holding’s outputs; aggregation only reflects outcomes already emitted for each holding.
 

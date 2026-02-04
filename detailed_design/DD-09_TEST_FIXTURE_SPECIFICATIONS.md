@@ -41,7 +41,7 @@
 - `PortfolioSnapshot_N1` (single holding)
 - `PortfolioSnapshot_N3` (three holdings)
 - `PortfolioSnapshot_N10` (ten holdings)
-- Each snapshot includes: `portfolio_id`, `base_currency`, `as_of_date`, `holdings[]`, `cash_pct` (if applicable), and holdings `holding_id`, `ticker`/`identifier`, `weight`.
+- Each snapshot includes: `portfolio_id`, `as_of_date`, `holdings[]`, `cash_pct` (if applicable), and holdings `holding_id`, `ticker`/`identifier`, `weight`. Base currency is provided via `PortfolioConfig`.
 
 3.2 **RunConfig Fixtures**
 - `RunConfig_FAST`
@@ -76,14 +76,14 @@
 - **Given** `PortfolioSnapshot_N3`, `RunConfig_DEEP`, all seeded data present and sourced.
 - **When** orchestration executes the full run.
 - **Then** `portfolio_run_outcome=COMPLETED`, all holdings `COMPLETED`, and canonical hash generated.
-- **Minimal Required Inputs**: `portfolio_id`, `base_currency`, `holdings[]`, `run_mode=DEEP`, required seeded financials + price/volume + macro + FX with `SourceRef`.
+- **Minimal Required Inputs**: `portfolio_id`, `holdings[]`, `PortfolioConfig.base_currency`, `run_mode=DEEP`, required seeded financials + price/volume + macro + FX with `SourceRef`.
 - **Traceability**: DD-01 Schema Specifications; DD-02 Data Contracts; DD-04 Orchestration Flow; DD-05 Penalty Engine Specification; DD-07 Canonicalization Specification; DD-08 Orchestration Guards.
 
 ### TF-02 — Missing Base Currency
-- **Given** a `PortfolioSnapshot` missing `base_currency`.
+- **Given** a `PortfolioConfig` missing `base_currency` while a `PortfolioSnapshot` is present.
 - **When** validation runs.
 - **Then** portfolio is `VETOED` with DIO integrity veto; minimal outputs only (no penalties, no scores).
-- **Minimal Required Inputs**: `portfolio_id`, `holdings[]`, missing `base_currency`.
+- **Minimal Required Inputs**: `portfolio_id`, `holdings[]`, `PortfolioConfig` missing `base_currency`.
 - **Traceability**: DD-01 Schema Specifications; DD-02 Data Contracts; DD-08 Orchestration Guards.
 
 ### TF-03 — GRRA Do-Not-Trade
@@ -96,7 +96,7 @@
 ### TF-04 — Holding Identity Schema Violation
 - **Given** a portfolio with one holding missing required identity fields.
 - **When** holding validation runs.
-- **Then** the invalid holding `FAILED`, remaining holdings processed; portfolio `COMPLETED` if failure rate is under threshold.
+- **Then** the invalid holding `FAILED`, remaining holdings processed; portfolio `COMPLETED` if failure rate is under threshold; failed holding emits a minimal HoldingPacket with limitations containing an error classification entry.
 - **Minimal Required Inputs**: `PortfolioSnapshot` with >=2 holdings; one holding missing identity fields; failure threshold from `RunConfig`.
 - **Traceability**: DD-01 Schema Specifications; DD-04 Orchestration Flow; DD-08 Orchestration Guards.
 

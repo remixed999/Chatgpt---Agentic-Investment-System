@@ -102,11 +102,20 @@ This document does NOT define:
 - **Semantics:** `debug_mode` enables diagnostic logging of guard violations but MUST NOT alter outcomes or emission eligibility.  
 - **Immutability guarantees:** RunConfig is treated as read-only once emitted.  
 
+### 4.5 ConfigSnapshot Contract
+- **Producer:** Data Ingestion Layer or governance configuration service.  
+- **Consumers:** DIO, Penalty Engine, Orchestrator, Chair/Aggregator.  
+- **Required fields:** `hard_stop_field_registry`, `penalty_critical_field_registry`, `scoring_rubric_version`, `agent_prompt_versions`.  
+- **Optional fields:** None (schema is fixed per DD-01).  
+- **Scope:** Portfolio-level.  
+- **Immutability guarantees:** ConfigSnapshot is read-only once emitted.  
+
 ---
 
 ## 5. Agent Output Contracts
 
 ### Common AgentResult Contract
+- **Schema authority:** AgentResult fields are defined in DD-01; the list below is a contract summary and must match DD-01.  
 - **Required fields:** `agent_name`, `status`, `confidence`, `key_findings`, `metrics`, `suggested_penalties`, `veto_flags`.  
 - **Optional fields:** `counter_case`, `notes`.  
 - **Use of MetricValue:** All metric entries must be MetricValue objects; when `value` is present, `source_ref` is required.  
@@ -151,7 +160,7 @@ This document does NOT define:
 
 ## 6. Portfolio vs Holding Contract Interaction Rules
 
-- If a holding fails, its HoldingPacket must still include `holding_id`, `instrument`, and `holding_run_outcome`, while omitting `scorecard`, `recommendation_category`, and `position_sizing_guidance` per schema rules.  
+- If a holding fails, its HoldingPacket must still include `holding_id`, `instrument`, and `holding_run_outcome`, plus `limitations` containing an error classification entry derived from RunLog.ErrorRecord.error_type; omit `scorecard`, `recommendation_category`, and `position_sizing_guidance` per schema rules.  
 - If multiple holdings fail, `per_holding_outcomes` in the PortfolioCommitteePacket must still enumerate all holding outcomes.  
 - Portfolio-level aggregation data (`pscc_output`, `portfolio_level_metrics`, `canonical_output_hash`) is only present when `portfolio_run_outcome = COMPLETED`.  
 - Holding-level failures do not remove the holding from `portfolio_snapshot` or `holdings` lists; they only constrain which fields appear in each HoldingPacket.  
