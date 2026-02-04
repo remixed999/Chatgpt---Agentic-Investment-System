@@ -1,178 +1,164 @@
 # SCHEMA_SPECIFICATIONS.md
 
-## 1. Document Conventions
+## SECTION 1 — Document Conventions
 
 ### Purpose
-This document defines the authoritative, field-level schema specifications for the system’s core data structures during Detailed Design (DD). It is the single source of truth for requiredness, nullability, constraints, and cross-field invariants for the schemas listed in this document.
+This document defines the design-time schema specifications for the system’s data models, derived strictly from HLD v1.0 §5 (Data Models & Contracts), with a portfolio-first orientation and no implementation logic.
 
-### How to read schema tables
-Each schema includes a field table with these columns:
-- **Field**: Exact field name.
-- **Type**: Declared type from the Type System section.
-- **Required**: **Yes** if the field must be present in the object; **No** if it may be omitted.
-- **Nullable**: **Yes** if the field may explicitly be set to null; **No** if null is not permitted.
-- **Default**: The default value if any (explicitly stated). If none, use “—”.
-- **Constraints**: Allowed values, ranges, formats, or conditional requirements.
-- **Notes**: Clarifying guidance, including traceability and scope.
+### How to Read Schema Tables
+Each schema is described using a field table with the columns:
 
-### Required vs Optional vs Nullable semantics
-- **Required**: Field must appear in the object.
+- **Field** — canonical field name.
+- **Type** — design-time type or constrained type.
+- **Required** — whether the field must appear in the schema.
+- **Nullable** — whether the field may explicitly carry null when present.
+- **Default** — only if explicitly specified in HLD.
+- **Constraints** — any format or semantic limitations specified by HLD.
+- **Notes** — clarifications, including traceability.
+
+### Required vs Optional vs Nullable Semantics
+- **Required**: Field must be present in every instance.
 - **Optional**: Field may be omitted entirely.
-- **Nullable**: Field may be present with a null value. Nullability does **not** imply optionality.
+- **Nullable**: Field may be present with an explicit null value.
 
-### Null semantics
-- **Null** indicates **Unknown** only (not captured, not supplied, or not determinable).
-- **Not Applicable** must be represented explicitly and never via null.
-- **Unknown vs Not Applicable** must be unambiguous in every schema (see Type System: Availability).
+**DESIGN DECISION:** Nullable is used only where HLD explicitly permits null semantics (MetricValue.value). No other fields are nullable unless implied by HLD.
 
-### Traceability rules
-- Every schema must trace to **HLD v1.0 §5 (Data Models & Contracts)** and list applicable requirement IDs.
-- If the HLD text or requirement IDs are unavailable in the repository, this must be flagged as a **DESIGN DECISION** and traced as “TBD” pending HLD inclusion.
+### Null vs Unknown vs Not Applicable (Explicit Semantics)
+Derived from MetricValue semantic rules in HLD:
 
-### Schema versioning rules
-- Schema versions are tracked at the document level. This document represents **DD-01**.
-- Any schema change requires a new DD revision and explicit approval.
+- **Null**: `value = None` explicitly indicates absence of a value. Allowed only for MetricValue.value.
+- **Unknown/Missing**: `value = None` and `missing_reason` provided indicates unknown data and may incur penalty if critical.
+- **Not Applicable**: `not_applicable = true` indicates the metric is irrelevant for this instrument/sector; no penalty applies.
+- **Schema Violation**: `value = None` and `not_applicable = false` and `missing_reason = None`.
 
----
+### Traceability Rules to HLD v1.0 §5
+- Every schema explicitly cites relevant HLD §5 subsections.
+- No fields, defaults, or constraints may be introduced beyond those listed in HLD §5.
 
-## 2. Type System
+### Schema Versioning Rules (Document-Level Only)
+- Versioning applies only to this document (e.g., DD-01).
+- No runtime schema versioning is implied.
 
-### Primitive types
-- **String**: UTF-8 text.
-- **Boolean**: True/False.
-- **Integer**: Whole numbers.
-- **Decimal**: Fixed-point numeric with precision defined by constraints.
-- **Date**: Calendar date (no time).
-- **DateTime**: Timestamp with timezone offset.
-
-### Constrained types
-- **NonEmptyString**: String with length ≥ 1.
-- **IdentifierString**: NonEmptyString with no leading/trailing whitespace.
-- **CanonicalKey**: IdentifierString used for deduplication and canonicalization references.
-
-### Enum definitions
-- **Availability**:
-  - **KNOWN**: Value is known and present.
-  - **UNKNOWN**: Value is not known (represented as null in value-bearing fields).
-  - **NOT_APPLICABLE**: Field does not apply to the entity; must be explicit, never null.
-
-> **DESIGN DECISION:** The Availability enum is introduced to enforce the “Unknown vs Not Applicable” rule in the absence of explicit HLD guidance in the repository. Traceability is marked TBD until HLD v1.0 §5 is available locally.
-
-### Collection types
-- **Array<T>**: Ordered list of items of type T.
-- **Object**: Structured fields per schema table.
-
-### Schema composition rules
-- **Embedded** schemas are reusable objects nested inside other schemas.
-- **Portfolio-level** schemas describe the portfolio as a whole.
-- **Holding-level** schemas describe a specific holding within a portfolio.
-- **No implicit defaults**: if a field is required, it must be explicitly provided.
+**DESIGN DECISION:** Document-level versioning supports DD phase change control while preserving HLD as authoritative.
 
 ---
 
-## 3. Core Primitive Schemas
+## SECTION 2 — Type System
+
+### Primitive Types
+- `string`
+- `float`
+- `bool`
+- `datetime` (tz-aware UTC where specified)
+
+### Constrained Types
+- **CurrencyCode**: ISO currency code.
+- **CountryCode**: ISO country code.
+- **DateTimeUTC**: tz-aware UTC timestamp.
+
+### Enum Definitions
+None. HLD provides examples only and does not define closed enumerations for these schemas.
+
+### Collection Types
+- `list<T>`
+- `dict<K,V>`
+
+### Schema Composition Rules
+- **Holding-level**: Applies per holding.
+- **Embedded**: Used within other schemas.
+
+Composition:
+- InstrumentIdentity → Holding-level
+- SourceRef → Embedded
+- MetricValue → Embedded
+
+---
+
+## SECTION 3 — Core Primitive Schemas
 
 ### 3.1 InstrumentIdentity
 
-**Traces to:** HLD v1.0 §5 (Data Models & Contracts), requirement IDs TBD.
+**Description**
+Canonical identity for a holding-level instrument. Required by HLD to include ticker, exchange, and currency.
 
-**Level:** Embedded (used at Holding level, potentially Portfolio level where applicable).
-
-**Description:**
-Defines the canonical identity fields for an instrument. Provides a consistent identity across sources without implying pricing, valuation, or FX logic.
+**Scope**
+Holding-level
 
 **Field Table**
 
 | Field | Type | Required | Nullable | Default | Constraints | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| identifier_type | NonEmptyString | Yes | No | — | Must be one of the identifier types listed in HLD v1.0 §5. | Traceability pending HLD inclusion. |
-| identifier_value | IdentifierString | Yes | No | — | Must conform to the format required by identifier_type. | No leading/trailing whitespace. |
-| instrument_name | String | No | Yes | — | If present, must be descriptive and non-empty. | Null indicates unknown. |
-| display_symbol | String | No | Yes | — | If present, must be the human-readable display symbol. | Optional for non-ticker instruments. |
-| canonical_key | CanonicalKey | No | Yes | — | If present, must be stable across sources. | Canonicalization acknowledgement only; no logic specified here. |
+|-----|-----|-----|-----|-----|-----|-----|
+| ticker | string | Yes | No | — | — | Required by HLD. |
+| exchange | string | Yes | No | — | Free-form in v0.1 | Required by HLD. |
+| country | CountryCode | No | No | — | ISO country code | Optional per HLD. |
+| currency | CurrencyCode | Yes | No | — | ISO currency code | Required by HLD. |
+| isin | string | No | No | — | — | Optional per HLD. |
+| instrument_type | string | No | No | — | Examples only | Not an enum per HLD. |
+| share_class | string | No | No | — | Examples only | Optional per HLD. |
 
-**Cross-field invariants**
-- identifier_type and identifier_value must be provided together.
-- If canonical_key is present, it must map to the same instrument as identifier_type + identifier_value.
+**Cross-Field Invariants**
+- `ticker`, `exchange`, and `currency` are independently required; absence of any violates identity completeness.
 
-**DESIGN DECISIONS**
-- Identifier type enumeration is marked TBD until HLD v1.0 §5 is present in the repository.
+**Traceability**
+HLD v1.0 §5.1 (R9)
 
 ---
 
 ### 3.2 SourceRef
 
-**Traces to:** HLD v1.0 §5 (Data Models & Contracts), requirement IDs TBD.
+**Description**
+Provenance metadata for sourced data.
 
-**Level:** Embedded.
-
-**Description:**
-Represents the provenance of any sourced data point. Enforces the “no unsourced numbers” requirement.
+**Scope**
+Embedded
 
 **Field Table**
 
 | Field | Type | Required | Nullable | Default | Constraints | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| source_name | NonEmptyString | Yes | No | — | Must match an allowed source name from HLD v1.0 §5. | Traceability pending HLD inclusion. |
-| source_id | IdentifierString | No | Yes | — | If present, must be stable for the source. | Null indicates unknown. |
-| retrieval_timestamp | DateTime | Yes | No | — | Must include timezone offset. | Required for auditability. |
-| source_notes | String | No | Yes | — | Free-text notes, if provided. | Null indicates unknown. |
+|-----|-----|-----|-----|-----|-----|-----|
+| origin | string | No | No | — | Examples only | Not an enum. |
+| as_of_date | DateTimeUTC | Yes | No | — | tz-aware UTC | Required by HLD. |
+| retrieval_timestamp | DateTimeUTC | Yes | No | — | tz-aware UTC | Required by HLD. |
+| original_timezone | string | No | No | — | — | Optional. |
+| provider_name | string | No | No | — | — | Optional. |
+| provider_version | string | No | No | — | — | Optional. |
+| notes | string | No | No | — | — | Optional. |
 
-**Cross-field invariants**
-- source_name must be present for any SourceRef.
-- retrieval_timestamp must be present to ensure auditability.
+**Cross-Field Invariants**
+- `as_of_date` and `retrieval_timestamp` must always be present.
 
-**DESIGN DECISIONS**
-- Allowed source_name values are TBD pending HLD v1.0 §5 availability in the repository.
+**Traceability**
+HLD v1.0 §5.1 (R2)
 
 ---
 
 ### 3.3 MetricValue
 
-**Traces to:** HLD v1.0 §5 (Data Models & Contracts), requirement IDs TBD.
+**Description**
+Metric wrapper governing value presence, provenance, and applicability semantics.
 
-**Level:** Embedded (used at Portfolio or Holding level depending on metric context).
-
-**Description:**
-Represents a single numeric metric with explicit provenance and applicability semantics. Enforces portfolio-first design by allowing metrics at portfolio or holding scope without implying execution logic.
+**Scope**
+Embedded
 
 **Field Table**
 
 | Field | Type | Required | Nullable | Default | Constraints | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| metric_name | NonEmptyString | Yes | No | — | Must map to a metric defined in HLD v1.0 §5. | Traceability pending HLD inclusion. |
-| value | Decimal | No | Yes | — | If present, must be numeric and comply with metric-specific precision. | Null indicates unknown only. |
-| availability | Availability | Yes | No | — | Must be KNOWN, UNKNOWN, or NOT_APPLICABLE. | Enforces Unknown vs Not Applicable distinction. |
-| unit | String | No | Yes | — | Required if value is present and metric has units. | No default base currency. |
-| as_of_date | Date | No | Yes | — | If present, must be the date the metric is valid for. | Null indicates unknown. |
-| source_ref | SourceRef | No | Yes | — | Required when value is present. | Enforces “no unsourced numbers.” |
+|-----|-----|-----|-----|-----|-----|-----|
+| value | float \| string \| bool | No | Yes | — | Allowed primitives only | Null indicates unknown only. |
+| unit | string | No | No | — | Examples only | Optional per HLD. |
+| missing_reason | string | No | No | — | Required if value is null and not_applicable = false | Clarifies unknown/missing. |
+| not_applicable | bool | No | No | False | — | Default false per HLD. |
+| source_ref | SourceRef | Conditional | No | — | Required if value present | Enforces provenance. |
 
-**Cross-field invariants**
-- If availability = KNOWN, value must be present and non-null.
-- If availability = UNKNOWN, value must be null.
-- If availability = NOT_APPLICABLE, value must be null and metric_name must still be present.
-- If value is present, source_ref must be present.
-- If unit is required by the metric, it must be explicitly provided; no default base currency is assumed.
+**Cross-Field Invariants**
+- If `value` is present → `source_ref` must be present.
+- If `not_applicable = true` → no penalty applies.
+- If `value = null` and `missing_reason` is set → unknown/missing.
+- If `value = null` and `not_applicable = false` and `missing_reason = null` → schema violation (FAILED).
 
-**DESIGN DECISIONS**
-- Metric names and unit requirements are TBD pending HLD v1.0 §5 availability in the repository.
+**Traceability**
+HLD v1.0 §5.1 (R2, R3)
 
 ---
 
-## 4. Schema-Level Governance Rules
-
-### VETOED vs FAILED distinction
-- **VETOED**: A deterministic governance rule explicitly blocks an output due to a hard constraint violation.
-- **FAILED**: A process or validation cannot complete due to missing or invalid data that prevents evaluation.
-
-### Examples
-- **VETOED**: A holding violates a hard exclusion rule; output is blocked.
-- **FAILED**: A required metric is missing and cannot be sourced; evaluation halts without a determinative veto.
-
-### Precedence rules
-- **VETOED** takes precedence over **FAILED** if both could apply; a known rule violation is stronger than incompleteness.
-- **FAILED** applies only when no deterministic veto can be established due to missing information.
-
----
-
-STATUS: DD-01 COMPLETE — Awaiting approval to proceed to DD-02 (DATA_CONTRACTS.md)
+STATUS: DD-01 COMPLETE — Sections 1–3 finalized.
