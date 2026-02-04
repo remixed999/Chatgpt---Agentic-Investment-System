@@ -41,12 +41,12 @@ Trigger conditions:
 - PortfolioSnapshot, PortfolioConfig, RunConfig, seeded data fail schema validation.
 - PortfolioSnapshot provided but PortfolioConfig.base_currency missing.
 - RunConfig malformed (e.g., burn_rate_classification conflict).
-- MetricValue has value != None and missing source_ref.
+- MetricValue has value != None and missing SourceRef.
 
 Actions:
 - Schema validation failures => STOP_RUN with portfolio_run_outcome=FAILED.
 - Missing base_currency with PortfolioSnapshot => portfolio_run_outcome=VETOED (DIO).
-- MetricValue with value but no source_ref => portfolio_run_outcome=FAILED (input corruption).
+- MetricValue with value but no SourceRef => portfolio_run_outcome=FAILED (input corruption).
 
 Logged artifacts:
 - Initialize RunLog with input_snapshot_hash.
@@ -79,7 +79,7 @@ Notes:
 Scope: holding-level or portfolio-level depending on where the metric is used.
 
 Trigger conditions:
-- Any numeric metric used in scoring, penalties, caps, regime, or position sizing lacks SourceRef and is not explicitly marked as unknown or NA.
+- Any numeric metric used in scoring, penalties, caps, regime, or position sizing lacks MetricValue.SourceRef and is not explicitly marked as unknown or NA.
 - Devil’s Advocate narrative includes numeric claims without SourceRef.
 
 Actions:
@@ -90,6 +90,8 @@ Logged artifacts:
 - DIOOutput.unsourced_numbers_detected=true.
 - integrity_veto_triggered=true.
 - RunLog.ErrorRecord identifying agent_name, field, and scope.
+Notes:
+- Provenance validation operates on MetricValue.SourceRef only; AgentResult.source_refs is ignored or treated as a non-authoritative passthrough if present.
 
 ---
 

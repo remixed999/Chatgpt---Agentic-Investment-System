@@ -18,6 +18,7 @@ This document defines the orchestration flow and state transitions for the syste
 4. **Non-mutating contracts:** Inputs and agent outputs are treated as immutable once emitted; orchestration only routes and aggregates per DD-02.
 5. **Explicit short-circuiting:** When eligibility conditions are met (e.g., VETOED, FAILED, SHORT_CIRCUITED), the flow terminates deterministically with specified outputs.
 6. **Schema-locked outputs:** Orchestration may emit only the schema-defined packets and must honor presence/absence rules by run outcome.
+7. **PSCC singular execution:** PSCC executes exactly once per portfolio run after holding-level evaluation completes and before aggregation readiness.
 
 ---
 
@@ -57,7 +58,7 @@ This document defines the orchestration flow and state transitions for the syste
 
 ---
 
-### Phase 2 — Portfolio Context Evaluation (GRRA / PSCC Pre-Checks)
+### Phase 2 — Portfolio Context Evaluation (GRRA)
 **Purpose:** Establish macro regime context and portfolio pre-flight signals that may gate holding execution.
 
 **Inputs (schemas):**
@@ -89,6 +90,22 @@ This document defines the orchestration flow and state transitions for the syste
 
 ---
 
+### Phase 3B — Portfolio Structure & Concentration Controls (PSCC)
+**Purpose:** Evaluate portfolio structure and concentration caps after holding-level outputs are complete and before aggregation.
+
+**Inputs (schemas):**
+- PortfolioSnapshot
+- PortfolioConfig
+- Holding-level outputs (read-only)
+
+**Outputs (schemas):**
+- PSCCOutput
+- RunLog (updated)
+
+**Eligible outcomes:** CONTINUE / FAIL
+
+---
+
 ### Phase 4 — Risk Aggregation
 **Purpose:** Aggregate holding-level risk and portfolio context into a portfolio-level risk view.
 
@@ -96,7 +113,7 @@ This document defines the orchestration flow and state transitions for the syste
 - PortfolioSnapshot
 - PortfolioConfig
 - GRRAOutput
-- PSCCOutput (if available)
+- PSCCOutput
 - Holding-level outputs and outcomes
 
 **Outputs (schemas):**
@@ -180,13 +197,14 @@ This document defines the orchestration flow and state transitions for the syste
 
 1. **Portfolio Intake Order:** PortfolioSnapshot → PortfolioConfig → RunConfig are required before any portfolio-level agent runs.
 2. **Portfolio-Level Agents:** DIO (portfolio integrity) and GRRA (macro regime) are evaluated before holding-level agents.
-3. **Portfolio Failure Impact:**
+3. **PSCC Timing:** PSCC executes once after all holding-level analytical outputs are complete and before any aggregation; aggregation cannot proceed until PSCCOutput is available.
+4. **Portfolio Failure Impact:**
    - Portfolio-level FAILED or VETOED terminates the run and prevents holding-level evaluation outputs from being emitted except where explicitly allowed by DD-02.
    - Portfolio-level SHORT_CIRCUIT ends the run with appropriate packets reflecting short-circuit status.
-4. **PortfolioCommitteePacket Eligibility:**
+5. **PortfolioCommitteePacket Eligibility:**
    - Eligible when portfolio_run_outcome is COMPLETED, VETOED, or SHORT_CIRCUITED.
    - Not eligible when portfolio_run_outcome is FAILED (FailedRunPacket only).
-5. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
+6. **Per-Holding Outcomes:** PortfolioCommitteePacket must enumerate per_holding_outcomes even when holdings are failed or vetoed.
 
 ---
 

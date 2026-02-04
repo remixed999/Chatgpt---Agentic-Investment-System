@@ -60,12 +60,14 @@ Transitions are evaluated in the order defined below; the first applicable termi
 
 5. **HOLDING_EVALUATION_IN_PROGRESS → HOLDING_EVALUATION_COMPLETE**
    - Trigger: All holdings have reached terminal holding outcomes.
-   - Failure path: portfolio-critical agent crash (GRRA/PSCC) → **FAILED**.
+   - Failure path: portfolio-critical agent crash (GRRA) → **FAILED**.
 
 6. **HOLDING_EVALUATION_COMPLETE → AGGREGATION_READY**
-   - Trigger: All per-holding outcomes recorded; aggregation inputs available.
+   - Trigger: All per-holding outcomes recorded; PSCC executed exactly once; aggregation inputs available.
+   - Partial failure gate: evaluate `run_config.partial_failure_veto_threshold_pct` before aggregation readiness; if exceeded → **VETOED** and aggregation is skipped.
    - Veto path: portfolio-level veto detected post-holding evaluation (Risk Officer veto) → **VETOED**.
-   - Failure path: aggregation inputs invalid → **FAILED**.
+   - Failure path: PSCC failure or aggregation inputs invalid → **FAILED**.
+   - Sequencing note: PSCC runs after holding evaluation and before aggregation; final outcome resolution only occurs after aggregation and finalization.
 
 7. **AGGREGATION_READY → FINALIZATION_READY**
    - Trigger: Aggregation outputs ready and consistent.
@@ -123,6 +125,7 @@ Terminal states map to output eligibility as follows:
 - **Hard-stops beat penalties:** once a hard-stop veto is triggered, penalties are not applied.
 - **Portfolio-first:** portfolio terminal outcome gates final emissions; holdings inherit portfolio short-circuit where applicable.
 - **Single authoritative outcome:** exactly one terminal outcome per portfolio run and per holding.
+- **PSCC singular execution:** PSCC executes exactly once per portfolio run during HOLDING_EVALUATION_COMPLETE → AGGREGATION_READY, before aggregation and final outcome resolution.
 
 ---
 

@@ -23,13 +23,16 @@ All agents MUST emit the common **AgentResult** envelope. This wrapper is requir
 - **outputs**: agent-specific payload only
 - **veto_flags**: advisory-only flags (if applicable)
 - **limitations**: explicit known limitations or gaps
-- **source_refs**: required when any numeric value appears in outputs
+
+**Deprecated field (non-authoritative):**
+- **source_refs**: optional passthrough only; if present, it MUST mirror MetricValue.SourceRef entries and MUST NOT be treated as authoritative provenance.
 
 ### 2.2 Envelope Invariants
 - Agents **never emit final scores**.
 - Agents **never apply penalties**.
 - Agents **never override governance** (veto/short-circuit/caps are enforced elsewhere).
-- Any numeric value in `outputs` requires traceable provenance via `source_refs`.
+- Any numeric value in `outputs` requires traceable provenance via **MetricValue.SourceRef**.
+- `source_refs` is deprecated and non-authoritative; provenance validation is based solely on MetricValue.SourceRef.
 
 ---
 
@@ -154,7 +157,7 @@ Each agent below MUST conform to the AgentResult envelope and provide the explic
 ## 6. Determinism Rules
 - Identical inputs MUST yield identical AgentResult outputs.
 - Ordering of lists or dictionaries MUST NOT alter meaning.
-- All numeric outputs MUST be sourced via `source_refs` or explicitly marked unknown/not_applicable.
+- All numeric outputs MUST be sourced via MetricValue.SourceRef or explicitly marked unknown/not_applicable.
 - If a numeric value lacks provenance, it must be flagged as unsourced (no invented numbers).
 
 ---

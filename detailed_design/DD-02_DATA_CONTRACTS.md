@@ -94,6 +94,14 @@ This document does NOT define:
 - **Holding-level isolation rules:** Each holding is evaluated independently; holding-level outputs must reference their own `holding_id` and `instrument` without dependency on other holdings.  
 - **Identity completeness guarantees:** `ticker`, `exchange`, and `currency` are required for every holding; missing any of these fields constitutes a technical failure (holding_run_outcome=FAILED) per the Outcome Classification Rule below.  
 
+### 4.4 RunConfig Contract
+- **Producer:** Data Ingestion Layer.  
+- **Consumers:** Orchestrator, Chair/Aggregator, guards, and governance layers.  
+- **Required fields:** `run_mode` and any thresholds or caps referenced by guards (e.g., penalty caps, staleness thresholds, `partial_failure_veto_threshold_pct`).  
+- **Optional fields:** `debug_mode` (boolean).  
+- **Semantics:** `debug_mode` enables diagnostic logging of guard violations but MUST NOT alter outcomes or emission eligibility.  
+- **Immutability guarantees:** RunConfig is treated as read-only once emitted.  
+
 ---
 
 ## 5. Agent Output Contracts
@@ -102,7 +110,7 @@ This document does NOT define:
 - **Required fields:** `agent_name`, `status`, `confidence`, `key_findings`, `metrics`, `suggested_penalties`, `veto_flags`.  
 - **Optional fields:** `counter_case`, `notes`.  
 - **Use of MetricValue:** All metric entries must be MetricValue objects; when `value` is present, `source_ref` is required.  
-- **Provenance guarantees:** MetricValue enforces provenance via SourceRef when a value is present; missing provenance is a contract violation.  
+- **Provenance guarantees:** MetricValue enforces provenance via SourceRef when a value is present; missing provenance is a contract violation. MetricValue.SourceRef is the single authoritative provenance structure.  
 - **Prohibited behaviors:** Agents must not introduce fields outside the schema or populate MetricValue.value without an accompanying SourceRef.  
 
 ### Agent-Specific Output Constraints
