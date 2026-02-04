@@ -177,6 +177,13 @@ A `run_hash` MUST be computed as the SHA-256 of:
 ```
 The composite hash binds the run to all decision-significant inputs and outputs.
 
+### 6.4 Non-Completed Outcomes (VETOED / FAILED / SHORT_CIRCUITED)
+- Canonical payloads MAY be constructed for validation and replay using the same ordering rules.
+- Emitted hashes:
+  - `snapshot_hash`, `config_hash`, and `run_config_hash` MAY be recorded for auditability.
+  - `committee_packet_hash`, `decision_hash`, and `run_hash` MUST be withheld unless `portfolio_run_outcome=COMPLETED`.
+- If a minimal PortfolioCommitteePacket is emitted for VETOED or SHORT_CIRCUITED runs, it is still canonicalizable, but its hashes are not emitted.
+
 ---
 
 ## 7. Replay Invariants
