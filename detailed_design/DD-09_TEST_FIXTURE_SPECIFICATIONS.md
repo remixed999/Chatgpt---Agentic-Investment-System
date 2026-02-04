@@ -1,4 +1,4 @@
-# DD-08 — Test Fixture Specifications
+# DD-09 — Test Fixture Specifications
 
 ## 1. Purpose & Scope
 1.1 This document defines deterministic, portfolio-first test fixtures used for unit and integration tests across the orchestration, governance, penalty, and canonicalization subsystems.

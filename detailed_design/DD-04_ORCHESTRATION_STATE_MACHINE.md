@@ -1,4 +1,4 @@
-# DD-03 Orchestration State Machine
+# DD-04 Orchestration State Machine
 
 Placeholder for the orchestration state machine specification.
 
