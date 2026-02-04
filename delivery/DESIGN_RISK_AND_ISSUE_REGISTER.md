@@ -1,204 +1,91 @@
 # Design Risk and Issue Register
 
 ## 1. Purpose
-This document provides a formal design assurance review of the Detailed Design phase. It records design risks and design issues observed across the detailed design artefacts and identifies required design actions to preserve determinism, governance precedence, portfolio-first consistency, and auditability.
+This document represents a **post-remediation design assurance review** of the Detailed Design artefacts. It provides a clean, current snapshot of residual design risks and design issues based solely on the present DD documentation set.
 
 ## 2. Design Risk Register
 
 ### R-01
-Risk ID: R-01
-Description: The orchestration state machine specification is a placeholder, creating a material gap in deterministic transition definitions and terminal outcome handling across portfolio and holding scopes.
-Affected DD file(s): DD-04_ORCHESTRATION_STATE_MACHINE.md
-Likelihood: High
-Impact: High
-Risk Rating: High, because the absence of a defined state machine directly undermines deterministic and reproducible orchestration behavior.
-Mitigation Strategy: Replace the placeholder with a complete state machine definition aligned to the orchestration flow, including explicit transitions, terminal outcomes, and mapping to output eligibility.
-Residual Risk after mitigation: Medium, because alignment across multiple DDs still requires verification.
-Status: RESOLVED
-Resolution Notes: Added the deterministic orchestration state machine specification aligned to DD-04 flow, outcomes, and emission rules in DD-04_ORCHESTRATION_STATE_MACHINE.md.
+**Risk ID:** R-01  
+**Description:** The orchestration flow references PSCC “pre-checks,” yet the phase outputs do not explicitly include PSCC output production, leaving execution timing and dependency ordering ambiguous for portfolio-level concentration checks.  
+**Affected DD file(s):** DD-04_ORCHESTRATION_FLOW.md; DD-04_ORCHESTRATION_STATE_MACHINE.md; DD-03_AGENT_INTERFACE_CONTRACTS.md; DD-02_DATA_CONTRACTS.md  
+**Likelihood:** Medium  
+**Impact:** Medium  
+**Risk Rating:** Medium, because ambiguity in PSCC execution timing can cause inconsistent portfolio-level enforcement in implementation.  
+**Mitigation Strategy:** Clarify in DD-04 the explicit phase and output ownership for PSCC (input prerequisites, output emission timing, and gating relationship to aggregation).  
+**Status:** OPEN  
+**Residual Risk Commentary:** Until PSCC timing is explicitly anchored, orchestration correctness remains susceptible to divergent implementations.
 
 ### R-02
-Risk ID: R-02
-Description: Governance precedence and outcome eligibility are defined across multiple DD documents without a single consolidated reconciliation point, increasing the risk of inconsistent enforcement across guards, governance rules, and orchestration flow.
-Affected DD file(s): DD-04_ORCHESTRATION_FLOW.md, DD-06_GOVERNANCE_RULES.md, DD-08_ORCHESTRATION_GUARDS.md
-Likelihood: Medium
-Impact: High
-Risk Rating: High, due to the criticality of precedence order and the number of documents defining enforcement behavior.
-Mitigation Strategy: Introduce a cross-DD precedence reconciliation section that explicitly maps guard actions to governance rules and orchestration terminal outcomes, and require conformance checks in acceptance criteria.
-Residual Risk after mitigation: Medium.
-Status: RESOLVED
-Resolution Notes: Added cross-DD governance reconciliation, precedence stack, and deterministic ordering rules in DD-06_GOVERNANCE_RULES.md with explicit references to DD-04, DD-07, and DD-08.
+**Risk ID:** R-02  
+**Description:** Provenance requirements are specified both as MetricValue.SourceRef (DD-01/DD-02) and as AgentResult-level `source_refs` (DD-03), which risks inconsistent provenance enforcement across guards and agents.  
+**Affected DD file(s):** DD-01_SCHEMA_SPECIFICATIONS.md; DD-02_DATA_CONTRACTS.md; DD-03_AGENT_INTERFACE_CONTRACTS.md; DD-08_ORCHESTRATION_GUARDS.md  
+**Likelihood:** Medium  
+**Impact:** High  
+**Risk Rating:** High, because provenance is a core governance control and any ambiguity may permit unsourced numeric values to pass guard checks.  
+**Mitigation Strategy:** Consolidate provenance requirements by specifying a single authoritative provenance structure (preferably MetricValue.SourceRef) and explicitly mapping or deprecating any secondary `source_refs` wrapper in DD-03.  
+**Status:** OPEN  
+**Residual Risk Commentary:** Until provenance ownership is unified, guard enforcement risks inconsistent interpretation across components.
 
 ### R-03
-Risk ID: R-03
-Description: Ambiguities in VETOED versus FAILED handling at holding scope may cause inconsistent governance outcomes and undermine reproducibility of per-holding results.
-Affected DD file(s): DD-02_DATA_CONTRACTS.md, DD-04_ORCHESTRATION_FLOW.md, DD-08_ORCHESTRATION_GUARDS.md
-Likelihood: Medium
-Impact: High
-Risk Rating: High, because ambiguous outcome classification affects the core governance model and downstream packet eligibility.
-Mitigation Strategy: Align contract failure semantics and guard actions to a single authoritative rule set that clearly distinguishes VETOED from FAILED for identity and schema violations.
-Residual Risk after mitigation: Low to Medium.
-Status: RESOLVED
-Resolution Notes: Standardized identity/base_currency outcome classification in DD-02, aligned DD-08 G1 and DD-04 orchestration flow wording.
+**Risk ID:** R-03  
+**Description:** Canonicalization is defined as mandatory for decision-significant outputs, while guard rules restrict canonical output hashing to COMPLETED runs; the interplay for non-completed outcomes is not explicitly reconciled, which may lead to inconsistent hashing expectations.  
+**Affected DD file(s):** DD-07_CANONICALIZATION_SPEC.md; DD-08_ORCHESTRATION_GUARDS.md; DD-04_ORCHESTRATION_FLOW.md  
+**Likelihood:** Low  
+**Impact:** Medium  
+**Risk Rating:** Low to Medium, because ambiguity may surface during audit or replay validation for VETOED/FAILED outcomes.  
+**Mitigation Strategy:** Add an explicit statement in DD-07 or DD-08 clarifying canonicalization expectations for non-COMPLETED outcomes (e.g., whether canonical payloads are constructed but hashes are withheld).  
+**Status:** OPEN  
+**Residual Risk Commentary:** Without explicit guidance, replay tooling may diverge on handling of non-completed runs.
 
 ### R-04
-Risk ID: R-04
-Description: Canonicalization and hashing requirements are specified, but several documents reference inconsistent DD identifiers and versions, creating a risk of non-compliant implementation and audit traceability errors.
-Affected DD file(s): DD-07_CANONICALIZATION_SPEC.md, DD-09_TEST_FIXTURE_SPECIFICATIONS.md
-Likelihood: Medium
-Impact: Medium
-Risk Rating: Medium, because inconsistent references can lead to implementation drift and test coverage gaps.
-Mitigation Strategy: Normalize DD numbering references and version identifiers across all documents; add explicit reference mapping in DD-09 test fixtures.
-Residual Risk after mitigation: Low.
-Status: RESOLVED
-Resolution Notes: Corrected DD-07 versioning and updated DD-09 traceability to canonical DD identifiers.
+**Risk ID:** R-04  
+**Description:** Partial portfolio failure thresholds are defined as a RunConfig field in guards and fixtures, but the state machine does not explicitly indicate where threshold evaluation occurs in the transition sequence.  
+**Affected DD file(s):** DD-08_ORCHESTRATION_GUARDS.md; DD-09_TEST_FIXTURE_SPECIFICATIONS.md; DD-04_ORCHESTRATION_STATE_MACHINE.md  
+**Likelihood:** Medium  
+**Impact:** Medium  
+**Risk Rating:** Medium, as transition ambiguity can cause divergent interpretations of when VETOED outcomes are applied at portfolio scope.  
+**Mitigation Strategy:** Annotate the portfolio-level state transition where partial failure threshold evaluation is applied and how it interacts with aggregation readiness.  
+**Status:** OPEN  
+**Residual Risk Commentary:** The threshold logic is defined but not fully anchored to a specific state transition.
 
 ### R-05
-Risk ID: R-05
-Description: Partial portfolio run thresholds are defined as a fixed percentage without a stable configuration reference, creating uncertainty in governance enforcement and testability across run modes.
-Affected DD file(s): DD-08_ORCHESTRATION_GUARDS.md, DD-09_TEST_FIXTURE_SPECIFICATIONS.md
-Likelihood: Medium
-Impact: Medium
-Risk Rating: Medium, because the threshold affects portfolio-level outcomes and determinism across runs.
-Mitigation Strategy: Explicitly bind the threshold to a RunConfig field or ConfigSnapshot registry and ensure deterministic default values are recorded.
-Residual Risk after mitigation: Low.
-Status: RESOLVED
-Resolution Notes: Bound the partial failure threshold to run_config.partial_failure_veto_threshold_pct with default 30.0 in DD-08 and referenced in DD-09 fixtures.
-
-### R-06
-Risk ID: R-06
-Description: Agent execution ordering rules are defined in guards but are not explicitly harmonized with orchestration flow phases, increasing the risk of non-deterministic execution paths.
-Affected DD file(s): DD-04_ORCHESTRATION_FLOW.md, DD-08_ORCHESTRATION_GUARDS.md
-Likelihood: Medium
-Impact: Medium
-Risk Rating: Medium, due to potential ordering-induced divergence in outputs.
-Mitigation Strategy: Add explicit ordering requirements to the orchestration flow phase definitions and align with canonicalization ordering rules.
-Residual Risk after mitigation: Low.
-Status: RESOLVED
-Resolution Notes: Reinforced deterministic ordering in DD-06 reconciliation section and DD-04 orchestration state machine; aligned guard references in DD-08.
+**Risk ID:** R-05  
+**Description:** Test fixtures introduce a `debug_mode` field in RunConfig without an explicit schema definition in the data contracts, risking non-deterministic test interpretation and mismatched implementation expectations.  
+**Affected DD file(s):** DD-09_TEST_FIXTURE_SPECIFICATIONS.md; DD-02_DATA_CONTRACTS.md  
+**Likelihood:** Medium  
+**Impact:** Medium  
+**Risk Rating:** Medium, because fixture-driven tests may diverge from authoritative contracts.  
+**Mitigation Strategy:** Either define `debug_mode` explicitly in RunConfig contracts or remove it from fixture requirements if it is not a supported design field.  
+**Status:** OPEN  
+**Residual Risk Commentary:** Until aligned, testability and contract conformance remain at risk.
 
 ## 3. Design Issue Log
 
 ### I-01
-Issue ID: I-01
-Description: The orchestration state machine document is a placeholder and does not contain the required state machine definition.
-Affected DD file(s): DD-04_ORCHESTRATION_STATE_MACHINE.md
-Severity: High
-Root Cause: Incomplete document content.
-Recommended Design Fix: Provide a full state machine specification that maps to the orchestration flow phases and outcome eligibility matrix.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Replaced the placeholder state machine with a complete, deterministic specification in DD-04_ORCHESTRATION_STATE_MACHINE.md.
+**Issue ID:** I-01  
+**Description:** `RunConfig.debug_mode` is referenced in the test fixture specification but is not defined in the data contracts or schema specifications.  
+**Affected DD file(s):** DD-09_TEST_FIXTURE_SPECIFICATIONS.md; DD-02_DATA_CONTRACTS.md  
+**Severity:** Medium  
+**Root Cause:** Fixture specification not aligned to RunConfig contract definition.  
+**Resolution Status:** OPEN  
+**Notes:** The fixture expectations cannot be validated against the current contract scope until the field is either defined or removed.
 
 ### I-02
-Issue ID: I-02
-Description: Holding identity missing fields are treated as VETO-eligible in data contracts, but as FAILED in orchestration guards, creating a direct conflict in outcome semantics.
-Affected DD file(s): DD-02_DATA_CONTRACTS.md, DD-08_ORCHESTRATION_GUARDS.md
-Severity: High
-Root Cause: Conflicting outcome classification rules across documents.
-Recommended Design Fix: Standardize identity field omissions to a single outcome classification and update guard actions and contract failure semantics accordingly.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Added authoritative outcome classification rule in DD-02 and aligned G1 in DD-08 plus DD-04 orchestration flow wording.
+**Issue ID:** I-02  
+**Description:** PSCC output production timing is not explicitly defined in the orchestration flow phases, despite being referenced as a portfolio-level output in later aggregation steps.  
+**Affected DD file(s):** DD-04_ORCHESTRATION_FLOW.md; DD-04_ORCHESTRATION_STATE_MACHINE.md  
+**Severity:** Medium  
+**Root Cause:** Orchestration phase outputs do not enumerate PSCC output production, creating a sequencing gap.  
+**Resolution Status:** OPEN  
+**Notes:** Without explicit timing, orchestration implementations may schedule PSCC inconsistently.
 
-### I-03
-Issue ID: I-03
-Description: Governance rules reference the penalty engine as DD-04, while the penalty specification is DD-05, creating an authoritative reference mismatch.
-Affected DD file(s): DD-06_GOVERNANCE_RULES.md, DD-05_PENALTY_ENGINE_SPEC.md
-Severity: Medium
-Root Cause: Document numbering drift.
-Recommended Design Fix: Correct references to the penalty engine specification and verify all cross-DD references.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Corrected penalty engine references to DD-05 in DD-06 and updated traceability where needed.
-
-### I-04
-Issue ID: I-04
-Description: The canonicalization specification declares versioning as DD-06 v1.0 while the file is DD-07, creating traceability ambiguity.
-Affected DD file(s): DD-07_CANONICALIZATION_SPEC.md
-Severity: Medium
-Root Cause: Inconsistent document version labeling.
-Recommended Design Fix: Align the version reference with the correct DD identifier and update downstream references.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Corrected DD-07 version statement to DD-07 v1.0 in DD-07_CANONICALIZATION_SPEC.md.
-
-### I-05
-Issue ID: I-05
-Description: The orchestration guards document header states DD-07, conflicting with its file name and with references from other documents.
-Affected DD file(s): DD-08_ORCHESTRATION_GUARDS.md
-Severity: Medium
-Root Cause: Document header not aligned to file identity.
-Recommended Design Fix: Update the document header and references to reflect the correct DD number and maintain consistent traceability.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Updated DD-08 header to match filename and ensured internal references align to DD-08.
-
-### I-06
-Issue ID: I-06
-Description: The orchestration flow document status references a transition to DD-04 state and audit, which is inconsistent with the current file naming and sequence.
-Affected DD file(s): DD-04_ORCHESTRATION_FLOW.md
-Severity: Low
-Root Cause: Status metadata not updated after document restructuring.
-Recommended Design Fix: Correct the status line to reflect the accurate next-phase document and naming.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Corrected DD-04 orchestration flow status line to reference DD-04_ORCHESTRATION_STATE_MACHINE.md.
-
-### I-07
-Issue ID: I-07
-Description: Test fixture traceability references incorrect DD identifiers for orchestration flow, penalty engine, canonicalization, and guards, creating a risk of test coverage misalignment.
-Affected DD file(s): DD-09_TEST_FIXTURE_SPECIFICATIONS.md
-Severity: Medium
-Root Cause: Traceability section not synchronized with DD numbering.
-Recommended Design Fix: Update traceability references to the correct DD document identifiers to preserve auditability.
-Requires DD Change: Yes
-Status: RESOLVED
-Resolution Notes: Updated DD-09 test matrix traceability to correct DD identifiers and filenames.
-
-## 4. Required Design Actions
-
-1. File name: DD-04_ORCHESTRATION_STATE_MACHINE.md
-   Section reference: Entire document
-   Summary of required change: Replace placeholder with the complete state machine definition aligned to DD-04 orchestration flow and output eligibility.
-
-2. File name: DD-02_DATA_CONTRACTS.md
-   Section reference: Contract Failure Semantics and Holding Input Contract
-   Summary of required change: Align identity field omission outcomes with guard definitions to eliminate VETOED versus FAILED conflicts.
-
-3. File name: DD-08_ORCHESTRATION_GUARDS.md
-   Section reference: G1 Identity & Portfolio Context Guards
-   Summary of required change: Harmonize identity failure outcomes with DD-02 and orchestration flow to ensure consistent governance classification.
-
-4. File name: DD-06_GOVERNANCE_RULES.md
-   Section reference: Penalty Governance Integration and precedence references
-   Summary of required change: Correct references to the penalty engine specification and ensure the precedence order references the correct DD identifier.
-
-5. File name: DD-07_CANONICALIZATION_SPEC.md
-   Section reference: Versioning
-   Summary of required change: Correct the DD identifier in the versioning statement and align with current document numbering.
-
-6. File name: DD-08_ORCHESTRATION_GUARDS.md
-   Section reference: Document header
-   Summary of required change: Update the header to reflect the correct DD identifier for orchestration guards.
-
-7. File name: DD-04_ORCHESTRATION_FLOW.md
-   Section reference: Status
-   Summary of required change: Correct the status line to reflect accurate document sequencing.
-
-8. File name: DD-09_TEST_FIXTURE_SPECIFICATIONS.md
-   Section reference: Traceability references in test matrix
-   Summary of required change: Update DD identifiers to reflect the correct sources for orchestration flow, penalty engine, canonicalization, and guards.
-
-9. File name: DD-08_ORCHESTRATION_GUARDS.md
-   Section reference: G9 Partial Portfolio Run Guards
-   Summary of required change: Bind the 30% threshold to a named RunConfig or registry field and define deterministic defaults.
+## 4. Accepted Risks
+No risks are explicitly accepted in this review. All listed risks remain OPEN pending design clarification.
 
 ## 5. Assurance Summary
-Overall design risk posture: Low to Medium. The design establishes strong governance and determinism principles, and the previously identified documentation inconsistencies and missing specification have been resolved.
-
-Key strengths of the design: The portfolio-first model, explicit governance precedence, and deterministic canonicalization and penalty policies are clearly articulated, which supports auditability and reproducibility when implemented as specified.
-
-Key remaining concerns: Confirm implementation conformance to the updated DD references and deterministic ordering rules during build-out and validation.
-
-Assumptions made during assessment: The assessment assumes HLD v1.0 is authoritative, and that all DD documents are intended to be internally consistent and cross-referenced by their file names.
+**Overall design risk posture:** Medium.  
+**Confidence level in proceeding to implementation:** Moderate, contingent on resolving the identified orchestration and contract ambiguities.  
+**Key strengths after remediation:** The DD set is internally consistent on governance precedence, determinism mandates, and portfolio-first orchestration principles.  
+**Remaining concerns:** Provenance ownership, PSCC sequencing, and fixture/contract alignment require clarification to avoid inconsistent implementations.  
+**Explicit assumptions:** This review assumes HLD v1.0 remains authoritative and that no external schema extensions exist beyond the DD artefacts reviewed.
