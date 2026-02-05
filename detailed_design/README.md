@@ -37,3 +37,26 @@ Each document maps directly to the High Level Design (HLD) and task plan.
 - File numbering reflects **design authority order**, not creation order.
 - Supporting documents (e.g. orchestration flow) intentionally share a DD number suffix.
 - Content was preserved exactly during renaming.
+
+---
+
+## IMP-01 Skeleton (Foundation)
+
+This repository includes an IMP-01 orchestration skeleton that enforces schema validation, release manifest hash checks, and G0/G1 guard scaffolding. It produces RunLog and FailedRunPacket outputs for FAILED or VETOED outcomes but does not execute agents, penalties, aggregation, or canonical hashing.
+
+### Run the skeleton CLI
+
+```bash
+python -m src.cli.run \
+  --snapshot fixtures/portfolio_snapshot.json \
+  --portfolio_config fixtures/portfolio_config.json \
+  --run_config fixtures/run_config.json \
+  --config_snapshot fixtures/config_snapshot.json \
+  --manifest config/release_manifest.json
+```
+
+### Run tests
+
+```bash
+pytest
+```
