@@ -9,3 +9,31 @@ This repository contains a design-first, portfolio-level agentic investment syst
 - `directives/`: SOP-style directives, including environment setup
 - `delivery/`: Project management and delivery artifacts
 - `notes/`: Design decision logs
+
+## Determinism & Canonicalization (IMP-02)
+
+Canonicalization and hashing are applied to decision-significant payloads prior to hash emission. The canonicalizer enforces:
+
+- UTF-8 JSON encoding with sorted keys and no whitespace.
+- Deterministic ordering for collections:
+  - Holdings sorted by `holding_id`.
+  - Agent outputs sorted by `agent_name`.
+  - Penalty items sorted by `category`, then `reason`, then `source_agent`.
+  - Veto logs sorted by `sequence_number`, `agent_name`, `rule_id`; if any veto log lacks `sequence_number`, veto logs are excluded from canonical hashes.
+- Stable numeric formatting (ints without decimals, floats without exponent notation or trailing zeros).
+
+Excluded fields from canonical hashes:
+
+- `run_id`
+- Runtime timestamps such as `generated_at` and `retrieval_timestamp`
+- Narrative text fields such as `notes`, `disclaimers`, and `limitations`
+
+Hashes are emitted only when the portfolio run outcome is `COMPLETED`. Failed, vetoed, or short-circuited runs omit hash fields entirely.
+
+### Replay validation tests
+
+To run hash stability/replay validation tests:
+
+```bash
+pytest
+```
