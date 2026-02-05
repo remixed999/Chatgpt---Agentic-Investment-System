@@ -559,6 +559,8 @@ class RunConfig:
     burn_rate_classification: Mapping[str, BurnRateClassification]
     staleness_thresholds: StalenessThresholds
     penalty_caps: PenaltyCaps
+    partial_failure_veto_threshold_pct: float = 30.0
+    debug_mode: bool = False
     custom_overrides: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self) -> None:
@@ -599,5 +601,204 @@ class RunConfig:
             penalty_caps=PenaltyCaps.from_dict(
                 _ensure_mapping(data["penalty_caps"], "penalty_caps")
             ),
+            partial_failure_veto_threshold_pct=_ensure_float(
+                data.get("partial_failure_veto_threshold_pct", 30.0),
+                "partial_failure_veto_threshold_pct",
+            ),
+            debug_mode=_ensure_bool(data.get("debug_mode", False), "debug_mode"),
             custom_overrides=custom_overrides,
         )
+
+
+@dataclass(frozen=True)
+class StalenessFlag:
+    data_category: str
+    age_days: float
+    hard_stop_triggered: bool
+    penalty_triggered: bool
+
+
+@dataclass(frozen=True)
+class DIOOutput:
+    agent_name: str
+    status: str
+    confidence: float
+    key_findings: Mapping[str, Any]
+    metrics: Tuple[MetricValue, ...]
+    suggested_penalties: Tuple[PenaltyItem, ...]
+    veto_flags: Tuple[str, ...]
+    missing_hard_stop_fields: Tuple[str, ...]
+    missing_penalty_critical_fields: Tuple[str, ...]
+    staleness_flags: Tuple[StalenessFlag, ...]
+    contradictions: Tuple[str, ...]
+    unsourced_numbers_detected: bool
+    corporate_action_risk: Tuple[str, ...]
+    integrity_veto_triggered: bool = False
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "DIOOutput":
+        _require_fields(
+            data,
+            [
+                "agent_name",
+                "status",
+                "confidence",
+                "key_findings",
+                "metrics",
+                "suggested_penalties",
+                "veto_flags",
+                "missing_hard_stop_fields",
+                "missing_penalty_critical_fields",
+                "staleness_flags",
+                "contradictions",
+                "unsourced_numbers_detected",
+                "corporate_action_risk",
+            ],
+            "DIOOutput",
+        )
+        metrics = tuple(
+            MetricValue.from_dict(_ensure_mapping(item, "MetricValue"))
+            for item in _ensure_sequence(data["metrics"], "metrics")
+        )
+        suggested_penalties = tuple(
+            PenaltyItem.from_dict(_ensure_mapping(item, "PenaltyItem"))
+            for item in _ensure_sequence(data["suggested_penalties"], "suggested_penalties")
+        )
+        veto_flags = tuple(
+            _ensure_str(item, "veto_flags")
+            for item in _ensure_sequence(data["veto_flags"], "veto_flags")
+        )
+        staleness_flags = tuple(
+            StalenessFlag(
+                data_category=_ensure_str(item["data_category"], "data_category"),
+                age_days=float(item["age_days"]),
+                hard_stop_triggered=bool(item["hard_stop_triggered"]),
+                penalty_triggered=bool(item["penalty_triggered"]),
+            )
+            for item in _ensure_sequence(data["staleness_flags"], "staleness_flags")
+        )
+        return cls(
+            agent_name=_ensure_str(data["agent_name"], "agent_name"),
+            status=_ensure_str(data["status"], "status"),
+            confidence=_ensure_float(data["confidence"], "confidence"),
+            key_findings=_freeze_mapping(_ensure_mapping(data["key_findings"], "key_findings")),
+            metrics=metrics,
+            suggested_penalties=suggested_penalties,
+            veto_flags=veto_flags,
+            missing_hard_stop_fields=_freeze_sequence(
+                _ensure_sequence(data["missing_hard_stop_fields"], "missing_hard_stop_fields")
+            ),
+            missing_penalty_critical_fields=_freeze_sequence(
+                _ensure_sequence(
+                    data["missing_penalty_critical_fields"], "missing_penalty_critical_fields"
+                )
+            ),
+            staleness_flags=staleness_flags,
+            contradictions=_freeze_sequence(
+                _ensure_sequence(data["contradictions"], "contradictions")
+            ),
+            unsourced_numbers_detected=_ensure_bool(
+                data["unsourced_numbers_detected"], "unsourced_numbers_detected"
+            ),
+            corporate_action_risk=_freeze_sequence(
+                _ensure_sequence(data["corporate_action_risk"], "corporate_action_risk")
+            ),
+            integrity_veto_triggered=_ensure_bool(
+                data.get("integrity_veto_triggered", False), "integrity_veto_triggered"
+            ),
+            counter_case=data.get("counter_case"),
+            notes=data.get("notes"),
+        )
+
+
+@dataclass(frozen=True)
+class GRRAOutput:
+    agent_name: str
+    status: str
+    confidence: float
+    key_findings: Mapping[str, Any]
+    metrics: Tuple[MetricValue, ...]
+    suggested_penalties: Tuple[PenaltyItem, ...]
+    veto_flags: Tuple[str, ...]
+    regime_label: Optional[str]
+    regime_confidence: Optional[float]
+    do_not_trade_flag: bool
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class LEFOOutput:
+    agent_name: str
+    status: str
+    confidence: float
+    key_findings: Mapping[str, Any]
+    metrics: Tuple[MetricValue, ...]
+    suggested_penalties: Tuple[PenaltyItem, ...]
+    veto_flags: Tuple[str, ...]
+    liquidity_grade: Optional[int]
+    hard_override_flags: Tuple[str, ...]
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class PSCCOutput:
+    agent_name: str
+    status: str
+    confidence: float
+    key_findings: Mapping[str, Any]
+    metrics: Tuple[MetricValue, ...]
+    suggested_penalties: Tuple[PenaltyItem, ...]
+    veto_flags: Tuple[str, ...]
+    concentration_breaches: Tuple[str, ...]
+    fx_exposure_flags: Tuple[str, ...]
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class PenaltyBreakdown:
+    category_A_missing_critical: float
+    category_B_staleness: float
+    category_C_contradictions_integrity: float
+    category_D_confidence: float
+    category_E_fx_exposure_risk: float
+    category_F_data_validity: float
+    total_penalties: float
+    details: Tuple[PenaltyItem, ...]
+
+
+@dataclass(frozen=True)
+class Scorecard:
+    base_score: float
+    penalty_breakdown: PenaltyBreakdown
+    final_score: float
+
+
+@dataclass(frozen=True)
+class HoldingPacket:
+    holding_id: str
+    instrument: InstrumentIdentity
+    holding_run_outcome: str
+    scorecard: Optional[Scorecard] = None
+    recommendation_category: Optional[str] = None
+    position_sizing_guidance: Optional[Mapping[str, Any]] = None
+    limitations: Optional[Tuple[str, ...]] = None
+
+
+@dataclass(frozen=True)
+class PortfolioCommitteePacket:
+    portfolio_run_outcome: str
+    per_holding_outcomes: Mapping[str, str]
+    holding_packets: Tuple[HoldingPacket, ...]
+    canonical_output_hash: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class FailedRunPacket:
+    portfolio_run_outcome: str
+    errors: Tuple[str, ...]
+
