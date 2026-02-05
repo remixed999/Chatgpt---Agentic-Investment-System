@@ -25,23 +25,40 @@ class RunOutcome(str, Enum):
 
 
 class HoldingIdentity(StrictBaseModel):
-    holding_id: str
+    holding_id: Optional[str] = None
     ticker: Optional[str] = None
     identifier: Optional[str] = None
 
+
+class SourceRef(StrictBaseModel):
+    origin: str
+    as_of_date: datetime
+    retrieval_timestamp: datetime
+
+
+class MetricValue(StrictBaseModel):
+    value: Optional[float] = None
+    source_ref: Optional[SourceRef] = None
+    missing_reason: Optional[str] = None
+    not_applicable: bool = False
+
     @root_validator
-    def ensure_identifier_present(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        ticker = values.get("ticker")
-        identifier = values.get("identifier")
-        if not ticker and not identifier:
-            raise ValueError("HoldingIdentity requires ticker or identifier")
+    def validate_semantics(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        value = values.get("value")
+        missing_reason = values.get("missing_reason")
+        not_applicable = values.get("not_applicable")
+        if value is None and not not_applicable and missing_reason is None:
+            raise ValueError("MetricValue missing_reason required when value is None and not_applicable is False")
+        if not_applicable and missing_reason is not None:
+            raise ValueError("MetricValue missing_reason must be None when not_applicable is True")
         return values
 
 
 class HoldingInput(StrictBaseModel):
-    identity: HoldingIdentity
+    identity: Optional[HoldingIdentity] = None
     weight: float
     currency: Optional[str] = None
+    metrics: Dict[str, MetricValue] = Field(default_factory=dict)
 
 
 class PortfolioSnapshot(StrictBaseModel):
@@ -61,6 +78,7 @@ class RunConfig(StrictBaseModel):
     run_mode: RunMode
     partial_failure_veto_threshold_pct: float = 30.0
     debug_mode: bool = False
+    do_not_trade_flag: bool = False
     retrieval_timestamp: Optional[datetime] = None
 
 
@@ -68,6 +86,14 @@ class ConfigSnapshot(StrictBaseModel):
     rubric_version: str
     registries: Dict[str, Any] = Field(default_factory=dict)
     hash: str
+
+
+class AgentResult(StrictBaseModel):
+    agent_name: str
+    scope: str
+    status: str
+    output: Dict[str, Any] = Field(default_factory=dict)
+    holding_id: Optional[str] = None
 
 
 class RunLog(StrictBaseModel):
@@ -120,6 +146,13 @@ class HashBundle(StrictBaseModel):
     run_hash: str
 
 
+class HoldingPacket(StrictBaseModel):
+    holding_id: Optional[str] = None
+    outcome: RunOutcome
+    reasons: List[str] = Field(default_factory=list)
+    identity: Optional[HoldingIdentity] = None
+
+
 class CompletedRunPacket(StrictBaseModel):
     run_id: str
     outcome: RunOutcome
@@ -128,8 +161,22 @@ class CompletedRunPacket(StrictBaseModel):
     base_currency: Optional[str] = None
     run_mode: Optional[RunMode] = None
     committee_packet: CommitteePacket
+    holding_packets: List[HoldingPacket] = Field(default_factory=list)
     decision_packet: DecisionPacket
     hashes: HashBundle
+
+
+class ShortCircuitRunPacket(StrictBaseModel):
+    run_id: str
+    outcome: RunOutcome
+    reasons: List[str]
+    portfolio_id: Optional[str] = None
+    as_of_date: Optional[datetime] = None
+    base_currency: Optional[str] = None
+    run_mode: Optional[RunMode] = None
+    committee_packet: Optional[CommitteePacket] = None
+    holding_packets: List[HoldingPacket] = Field(default_factory=list)
+    config_hashes: Dict[str, str] = Field(default_factory=dict)
 
 
 class GuardResult(StrictBaseModel):
@@ -145,4 +192,6 @@ class OrchestrationResult(StrictBaseModel):
     guard_results: List[GuardResult]
     failed_run_packet: Optional[FailedRunPacket] = None
     completed_run_packet: Optional[CompletedRunPacket] = None
+    short_circuit_packet: Optional[ShortCircuitRunPacket] = None
+    holding_packets: List[HoldingPacket] = Field(default_factory=list)
     ordered_holdings: List[HoldingInput] = Field(default_factory=list)

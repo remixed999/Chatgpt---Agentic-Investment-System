@@ -42,6 +42,8 @@ def test_missing_base_currency_vetoes_run():
     result = orchestrator.run(**inputs)
 
     assert result.outcome == RunOutcome.VETOED
+    assert result.completed_run_packet is None
+    assert result.failed_run_packet is not None
     assert result.run_log.outcome == RunOutcome.VETOED
     assert result.run_log.started_at_utc == FIXED_TIME
     assert result.run_log.ended_at_utc == FIXED_TIME
