@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
@@ -8,8 +9,12 @@ from pydantic import ValidationError
 
 from src.core.guards.registry import build_guard_registry
 from src.core.models import (
+    CommitteePacket,
+    CompletedRunPacket,
+    DecisionPacket,
     ConfigSnapshot,
     FailedRunPacket,
+    HashBundle,
     OrchestrationResult,
     PortfolioConfig,
     PortfolioSnapshot,
@@ -17,6 +22,7 @@ from src.core.models import (
     RunLog,
     RunOutcome,
 )
+from src.core.canonicalization.hashing import RunHashes, compute_run_hashes
 from src.core.utils.determinism import stable_sort_holdings
 
 
@@ -98,17 +104,65 @@ class Orchestrator:
                 ordered_holdings=ordered_holdings,
             )
 
-        return self._build_failure_result(
+        committee_packet = CommitteePacket(
+            portfolio_id=portfolio_snapshot.portfolio_id,
+            as_of_date=portfolio_snapshot.as_of_date,
+            base_currency=portfolio_config.base_currency,
+            holdings=ordered_holdings,
+            agent_outputs=[],
+            penalty_items=[],
+            veto_logs=None,
+        )
+        decision_packet = DecisionPacket(
+            portfolio_id=portfolio_snapshot.portfolio_id,
+            as_of_date=portfolio_snapshot.as_of_date,
+            base_currency=portfolio_config.base_currency,
+            decision_summary={\"status\": \"skeleton\"},
+        )
+
+        hashes = compute_run_hashes(
+            portfolio_snapshot=portfolio_snapshot,
+            portfolio_config=portfolio_config,
+            run_config=run_config,
+            committee_packet=committee_packet,
+            decision_packet=decision_packet,
+        )
+
+        g7_result = self._guards[\"G7\"].evaluate(
+            snapshot_hash=hashes.snapshot_hash,
+            config_hash=hashes.config_hash,
+            run_config_hash=hashes.run_config_hash,
+            committee_packet_hash=hashes.committee_packet_hash,
+            decision_hash=hashes.decision_hash,
+            run_hash=hashes.run_hash,
+        )
+        guard_results.append(g7_result)
+        if g7_result.outcome:
+            return self._build_guard_failure(
+                run_id=run_identifier,
+                started_at=started_at,
+                guard_results=guard_results,
+                outcome=g7_result.outcome,
+                reasons=g7_result.reasons,
+                config_hashes=config_hashes,
+                portfolio_snapshot=portfolio_snapshot,
+                portfolio_config=portfolio_config,
+                run_config=run_config,
+                ordered_holdings=ordered_holdings,
+            )
+
+        return self._build_completed_result(
             run_id=run_identifier,
             started_at=started_at,
-            outcome=RunOutcome.FAILED,
-            reasons=["completion_not_implemented"],
             config_hashes=config_hashes,
             portfolio_snapshot=portfolio_snapshot,
             portfolio_config=portfolio_config,
             run_config=run_config,
             guard_results=guard_results,
             ordered_holdings=ordered_holdings,
+            committee_packet=committee_packet,
+            decision_packet=decision_packet,
+            hashes=hashes,
         )
 
     def _build_guard_failure(
@@ -178,6 +232,50 @@ class Orchestrator:
             guard_results=guard_results or [],
             failed_run_packet=failed_run_packet,
             ordered_holdings=ordered_holdings or [],
+        )
+
+    def _build_completed_result(
+        self,
+        *,
+        run_id: str,
+        started_at: datetime,
+        config_hashes: Dict[str, str],
+        portfolio_snapshot: PortfolioSnapshot,
+        portfolio_config: PortfolioConfig,
+        run_config: RunConfig,
+        guard_results: List[Any],
+        ordered_holdings: List[Any],
+        committee_packet: CommitteePacket,
+        decision_packet: DecisionPacket,
+        hashes: RunHashes,
+    ) -> OrchestrationResult:
+        ended_at = self._now_func()
+        run_log = RunLog(
+            run_id=run_id,
+            started_at_utc=started_at,
+            ended_at_utc=ended_at,
+            status=\"terminal\",
+            outcome=RunOutcome.COMPLETED,
+            reasons=[],
+            config_hashes=config_hashes,
+        )
+        completed_run_packet = CompletedRunPacket(
+            run_id=run_id,
+            outcome=RunOutcome.COMPLETED,
+            portfolio_id=portfolio_snapshot.portfolio_id,
+            as_of_date=portfolio_snapshot.as_of_date,
+            base_currency=portfolio_config.base_currency,
+            run_mode=run_config.run_mode,
+            committee_packet=committee_packet,
+            decision_packet=decision_packet,
+            hashes=HashBundle(**asdict(hashes)),
+        )
+        return OrchestrationResult(
+            run_log=run_log,
+            outcome=RunOutcome.COMPLETED,
+            guard_results=guard_results,
+            completed_run_packet=completed_run_packet,
+            ordered_holdings=ordered_holdings,
         )
 
     @staticmethod
