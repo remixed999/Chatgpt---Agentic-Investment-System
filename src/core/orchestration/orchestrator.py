@@ -27,8 +27,10 @@ from src.core.models import (
     RunConfig,
     RunLog,
     RunOutcome,
+    Scorecard,
     ShortCircuitRunPacket,
 )
+from src.core.penalties import DIOOutput, FXExposureReport, compute_penalty_breakdown
 from src.core.utils.determinism import stable_sort_holdings
 
 
@@ -37,6 +39,7 @@ class HoldingState:
     holding: HoldingInput
     outcome: RunOutcome = RunOutcome.COMPLETED
     reasons: List[str] = field(default_factory=list)
+    scorecard: Optional[Scorecard] = None
 
     def to_packet(self) -> HoldingPacket:
         return HoldingPacket(
@@ -44,6 +47,7 @@ class HoldingState:
             outcome=self.outcome,
             reasons=self.reasons,
             identity=self.holding.identity,
+            scorecard=self.scorecard,
         )
 
 
@@ -125,9 +129,11 @@ class Orchestrator:
                     portfolio_snapshot=portfolio_snapshot,
                     portfolio_config=portfolio_config,
                     run_config=run_config,
+                    config_snapshot=config_snapshot,
                     guard_results=guard_results,
                     ordered_holdings=ordered_holdings,
                     holding_states=holding_states,
+                    agent_results=agent_results,
                 )
 
             if guard.guard_id == "G6":
@@ -152,9 +158,11 @@ class Orchestrator:
             portfolio_snapshot=portfolio_snapshot,
             portfolio_config=portfolio_config,
             run_config=run_config,
+            config_snapshot=config_snapshot,
             guard_results=guard_results,
             ordered_holdings=ordered_holdings,
             holding_states=holding_states,
+            agent_results=agent_results,
         )
 
     def _apply_violations(self, holding_states: List[HoldingState], evaluation: GuardEvaluation) -> None:
@@ -195,11 +203,20 @@ class Orchestrator:
         portfolio_snapshot: PortfolioSnapshot,
         portfolio_config: PortfolioConfig,
         run_config: RunConfig,
+        config_snapshot: ConfigSnapshot,
         guard_results: List[Any],
         ordered_holdings: List[HoldingInput],
         holding_states: List[HoldingState],
+        agent_results: List[AgentResult],
     ) -> OrchestrationResult:
         if outcome == RunOutcome.COMPLETED:
+            self._attach_penalties(
+                holding_states=holding_states,
+                run_config=run_config,
+                config_snapshot=config_snapshot,
+                portfolio_config=portfolio_config,
+                agent_results=agent_results,
+            )
             committee_packet = CommitteePacket(
                 portfolio_id=portfolio_snapshot.portfolio_id,
                 as_of_date=portfolio_snapshot.as_of_date,
@@ -367,6 +384,61 @@ class Orchestrator:
             holding_packets=holding_packets,
             ordered_holdings=ordered_holdings,
         )
+
+    def _attach_penalties(
+        self,
+        *,
+        holding_states: List[HoldingState],
+        run_config: RunConfig,
+        config_snapshot: ConfigSnapshot,
+        portfolio_config: PortfolioConfig,
+        agent_results: List[AgentResult],
+    ) -> None:
+        for state in holding_states:
+            if state.outcome != RunOutcome.COMPLETED:
+                continue
+            holding_id = state.holding.identity.holding_id if state.holding.identity else ""
+            dio_output = self._extract_dio_output(agent_results, holding_id)
+            fx_report = self._extract_fx_report(agent_results, holding_id)
+            penalty_breakdown = compute_penalty_breakdown(
+                holding_id=holding_id,
+                run_config=run_config,
+                config_snapshot=config_snapshot,
+                dio_output=dio_output,
+                agent_results=agent_results,
+                portfolio_config=portfolio_config,
+                pscc_output_optional=fx_report,
+            )
+            state.scorecard = Scorecard(penalty_breakdown=penalty_breakdown)
+
+    @staticmethod
+    def _extract_dio_output(agent_results: List[AgentResult], holding_id: str) -> DIOOutput:
+        for agent in agent_results:
+            if agent.agent_name != "DIO":
+                continue
+            if agent.scope != "holding" or agent.holding_id != holding_id:
+                continue
+            try:
+                return DIOOutput.parse_obj(agent.output)
+            except ValidationError:
+                return DIOOutput()
+        return DIOOutput()
+
+    @staticmethod
+    def _extract_fx_report(agent_results: List[AgentResult], holding_id: str) -> Optional[FXExposureReport]:
+        for agent in agent_results:
+            if agent.agent_name != "PSCC":
+                continue
+            if agent.scope != "holding" or agent.holding_id != holding_id:
+                continue
+            payload = agent.output.get("fx_exposure_report")
+            if payload is None:
+                continue
+            try:
+                return FXExposureReport.parse_obj(payload)
+            except ValidationError:
+                return None
+        return None
 
     def _build_completed_result(
         self,

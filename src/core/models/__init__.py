@@ -9,6 +9,8 @@ from src.core.models.schemas import (
     HoldingIdentity,
     HoldingInput,
     HoldingPacket,
+    PenaltyBreakdown,
+    PenaltyItem,
     MetricValue,
     OrchestrationResult,
     PortfolioConfig,
@@ -18,6 +20,7 @@ from src.core.models.schemas import (
     RunLog,
     RunMode,
     RunOutcome,
+    Scorecard,
     ShortCircuitRunPacket,
     SourceRef,
 )
@@ -33,6 +36,8 @@ __all__ = [
     "HoldingIdentity",
     "HoldingInput",
     "HoldingPacket",
+    "PenaltyBreakdown",
+    "PenaltyItem",
     "MetricValue",
     "OrchestrationResult",
     "PortfolioConfig",
@@ -42,6 +47,7 @@ __all__ = [
     "RunLog",
     "RunMode",
     "RunOutcome",
+    "Scorecard",
     "ShortCircuitRunPacket",
     "SourceRef",
 ]

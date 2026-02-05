@@ -80,6 +80,9 @@ class RunConfig(StrictBaseModel):
     debug_mode: bool = False
     do_not_trade_flag: bool = False
     retrieval_timestamp: Optional[datetime] = None
+    staleness_thresholds: Dict[str, Any] = Field(default_factory=dict)
+    penalty_caps: Dict[str, Any] = Field(default_factory=dict)
+    burn_rate_classification: Dict[str, bool] = Field(default_factory=dict)
 
 
 class ConfigSnapshot(StrictBaseModel):
@@ -94,6 +97,31 @@ class AgentResult(StrictBaseModel):
     status: str
     output: Dict[str, Any] = Field(default_factory=dict)
     holding_id: Optional[str] = None
+    confidence: Optional[float] = None
+
+
+class PenaltyItem(StrictBaseModel):
+    category: str
+    reason: str
+    amount: float
+    source_agent: str
+
+
+class PenaltyBreakdown(StrictBaseModel):
+    category_A_missing_critical: float
+    category_B_staleness: float
+    category_C_contradictions_integrity: float
+    category_D_confidence: float
+    category_E_fx_exposure_risk: float
+    category_F_data_validity: float
+    total_penalties: float
+    details: List[PenaltyItem] = Field(default_factory=list)
+
+
+class Scorecard(StrictBaseModel):
+    base_score: Optional[float] = None
+    final_score: Optional[float] = None
+    penalty_breakdown: Optional[PenaltyBreakdown] = None
 
 
 class RunLog(StrictBaseModel):
@@ -151,6 +179,7 @@ class HoldingPacket(StrictBaseModel):
     outcome: RunOutcome
     reasons: List[str] = Field(default_factory=list)
     identity: Optional[HoldingIdentity] = None
+    scorecard: Optional[Scorecard] = None
 
 
 class CompletedRunPacket(StrictBaseModel):
