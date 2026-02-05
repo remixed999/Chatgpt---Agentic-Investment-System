@@ -42,7 +42,7 @@ class MetricValue(StrictBaseModel):
     missing_reason: Optional[str] = None
     not_applicable: bool = False
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_semantics(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         value = values.get("value")
         missing_reason = values.get("missing_reason")
@@ -91,20 +91,25 @@ class ConfigSnapshot(StrictBaseModel):
     hash: str
 
 
-class AgentResult(StrictBaseModel):
-    agent_name: str
-    scope: str
-    status: str
-    output: Dict[str, Any] = Field(default_factory=dict)
-    holding_id: Optional[str] = None
-    confidence: Optional[float] = None
-
-
 class PenaltyItem(StrictBaseModel):
     category: str
     reason: str
     amount: float
     source_agent: str
+
+
+class AgentResult(StrictBaseModel):
+    agent_name: str
+    scope: str
+    status: str
+    confidence: float
+    key_findings: Dict[str, Any] = Field(default_factory=dict)
+    metrics: List[MetricValue] = Field(default_factory=list)
+    suggested_penalties: List[PenaltyItem] = Field(default_factory=list)
+    veto_flags: List[str] = Field(default_factory=list)
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+    holding_id: Optional[str] = None
 
 
 class PenaltyBreakdown(StrictBaseModel):

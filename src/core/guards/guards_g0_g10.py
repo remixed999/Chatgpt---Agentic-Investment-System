@@ -132,13 +132,59 @@ class G5AgentConformanceGuard(Guard):
         violations: List[GuardViolation] = []
         for agent in context.agent_results:
             if agent.scope not in {"portfolio", "holding"}:
-                return GuardEvaluation(
-                    result=fail_result(self.guard_id, RunOutcome.FAILED, ["agent_scope_invalid"]),
-                )
+                outcome = RunOutcome.FAILED
+                reasons = ["agent_scope_invalid"]
+                if agent.scope == "holding":
+                    violations.append(
+                        GuardViolation(
+                            scope=GuardScope.HOLDING,
+                            outcome=RunOutcome.FAILED,
+                            reason="agent_scope_invalid",
+                            holding_id=agent.holding_id,
+                        )
+                    )
+                    continue
+                return GuardEvaluation(result=fail_result(self.guard_id, outcome, reasons))
             if agent.status not in {"completed", "failed", "skipped"}:
+                if agent.scope == "holding":
+                    violations.append(
+                        GuardViolation(
+                            scope=GuardScope.HOLDING,
+                            outcome=RunOutcome.FAILED,
+                            reason="agent_status_invalid",
+                            holding_id=agent.holding_id,
+                        )
+                    )
+                    continue
                 return GuardEvaluation(
                     result=fail_result(self.guard_id, RunOutcome.FAILED, ["agent_status_invalid"]),
                 )
+            if not 0.0 <= agent.confidence <= 1.0:
+                if agent.scope == "holding":
+                    violations.append(
+                        GuardViolation(
+                            scope=GuardScope.HOLDING,
+                            outcome=RunOutcome.FAILED,
+                            reason="agent_confidence_invalid",
+                            holding_id=agent.holding_id,
+                        )
+                    )
+                    continue
+                return GuardEvaluation(
+                    result=fail_result(self.guard_id, RunOutcome.FAILED, ["agent_confidence_invalid"]),
+                )
+            if agent.status == "failed":
+                if agent.scope == "holding":
+                    violations.append(
+                        GuardViolation(
+                            scope=GuardScope.HOLDING,
+                            outcome=RunOutcome.FAILED,
+                            reason="agent_failed",
+                            holding_id=agent.holding_id,
+                        )
+                    )
+                    continue
+                return GuardEvaluation(result=fail_result(self.guard_id, RunOutcome.FAILED, ["agent_failed"]))
             if agent.scope == "holding" and not agent.holding_id:
                 violations.append(
                     GuardViolation(
@@ -158,7 +204,7 @@ class G6GovernancePrecedenceGuard(Guard):
             return GuardEvaluation(result=pass_result(self.guard_id))
 
         for agent in context.agent_results:
-            if agent.agent_name == "GRRA" and agent.output.get("do_not_trade_flag") is True:
+            if agent.agent_name == "GRRA" and agent.key_findings.get("do_not_trade_flag") is True:
                 return GuardEvaluation(
                     result=fail_result(self.guard_id, RunOutcome.SHORT_CIRCUITED, ["grra_do_not_trade"]),
                 )

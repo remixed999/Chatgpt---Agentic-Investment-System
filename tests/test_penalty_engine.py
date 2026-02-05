@@ -129,6 +129,10 @@ def test_total_cap_enforcement_drops_deterministic_items():
             status="completed",
             holding_id="H1",
             confidence=0.2,
+            key_findings={},
+            metrics=[],
+            suggested_penalties=[],
+            veto_flags=[],
         ),
         AgentResult(
             agent_name="TechnicalAgent",
@@ -136,6 +140,10 @@ def test_total_cap_enforcement_drops_deterministic_items():
             status="completed",
             holding_id="H1",
             confidence=0.3,
+            key_findings={},
+            metrics=[],
+            suggested_penalties=[],
+            veto_flags=[],
         ),
         AgentResult(
             agent_name="MacroAgent",
@@ -143,6 +151,10 @@ def test_total_cap_enforcement_drops_deterministic_items():
             status="completed",
             holding_id="H1",
             confidence=0.4,
+            key_findings={},
+            metrics=[],
+            suggested_penalties=[],
+            veto_flags=[],
         ),
     ]
 
@@ -156,10 +168,12 @@ def test_total_cap_enforcement_drops_deterministic_items():
     )
 
     reasons = {item.reason for item in breakdown.details}
-    assert breakdown.total_penalties == -35.0
+    assert breakdown.total_penalties == -32.0
     assert "stale_company_updates" not in reasons
+    assert "stale_price_volume" not in reasons
+    assert "missing_price_or_volume" not in reasons
     assert "recent_dividend_or_distribution" not in reasons
-    assert breakdown.category_B_staleness == -8.0
+    assert breakdown.category_B_staleness == -5.0
     assert breakdown.category_F_data_validity == -6.0
 
 
