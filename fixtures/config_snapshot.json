@@ -1,5 +1,11 @@
 {
   "rubric_version": "v0.1",
-  "registries": {},
+  "registries": {
+    "agent_registry": {
+      "path": "config/agent_registry.json",
+      "hash": "61a37244cc674a0417afa365d90b999949749f8709399cd6f4f43e9c3850ae48"
+    },
+    "agent_fixtures": {}
+  },
   "hash": "placeholder_hash"
 }

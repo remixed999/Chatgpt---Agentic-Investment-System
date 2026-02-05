@@ -77,14 +77,9 @@ def test_partial_failure_threshold_strict_comparison():
 
 def test_grra_short_circuit_forces_portfolio_and_holdings_short_circuited():
     inputs = _base_inputs()
-    inputs["agent_results_data"] = [
-        {
-            "agent_name": "GRRA",
-            "scope": "portfolio",
-            "status": "completed",
-            "output": {"do_not_trade_flag": True},
-        }
-    ]
+    inputs["config_snapshot_data"]["registries"]["agent_fixtures"] = {
+        "GRRA": {"portfolio": {"do_not_trade_flag": True, "confidence": 1.0}}
+    }
 
     result = Orchestrator().run(**inputs)
 
@@ -119,14 +114,9 @@ def test_emission_eligibility_by_outcome():
     assert failed.failed_run_packet is not None
 
     short_inputs = _base_inputs()
-    short_inputs["agent_results_data"] = [
-        {
-            "agent_name": "GRRA",
-            "scope": "portfolio",
-            "status": "completed",
-            "output": {"do_not_trade_flag": True},
-        }
-    ]
+    short_inputs["config_snapshot_data"]["registries"]["agent_fixtures"] = {
+        "GRRA": {"portfolio": {"do_not_trade_flag": True, "confidence": 1.0}}
+    }
     shorted = Orchestrator().run(**short_inputs)
 
     assert shorted.outcome == RunOutcome.SHORT_CIRCUITED

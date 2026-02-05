@@ -17,7 +17,7 @@ def sort_holdings(items: Iterable[Dict[str, Any]]) -> Optional[Tuple[Dict[str, A
     return tuple(
         sorted(
             items,
-            key=lambda item: item.get("identity", {}).get("holding_id", ""),
+            key=lambda item: (item.get("identity") or {}).get("holding_id", ""),
         )
     )
 

@@ -1,0 +1,56 @@
+{
+  "agents": {
+    "DIO": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "GRRA": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "LEFO": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "PSCC": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "RiskOfficer": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "Fundamentals": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "Technical": {
+      "version": "0.1",
+      "enabled": true
+    },
+    "DevilsAdvocate": {
+      "version": "0.1",
+      "enabled": true
+    }
+  },
+  "phases": {
+    "DIO": [
+      "DIO"
+    ],
+    "GRRA": [
+      "GRRA"
+    ],
+    "LEFO_PSCC": [
+      "LEFO",
+      "PSCC"
+    ],
+    "RISK_OFFICER": [
+      "RiskOfficer"
+    ],
+    "ANALYTICAL": [
+      "Fundamentals",
+      "Technical",
+      "DevilsAdvocate"
+    ]
+  }
+}

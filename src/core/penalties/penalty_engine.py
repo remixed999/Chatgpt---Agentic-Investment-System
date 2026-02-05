@@ -220,8 +220,8 @@ def _devils_advocate_unresolved(agent_results: Sequence[AgentResult], holding_id
             continue
         if "devil" not in agent.agent_name.lower():
             continue
-        output = agent.output or {}
-        if output.get("unresolved_fatal_risk") or output.get("fatal_risk_unresolved"):
+        findings = agent.key_findings or {}
+        if findings.get("unresolved_fatal_risk") or findings.get("fatal_risk_unresolved"):
             return True
     return False
 
