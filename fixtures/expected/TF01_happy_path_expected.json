@@ -1,0 +1,18 @@
+{
+  "portfolio_id": "PORT-N3",
+  "portfolio_run_outcome": "COMPLETED",
+  "holdings": [
+    {
+      "holding_id": "HOLDING-001",
+      "holding_run_outcome": "COMPLETED"
+    },
+    {
+      "holding_id": "HOLDING-002",
+      "holding_run_outcome": "COMPLETED"
+    },
+    {
+      "holding_id": "HOLDING-003",
+      "holding_run_outcome": "COMPLETED"
+    }
+  ]
+}

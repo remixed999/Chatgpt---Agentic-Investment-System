@@ -1,20 +1,10 @@
 {
   "fixture_id": "RunConfig_DEEP",
   "version": "1.0",
-  "description": "DEEP run configuration for aggregation tests.",
+  "description": "DEEP run configuration for IMP-01 skeleton tests.",
   "created_at_utc": "2025-01-01T00:00:00Z",
   "payload": {
     "run_mode": "DEEP",
-    "partial_failure_veto_threshold_pct": 30.0,
-    "debug_mode": false,
-    "do_not_trade_flag": false,
-    "staleness_thresholds": {},
-    "penalty_caps": {},
-    "burn_rate_classification": {
-      "HOLDING-001": false,
-      "HOLDING-002": false,
-      "HOLDING-003": false
-    },
-    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+    "partial_failure_veto_threshold_pct": 30.0
   }
 }

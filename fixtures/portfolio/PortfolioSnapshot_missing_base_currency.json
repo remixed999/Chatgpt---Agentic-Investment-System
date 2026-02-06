@@ -1,26 +1,21 @@
 {
-  "fixture_id": "PortfolioSnapshot_N3",
+  "fixture_id": "PortfolioSnapshot_missing_base_currency",
   "version": "1.0",
-  "description": "Three-holding portfolio snapshot for IMP-01 skeleton tests.",
+  "description": "Portfolio snapshot for missing base currency tests.",
   "created_at_utc": "2025-01-01T00:00:00Z",
   "payload": {
-    "portfolio_id": "PORT-N3",
+    "portfolio_id": "PORT-MISSING-BASE",
     "as_of_date": "2025-01-01T00:00:00Z",
     "holdings": [
       {
         "holding_id": "HOLDING-001",
         "identifier": "AAA-US",
-        "weight": 0.4
+        "weight": 0.5
       },
       {
         "holding_id": "HOLDING-002",
         "identifier": "BBB-US",
-        "weight": 0.35
-      },
-      {
-        "holding_id": "HOLDING-003",
-        "identifier": "CCC-US",
-        "weight": 0.25
+        "weight": 0.5
       }
     ]
   }
