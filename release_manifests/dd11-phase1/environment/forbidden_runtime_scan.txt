@@ -1,0 +1,5 @@
+tools/phase0_readiness.py:74:    offset = datetime.now().astimezone().utcoffset()
+tools/phase0_readiness.py:355:    now_func: Callable[[], datetime] = lambda: datetime.now(UTC),
+tests/unit/test_release_phase0.py:76:    sample.write_text("from datetime import datetime\nvalue = datetime.now()\n", encoding="utf-8")
+src/release/parity.py:25:    if time.timezone != 0 or time.altzone != 0 or time.daylight:
+

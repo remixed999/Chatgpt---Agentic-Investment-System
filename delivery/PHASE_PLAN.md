@@ -15,8 +15,8 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 | Phase | Status | Evidence Summary | Blocking Dependencies | Notes |
 | --- | --- | --- | --- | --- |
 | Phase 0 — Pre-Deployment Readiness | COMPLETE | - Phase 0 readiness run captured in `release_manifests/dd11-phase0/phase0_attestation.md` (PASSED). | - None. | Phase 0 gate satisfied; release bundle canonicalized and pinned. |
-| Phase 1 — Local / Developer Validation | READY TO START | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Phase 0 PASSED. | Awaiting execution of Phase 1 validation gates. |
-| Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Requires Phase 1 pass + integration run artifacts. | Not yet satisfied. |
+| Phase 1 — Local / Developer Validation | PASSED | - Phase 1 evidence captured in `release_manifests/dd11-phase1/` (attestation, tests, determinism, governance, environment). | - Phase 0 PASSED. | Phase 1 gates executed and passed. Phase 2 is **UNBLOCKED** but not started. |
+| Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Phase 1 PASSED; integration run artifacts required. | Phase 2 is **UNBLOCKED** but not started. |
 | Phase 3 — Staging (Pre-Production) | NOT STARTED | - No staging run artifacts or regression reports in repo. | - Requires Phase 2 pass + staging artifacts. | Not yet satisfied. |
 | Phase 4 — Production Rollout | NOT STARTED | - No production deployment artifacts in repo. | - Requires Phase 3 pass + production deployment artifacts. | Not yet satisfied. |
 | Phase 5 — Post-Deployment Validation & Monitoring | NOT STARTED | - No post-deployment replay or monitoring artifacts in repo. | - Requires Phase 4 completion + monitoring artifacts. | Not yet satisfied. |
@@ -36,9 +36,9 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 
 | Task | Status | Evidence Summary | Blocking Dependencies | Notes |
 | --- | --- | --- | --- | --- |
-| TST-01 — Unit Testing | NOT STARTED | - Unit/contract/determinism test suites exist under `tests/` but no execution artifacts captured. | - Execute tests and capture reports. | Not yet satisfied. |
+| TST-01 — Unit Testing | COMPLETE | - Phase 1 pytest execution captured in `release_manifests/dd11-phase1/tests/pytest_output.txt` and `pytest.xml`. | - None. | Satisfied as part of Phase 1. |
 | TST-02 — Integration Testing | NOT STARTED | - No integration run artifacts or reports in repo. | - Requires TST-01 execution and integration environment runs. | Not yet satisfied. |
-| TST-03 — Replay & Determinism Testing | NOT STARTED | - Deterministic replay utilities exist but no replay artifacts are captured. | - Requires replay executions + captured hash baselines. | Not yet satisfied. |
+| TST-03 — Replay & Determinism Testing | COMPLETE | - Deterministic replay artifacts captured in `release_manifests/dd11-phase1/determinism/`. | - None. | Satisfied as part of Phase 1. |
 | REL-01 — Staging Deployment | NOT STARTED | - No staging deployment artifacts in repo. | - Requires TST-03 completion. | Not yet satisfied. |
 | REL-02 — Production Deployment | NOT STARTED | - No production deployment artifacts in repo. | - Requires REL-01 completion. | Not yet satisfied. |
 | CLS-01 — Post-Implementation Review | NOT STARTED | - No PIR artifacts in repo. | - Requires REL-02 completion. | Not yet satisfied. |
@@ -52,4 +52,4 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 
 ## Next Legitimate Step
 
-Run Phase 1 local validation gates to generate auditable artifacts (manifest verification, pytest reports, deterministic replay/hash baselines). Do **not** start integration or staging deployment until Phase 1 artifacts are captured.
+Phase 2 is **UNBLOCKED** but must not start until integration environment readiness is confirmed and new Phase 2 artifacts are captured.

@@ -1,0 +1,14 @@
+{
+  "phase": "Phase 1",
+  "status": "PASSED",
+  "blocking_issues": [],
+  "evidence_paths": {
+    "phase0_attestation": "release_manifests/dd11-phase1/governance/phase0_attestation.md",
+    "checklist": "release_manifests/dd11-phase1/config/phase1_acceptance_checklist.md",
+    "environment": "release_manifests/dd11-phase1/environment",
+    "tests": "release_manifests/dd11-phase1/tests",
+    "determinism": "release_manifests/dd11-phase1/determinism",
+    "governance": "release_manifests/dd11-phase1/governance",
+    "attestation": "release_manifests/dd11-phase1/attestation.md"
+  }
+}

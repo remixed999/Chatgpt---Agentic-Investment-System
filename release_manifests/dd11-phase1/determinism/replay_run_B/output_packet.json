@@ -1,1 +1,0 @@
-{"as_of_date":"2024-01-01T00:00:00+00:00","base_currency":"USD","config_hashes":{},"failure_reason":"determinism_order_violation","portfolio_id":"PORTFOLIO-001","portfolio_run_outcome":"FAILED","reasons":["determinism_order_violation"],"run_id":"local-run","run_mode":"FAST"}
