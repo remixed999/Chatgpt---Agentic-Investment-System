@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from src.core.guards.base import (
@@ -34,12 +34,17 @@ class GuardContext:
     ordered_holdings: List[HoldingInput]
     agent_results: List[AgentResult]
     portfolio_outcome: Optional[RunOutcome] = None
+    schema_errors: List[str] = field(default_factory=list)
 
 
 class G0InputSchemaGuard(Guard):
     guard_id = "G0"
 
     def evaluate(self, *, context: GuardContext) -> GuardEvaluation:
+        if context.schema_errors:
+            return GuardEvaluation(
+                result=fail_result(self.guard_id, RunOutcome.FAILED, sorted(set(context.schema_errors))),
+            )
         manifest = context.manifest
         if manifest is None:
             return GuardEvaluation(result=pass_result(self.guard_id))
@@ -78,7 +83,7 @@ class G1IdentityContextGuard(Guard):
 
         for index, holding in enumerate(context.ordered_holdings):
             identity = holding.identity
-            if identity is None or not identity.holding_id or not (identity.ticker or identity.identifier):
+            if identity is None or not identity.holding_id or not identity.ticker:
                 violations.append(
                     GuardViolation(
                         scope=GuardScope.HOLDING,
