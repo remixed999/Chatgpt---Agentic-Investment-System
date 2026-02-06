@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from src.agents.base import BaseAgent
 from src.agents.executor import HoldingAgentContext, run_holding_agents
-from src.agents.registry import AgentRegistry
+from src.agents.registry import AgentRegistry, DEFAULT_AGENT_CLASSES
 from src.core.guards.guards_g0_g10 import GuardContext, G5AgentConformanceGuard
 from src.core.models import AgentResult, ConfigSnapshot, PortfolioConfig, PortfolioSnapshot, RunConfig, RunOutcome
 from src.core.orchestration import Orchestrator
@@ -81,8 +82,9 @@ def test_agent_execution_order_is_registry_defined():
 def test_agent_result_conformance_guard_fails_holding():
     portfolio_snapshot = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"))
     ordered_holdings = stable_sort_holdings(portfolio_snapshot.holdings)
+    constructor = getattr(AgentResult, "model_construct", AgentResult.construct)
     agent_results = [
-        AgentResult(
+        constructor(
             agent_name="Fundamentals",
             scope="holding",
             status="invalid",
@@ -109,7 +111,7 @@ def test_agent_result_conformance_guard_fails_holding():
 
     assert evaluation.result.outcome is None
     assert evaluation.violations
-    assert evaluation.violations[0].reason == "agent_status_invalid"
+    assert evaluation.violations[0].reason == "agent_schema_invalid"
 
 
 def test_grra_short_circuit_blocks_non_governance_agents():
@@ -135,7 +137,7 @@ def test_dio_veto_stops_downstream_for_holding():
         "partial_failure_veto_threshold_pct": 60.0,
     }
     inputs["config_snapshot_data"]["registries"]["agent_fixtures"] = {
-        "DIO": {"holdings": {"HOLDING-001": {"missing_hard_stop_fields": ["cash"], "confidence": 1.0}}}
+        "DIO": {"holdings": {"HOLDING-001": {"unsourced_numbers_detected": True, "confidence": 1.0}}}
     }
 
     result = Orchestrator().run(**inputs)
@@ -147,7 +149,7 @@ def test_dio_veto_stops_downstream_for_holding():
     vetoed_holdings = {item.get("holding_id") for item in outputs if item["agent_name"] == "DIO"}
     assert "HOLDING-001" in vetoed_holdings
     assert not any(
-        item["agent_name"] in {"Fundamentals", "Technical", "DevilsAdvocate"} and item.get("holding_id") == "HOLDING-001"
+        item["agent_name"] != "DIO" and item.get("holding_id") == "HOLDING-001"
         for item in outputs
     )
 
@@ -161,3 +163,74 @@ def test_pscc_portfolio_output_available_before_aggregation():
     agent_order = [item["agent_name"] for item in outputs]
     assert "PSCC" in agent_order
     assert agent_order == sorted(agent_order)
+
+
+def test_agent_result_conformance_guard_marks_holding_failed():
+    class InvalidAgent(BaseAgent):
+        @classmethod
+        def supported_scopes(cls) -> set[str]:
+            return {"holding"}
+
+        def execute(self, context: HoldingAgentContext) -> AgentResult:
+            holding_id = context.holding.identity.holding_id if context.holding.identity else None
+            constructor = getattr(AgentResult, "model_construct", AgentResult.construct)
+            if holding_id == "HOLDING-001":
+                return constructor(
+                    agent_name=self.agent_name,
+                    scope="holding",
+                    status="invalid",
+                    confidence=0.5,
+                    key_findings={},
+                    metrics=[],
+                    suggested_penalties=[],
+                    veto_flags=[],
+                    holding_id=holding_id,
+                )
+            return self._build_result(
+                status="completed",
+                confidence=0.5,
+                key_findings={},
+                metrics=[],
+                holding_id=holding_id,
+            )
+
+    config_data = {
+        "agents": {
+            "DIO": {"version": "0.1", "enabled": True},
+            "GRRA": {"version": "0.1", "enabled": True},
+            "LEFO": {"version": "0.1", "enabled": True},
+            "PSCC": {"version": "0.1", "enabled": True},
+            "RiskOfficer": {"version": "0.1", "enabled": True},
+            "InvalidAgent": {"version": "0.1", "enabled": True},
+        },
+        "phases": {
+            "DIO": ["DIO"],
+            "GRRA": ["GRRA"],
+            "LEFO_PSCC": ["LEFO", "PSCC"],
+            "RISK_OFFICER": ["RiskOfficer"],
+            "ANALYTICAL": ["InvalidAgent"],
+        },
+    }
+    registry = AgentRegistry(
+        config_data=config_data,
+        agent_classes={**DEFAULT_AGENT_CLASSES, "InvalidAgent": InvalidAgent},
+    )
+    inputs = _base_inputs()
+    inputs["run_config_data"] = {
+        **inputs["run_config_data"],
+        "partial_failure_veto_threshold_pct": 60.0,
+    }
+
+    result = Orchestrator(registry=registry).run(**inputs)
+
+    failed = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-001")
+    assert failed.holding_run_outcome == RunOutcome.FAILED
+
+
+def test_agent_ordering_is_deterministic() -> None:
+    inputs = _base_inputs()
+
+    result_a = Orchestrator().run(**inputs)
+    result_b = Orchestrator().run(**inputs)
+
+    assert result_a.portfolio_committee_packet.agent_outputs == result_b.portfolio_committee_packet.agent_outputs

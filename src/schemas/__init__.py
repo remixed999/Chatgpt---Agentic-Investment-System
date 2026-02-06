@@ -1,10 +1,13 @@
 from src.schemas.models import (
+    AgentResult,
     ConfigSnapshot,
     FailedRunPacket,
     HoldingInput,
     HoldingPacket,
     HoldingRunOutcome,
+    MetricValue,
     OrchestrationResult,
+    PenaltyItem,
     PortfolioCommitteePacket,
     PortfolioConfig,
     PortfolioRunOutcome,
@@ -12,15 +15,19 @@ from src.schemas.models import (
     RunConfig,
     RunLog,
     RunLogEvent,
+    SourceRef,
 )
 
 __all__ = [
+    "AgentResult",
     "ConfigSnapshot",
     "FailedRunPacket",
     "HoldingInput",
     "HoldingPacket",
     "HoldingRunOutcome",
+    "MetricValue",
     "OrchestrationResult",
+    "PenaltyItem",
     "PortfolioCommitteePacket",
     "PortfolioConfig",
     "PortfolioRunOutcome",
@@ -28,4 +35,5 @@ __all__ = [
     "RunConfig",
     "RunLog",
     "RunLogEvent",
+    "SourceRef",
 ]

@@ -27,6 +27,7 @@ from src.core.models import (
     RunConfig,
     RunOutcome,
 )
+from src.core.penalties import DIOOutput
 from src.core.utils.determinism import stable_sort_holdings
 
 
@@ -163,7 +164,7 @@ class Orchestrator:
                 ordered_holdings=parsed.ordered_holdings,
             )
 
-        agent_results = self._run_agents(parsed)
+        agent_results = self._run_agents(parsed, guard_violations)
         guard_context = GuardContext(
             portfolio_snapshot=parsed.portfolio_snapshot,
             portfolio_config=parsed.portfolio_config,
@@ -323,8 +324,13 @@ class Orchestrator:
             reasons.append(f"{suffix}:{message}")
         return reasons
 
-    def _run_agents(self, parsed: _ParsedInputs) -> List[AgentResult]:
+    def _run_agents(
+        self,
+        parsed: _ParsedInputs,
+        guard_violations: List[GuardViolation],
+    ) -> List[AgentResult]:
         agent_results: List[AgentResult] = []
+        terminal_holdings = self._terminal_holdings(parsed, guard_violations)
 
         portfolio_context = PortfolioAgentContext(
             portfolio_snapshot=parsed.portfolio_snapshot,
@@ -334,10 +340,42 @@ class Orchestrator:
             ordered_holdings=parsed.ordered_holdings,
             agent_results=agent_results,
         )
-        agent_results.extend(
-            self._sorted_agents(run_portfolio_agents("DIO", portfolio_context, registry=self._registry))
+        agent_results.extend(run_portfolio_agents("DIO", portfolio_context, registry=self._registry))
+        if self._dio_portfolio_veto(agent_results):
+            return self._sorted_agents(agent_results)
+        for index, holding in enumerate(parsed.ordered_holdings):
+            holding_id = self._holding_id_for(index, holding)
+            if holding_id in terminal_holdings:
+                continue
+            holding_context = HoldingAgentContext(
+                holding=holding,
+                portfolio_snapshot=parsed.portfolio_snapshot,
+                portfolio_config=parsed.portfolio_config,
+                run_config=parsed.run_config,
+                config_snapshot=parsed.config_snapshot,
+                ordered_holdings=parsed.ordered_holdings,
+                agent_results=agent_results,
+            )
+            agent_results.extend(run_holding_agents("DIO", holding_context, registry=self._registry))
+
+        terminal_holdings.update(self._dio_holding_vetoes(agent_results))
+
+        portfolio_context = PortfolioAgentContext(
+            portfolio_snapshot=parsed.portfolio_snapshot,
+            portfolio_config=parsed.portfolio_config,
+            run_config=parsed.run_config,
+            config_snapshot=parsed.config_snapshot,
+            ordered_holdings=parsed.ordered_holdings,
+            agent_results=agent_results,
         )
-        for holding in parsed.ordered_holdings:
+        agent_results.extend(run_portfolio_agents("GRRA", portfolio_context, registry=self._registry))
+        if self._grra_short_circuit(agent_results, parsed.run_config):
+            return self._sorted_agents(agent_results)
+
+        for index, holding in enumerate(parsed.ordered_holdings):
+            holding_id = self._holding_id_for(index, holding)
+            if holding_id in terminal_holdings:
+                continue
             holding_context = HoldingAgentContext(
                 holding=holding,
                 portfolio_snapshot=parsed.portfolio_snapshot,
@@ -348,7 +386,7 @@ class Orchestrator:
                 agent_results=agent_results,
             )
             agent_results.extend(
-                self._sorted_agents(run_holding_agents("DIO", holding_context, registry=self._registry))
+                run_holding_agents("LEFO_PSCC", holding_context, registry=self._registry)
             )
 
         portfolio_context = PortfolioAgentContext(
@@ -359,11 +397,12 @@ class Orchestrator:
             ordered_holdings=parsed.ordered_holdings,
             agent_results=agent_results,
         )
-        agent_results.extend(
-            self._sorted_agents(run_portfolio_agents("GRRA", portfolio_context, registry=self._registry))
-        )
+        agent_results.extend(run_portfolio_agents("LEFO_PSCC", portfolio_context, registry=self._registry))
 
-        for holding in parsed.ordered_holdings:
+        for index, holding in enumerate(parsed.ordered_holdings):
+            holding_id = self._holding_id_for(index, holding)
+            if holding_id in terminal_holdings:
+                continue
             holding_context = HoldingAgentContext(
                 holding=holding,
                 portfolio_snapshot=parsed.portfolio_snapshot,
@@ -373,29 +412,105 @@ class Orchestrator:
                 ordered_holdings=parsed.ordered_holdings,
                 agent_results=agent_results,
             )
-            agent_results.extend(
-                self._sorted_agents(run_holding_agents("ANALYTICAL", holding_context, registry=self._registry))
-            )
-            agent_results.extend(
-                self._sorted_agents(run_holding_agents("LEFO_PSCC", holding_context, registry=self._registry))
-            )
-            agent_results.extend(
-                self._sorted_agents(run_holding_agents("RISK_OFFICER", holding_context, registry=self._registry))
-            )
+            agent_results.extend(run_holding_agents("RISK_OFFICER", holding_context, registry=self._registry))
 
-        portfolio_context = PortfolioAgentContext(
-            portfolio_snapshot=parsed.portfolio_snapshot,
-            portfolio_config=parsed.portfolio_config,
-            run_config=parsed.run_config,
-            config_snapshot=parsed.config_snapshot,
-            ordered_holdings=parsed.ordered_holdings,
-            agent_results=agent_results,
-        )
-        agent_results.extend(
-            self._sorted_agents(run_portfolio_agents("LEFO_PSCC", portfolio_context, registry=self._registry))
-        )
+        terminal_holdings.update(self._risk_officer_vetoes(agent_results))
+
+        for index, holding in enumerate(parsed.ordered_holdings):
+            holding_id = self._holding_id_for(index, holding)
+            if holding_id in terminal_holdings:
+                continue
+            holding_context = HoldingAgentContext(
+                holding=holding,
+                portfolio_snapshot=parsed.portfolio_snapshot,
+                portfolio_config=parsed.portfolio_config,
+                run_config=parsed.run_config,
+                config_snapshot=parsed.config_snapshot,
+                ordered_holdings=parsed.ordered_holdings,
+                agent_results=agent_results,
+            )
+            agent_results.extend(run_holding_agents("ANALYTICAL", holding_context, registry=self._registry))
 
         return self._sorted_agents(agent_results)
+
+    @staticmethod
+    def _dio_portfolio_veto(agent_results: Iterable[AgentResult]) -> bool:
+        for agent in agent_results:
+            if agent.agent_name != "DIO" or agent.scope != "portfolio":
+                continue
+            if Orchestrator._dio_output_veto(agent.key_findings):
+                return True
+        return False
+
+    @staticmethod
+    def _dio_holding_vetoes(agent_results: Iterable[AgentResult]) -> set[str]:
+        vetoed: set[str] = set()
+        for agent in agent_results:
+            if agent.agent_name != "DIO" or agent.scope != "holding":
+                continue
+            if Orchestrator._dio_output_veto(agent.key_findings):
+                if agent.holding_id:
+                    vetoed.add(agent.holding_id)
+        return vetoed
+
+    @staticmethod
+    def _risk_officer_vetoes(agent_results: Iterable[AgentResult]) -> set[str]:
+        vetoed: set[str] = set()
+        for agent in agent_results:
+            if agent.agent_name != "RiskOfficer" or agent.scope != "holding":
+                continue
+            if agent.veto_flags and agent.holding_id:
+                vetoed.add(agent.holding_id)
+        return vetoed
+
+    @staticmethod
+    def _grra_short_circuit(agent_results: Iterable[AgentResult], run_config: RunConfig) -> bool:
+        if run_config.do_not_trade_flag:
+            return True
+        for agent in agent_results:
+            if agent.agent_name != "GRRA" or agent.scope != "portfolio":
+                continue
+            if agent.key_findings.get("do_not_trade_flag") is True:
+                return True
+        return False
+
+    @staticmethod
+    def _dio_output_veto(payload: Dict[str, object]) -> bool:
+        try:
+            dio_output = DIOOutput.parse_obj(payload)
+        except ValidationError:
+            return False
+        if dio_output.integrity_veto_triggered:
+            return True
+        if dio_output.unsourced_numbers_detected:
+            return True
+        if dio_output.missing_hard_stop_fields:
+            return True
+        if any(flag.hard_stop_triggered for flag in dio_output.staleness_flags):
+            return True
+        return False
+
+    def _terminal_holdings(
+        self,
+        parsed: _ParsedInputs,
+        guard_violations: List[GuardViolation],
+    ) -> set[str]:
+        terminal: set[str] = set()
+        for violation in guard_violations:
+            if violation.scope != GuardScope.HOLDING:
+                continue
+            if violation.outcome not in {RunOutcome.FAILED, RunOutcome.VETOED, RunOutcome.SHORT_CIRCUITED}:
+                continue
+            holding_id = violation.holding_id
+            if not holding_id and violation.holding_index is not None:
+                if 0 <= violation.holding_index < len(parsed.ordered_holdings):
+                    holding_id = self._holding_id_for(
+                        violation.holding_index,
+                        parsed.ordered_holdings[violation.holding_index],
+                    )
+            if holding_id:
+                terminal.add(holding_id)
+        return terminal
 
     @staticmethod
     def _sorted_agents(results: Iterable[AgentResult]) -> List[AgentResult]:
