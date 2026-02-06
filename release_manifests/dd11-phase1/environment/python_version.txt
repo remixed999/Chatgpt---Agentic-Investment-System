@@ -1,1 +1,1 @@
-PYTHON VERSION (placeholder)
+Python 3.10.19

@@ -1,1 +1,8 @@
-{}
+{
+  "determinism": "PASSED",
+  "phase": "DD-11 Phase 1",
+  "phase0_reference": "release_manifests/dd11-phase0/phase0_attestation.md",
+  "pytest": "FAILED",
+  "status": "FAILED",
+  "timestamp_utc": "2026-02-06T18:12:27.294876Z"
+}
