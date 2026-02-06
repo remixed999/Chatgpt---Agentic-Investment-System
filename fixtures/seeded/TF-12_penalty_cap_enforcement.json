@@ -1,0 +1,45 @@
+{
+  "fixture_id": "TF-12_penalty_cap_enforcement",
+  "version": "1.0",
+  "description": "Penalty list exceeds total cap in DEEP mode to enforce deterministic dropping.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "holding_id": "H1",
+    "dio_output": {
+      "missing_penalty_critical_fields": [
+        {
+          "field_name": "cash",
+          "not_applicable": false
+        },
+        {
+          "field_name": "price",
+          "not_applicable": false
+        },
+        {
+          "field_name": "macro_regime_input",
+          "not_applicable": false
+        }
+      ],
+      "staleness_flags": [
+        {
+          "staleness_type": "financials",
+          "age_days": 200,
+          "hard_stop_triggered": false
+        },
+        {
+          "staleness_type": "price_volume",
+          "age_days": 10,
+          "hard_stop_triggered": false
+        }
+      ],
+      "contradictions": [
+        {
+          "unresolved": false
+        }
+      ],
+      "corporate_action_risk": {
+        "split_days_ago": 30
+      }
+    }
+  }
+}

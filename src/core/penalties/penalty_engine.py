@@ -54,8 +54,29 @@ def compute_penalty_breakdown(
     portfolio_config: PortfolioConfig,
     pscc_output_optional: Optional[FXExposureReport] = None,
 ) -> PenaltyBreakdown:
+    breakdown, _ = compute_penalty_breakdown_with_cap_tracking(
+        holding_id=holding_id,
+        run_config=run_config,
+        config_snapshot=config_snapshot,
+        dio_output=dio_output,
+        agent_results=agent_results,
+        portfolio_config=portfolio_config,
+        pscc_output_optional=pscc_output_optional,
+    )
+    return breakdown
+
+
+def compute_penalty_breakdown_with_cap_tracking(
+    holding_id: str,
+    run_config: RunConfig,
+    config_snapshot: ConfigSnapshot,
+    dio_output: DIOOutput,
+    agent_results: Sequence[AgentResult],
+    portfolio_config: PortfolioConfig,
+    pscc_output_optional: Optional[FXExposureReport] = None,
+) -> tuple[PenaltyBreakdown, bool]:
     if _dio_hard_stop_triggered(dio_output):
-        return _zero_breakdown()
+        return _zero_breakdown(), False
 
     items: List[PenaltyItem] = []
     is_burn_rate_company = bool(run_config.burn_rate_classification.get(holding_id))
@@ -113,10 +134,13 @@ def compute_penalty_breakdown(
     items.extend(_data_validity_items(dio_output))
 
     items = _dedupe_items(items)
-    items = _apply_category_caps(items, _resolve_category_caps(run_config))
-    items = _apply_total_cap(items, _resolve_total_cap(run_config))
+    capped_by_category = _apply_category_caps(items, _resolve_category_caps(run_config))
+    category_cap_applied = len(capped_by_category) != len(items)
+    capped_total = _apply_total_cap(capped_by_category, _resolve_total_cap(run_config))
+    total_cap_applied = len(capped_total) != len(capped_by_category)
+    cap_applied = category_cap_applied or total_cap_applied
 
-    return _build_breakdown(items)
+    return _build_breakdown(capped_total), cap_applied
 
 
 def _dio_hard_stop_triggered(dio_output: DIOOutput) -> bool:

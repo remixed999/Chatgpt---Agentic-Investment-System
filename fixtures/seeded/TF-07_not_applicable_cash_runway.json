@@ -1,0 +1,17 @@
+{
+  "fixture_id": "TF-07_not_applicable_cash_runway",
+  "version": "1.0",
+  "description": "Missing cash/runway marked not_applicable should not incur penalties.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "holding_id": "H1",
+    "dio_output": {
+      "missing_penalty_critical_fields": [
+        {
+          "field_name": "cash",
+          "not_applicable": true
+        }
+      ]
+    }
+  }
+}

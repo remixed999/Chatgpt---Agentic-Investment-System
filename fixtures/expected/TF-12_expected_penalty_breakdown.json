@@ -1,0 +1,53 @@
+{
+  "fixture_id": "TF-12_expected_penalty_breakdown",
+  "version": "1.0",
+  "description": "Expected capped penalty breakdown after deterministic total cap enforcement.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "category_A_missing_critical": -14.0,
+    "category_B_staleness": -5.0,
+    "category_C_contradictions_integrity": -10.0,
+    "category_D_confidence": 0.0,
+    "category_E_fx_exposure_risk": 0.0,
+    "category_F_data_validity": -6.0,
+    "total_penalties": -35.0,
+    "details": [
+      {
+        "category": "A",
+        "reason": "missing_cash_or_runway",
+        "amount": -6.0,
+        "source_agent": "DIO"
+      },
+      {
+        "category": "A",
+        "reason": "missing_macro_regime_input",
+        "amount": -4.0,
+        "source_agent": "DIO"
+      },
+      {
+        "category": "A",
+        "reason": "missing_price_or_volume",
+        "amount": -4.0,
+        "source_agent": "DIO"
+      },
+      {
+        "category": "B",
+        "reason": "stale_financials",
+        "amount": -5.0,
+        "source_agent": "DIO"
+      },
+      {
+        "category": "C",
+        "reason": "contradiction_detected",
+        "amount": -10.0,
+        "source_agent": "DIO"
+      },
+      {
+        "category": "F",
+        "reason": "recent_split_or_reverse_split",
+        "amount": -6.0,
+        "source_agent": "DIO"
+      }
+    ]
+  }
+}

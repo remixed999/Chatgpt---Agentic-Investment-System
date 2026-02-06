@@ -1,0 +1,18 @@
+{
+  "fixture_id": "TF-08_staleness_financials_penalty",
+  "version": "1.0",
+  "description": "Financial staleness beyond penalty threshold but within hard-stop triggers Category B.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "holding_id": "H1",
+    "dio_output": {
+      "staleness_flags": [
+        {
+          "staleness_type": "financials",
+          "age_days": 100,
+          "hard_stop_triggered": false
+        }
+      ]
+    }
+  }
+}

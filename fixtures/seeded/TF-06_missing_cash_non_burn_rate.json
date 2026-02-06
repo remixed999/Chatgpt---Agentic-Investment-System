@@ -1,0 +1,17 @@
+{
+  "fixture_id": "TF-06_missing_cash_non_burn_rate",
+  "version": "1.0",
+  "description": "Non-burn-rate holding missing cash/runway for Category A penalty.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "holding_id": "H1",
+    "dio_output": {
+      "missing_penalty_critical_fields": [
+        {
+          "field_name": "cash",
+          "not_applicable": false
+        }
+      ]
+    }
+  }
+}
