@@ -1,0 +1,4 @@
+{
+  "run_mode": "DEEP",
+  "partial_failure_veto_threshold_pct": 30.0
+}
