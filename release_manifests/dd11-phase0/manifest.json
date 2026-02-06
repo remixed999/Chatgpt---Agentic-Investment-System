@@ -1,0 +1,53 @@
+{
+  "created_at_utc": "2026-02-06T17:48:16.331871Z",
+  "file_inventory": [
+    "config/release_bundle/RunConfig_DEEP.json",
+    "config/release_bundle/config_snapshot.json",
+    "config/release_bundle/run_config.json",
+    "fixtures/config/ConfigSnapshot_BASE.json",
+    "fixtures/config/ConfigSnapshot_v1.json",
+    "fixtures/config/PortfolioConfig_BASE.json",
+    "fixtures/config/PortfolioConfig_missing_base_currency.json",
+    "fixtures/config/RunConfig_DEEP.json",
+    "fixtures/config/RunConfig_TF14.json",
+    "fixtures/expected/TF-01_expected_portfolio_packet.json",
+    "fixtures/expected/TF-03_expected_short_circuit.json",
+    "fixtures/expected/TF-05_expected_burn_rate_veto.json",
+    "fixtures/expected/TF-06_expected_penalty_breakdown.json",
+    "fixtures/expected/TF-07_expected_penalty_breakdown.json",
+    "fixtures/expected/TF-08_expected_penalty_breakdown.json",
+    "fixtures/expected/TF-10_expected_penalty_breakdown.json",
+    "fixtures/expected/TF-12_expected_penalty_breakdown.json",
+    "fixtures/expected/TF-12_expected_penalty_cap.json",
+    "fixtures/expected/TF-13_expected_canonical_hash_stability.json",
+    "fixtures/expected/TF-14_expected_partial_failure_threshold.json",
+    "fixtures/expected/TF-15_expected_failed_packet.json",
+    "fixtures/expected/TF01_happy_path_expected.json",
+    "fixtures/expected/TF02_missing_base_currency_expected.json",
+    "fixtures/portfolio/PortfolioSnapshot_N3.json",
+    "fixtures/portfolio/PortfolioSnapshot_TF04_identity_missing.json",
+    "fixtures/portfolio/PortfolioSnapshot_TF14_partial_failure.json",
+    "fixtures/portfolio/PortfolioSnapshot_TF15_invalid.json",
+    "fixtures/seeded/SeededData_GRRA_DoNotTrade.json",
+    "fixtures/seeded/SeededData_HappyPath.json",
+    "fixtures/seeded/TF-06_missing_cash_non_burn_rate.json",
+    "fixtures/seeded/TF-07_not_applicable_cash_runway.json",
+    "fixtures/seeded/TF-08_staleness_financials_penalty.json",
+    "fixtures/seeded/TF-10_corporate_action_split.json",
+    "fixtures/seeded/TF-12_penalty_cap_enforcement.json"
+  ],
+  "git_commit": "d606c1d239f0b138d1710b587d4841ba7c1b664e",
+  "hashes": {
+    "config_snapshot_hash": "c46ee59da910ddb1f3568dbc08816491429b4feebc6fbc75ce8bdc79e3372b8b",
+    "registry_bundle_hash": "5bfddfb7a899947fd3d37583c78cd1b97db9d04a5bcc24e297d98f805fd555ee",
+    "run_config_hashes": {
+      "RunConfig_DEEP": "2d72dc15b0d2a933c2f773b17bbd0ede628e0c2f8b8b43e199d7e735c98d8c51",
+      "run_config": "c9cd1a32f5a7558fb3825a2035c0f5c0deec2d243541df743e1d5af6aa282a3c"
+    }
+  },
+  "release_id": "dd11-phase0",
+  "tooling_versions": {
+    "platform": "Linux-6.12.47-x86_64-with-glibc2.39",
+    "python_version": "3.10.19"
+  }
+}
