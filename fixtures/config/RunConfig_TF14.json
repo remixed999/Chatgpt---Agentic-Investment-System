@@ -1,0 +1,16 @@
+{
+  "fixture_id": "RunConfig_TF14",
+  "version": "1.0",
+  "description": "Run config with 50% partial failure veto threshold for TF-14.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "run_mode": "FAST",
+    "partial_failure_veto_threshold_pct": 50.0,
+    "debug_mode": false,
+    "do_not_trade_flag": false,
+    "staleness_thresholds": {},
+    "penalty_caps": {},
+    "burn_rate_classification": {},
+    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+  }
+}

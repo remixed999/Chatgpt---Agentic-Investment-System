@@ -1,0 +1,64 @@
+{
+  "fixture_id": "PortfolioSnapshot_TF14_partial_failure",
+  "version": "1.0",
+  "description": "Two-holding portfolio snapshot for partial failure threshold checks (TF-14).",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "portfolio_id": "PORT-TF14",
+    "as_of_date": "2025-01-01T00:00:00Z",
+    "holdings": [
+      {
+        "identity": null,
+        "weight": 0.5,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 70.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 60.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      },
+      {
+        "identity": {
+          "holding_id": "HOLDING-TF14",
+          "ticker": "TF14",
+          "identifier": "TF14-US"
+        },
+        "weight": 0.5,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 88.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 74.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      }
+    ],
+    "cash_pct": 0.05,
+    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "fixture_id": "PortfolioSnapshot_TF04_identity_missing",
+  "version": "1.0",
+  "description": "Portfolio snapshot with a missing holding identity for TF-04.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "portfolio_id": "PORT-TF04",
+    "as_of_date": "2025-01-01T00:00:00Z",
+    "holdings": [
+      {
+        "identity": null,
+        "weight": 0.5,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 75.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 65.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      },
+      {
+        "identity": {
+          "holding_id": "HOLDING-VALID",
+          "ticker": "VAL",
+          "identifier": "VAL-US"
+        },
+        "weight": 0.5,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 82.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 70.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      }
+    ],
+    "cash_pct": 0.05,
+    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+  }
+}
