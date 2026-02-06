@@ -2,20 +2,20 @@
 
 ## Current State Assessment
 
-Repository evidence indicates the IMP-01 through IMP-06 implementation scope is already delivered in code (orchestration, determinism/canonicalization, guards & governance, penalty engine, agents, and aggregation). Deployment phase tooling for Phase 0/Phase 1 exists, along with fixture-driven deterministic replay utilities and test suites, but there are **no captured run artifacts or executed test reports** in the repo. As a result, implementation is complete, while verification and deployment gating remain unexecuted.
+Repository evidence indicates the IMP-01 through IMP-06 implementation scope is already delivered in code (orchestration, determinism/canonicalization, guards & governance, penalty engine, agents, and aggregation). Phase 0 readiness artifacts are now captured, while Phase 1 and beyond remain unexecuted. As a result, implementation is complete, Phase 0 gating is satisfied, and verification beyond Phase 0 remains unexecuted.
 
 **Acceptance-criteria signals already implemented in code:**
 - Deterministic canonicalization + hashing (canonical ordering/serialization and hash bundle computation). 
 - Determinism guard and ordering/serialization checks enforced at runtime. 
 - Intake validation and schema enforcement via guard G0 and schema parsing in orchestration.
-- Fixture-driven deterministic replay utilities and Phase 0/1 readiness tooling are present (but not executed).
+- Fixture-driven deterministic replay utilities and Phase 0/1 readiness tooling are present; Phase 0 has been executed and attested.
 
 ## Deployment Phases (DD-11)
 
 | Phase | Status | Evidence Summary | Blocking Dependencies | Notes |
 | --- | --- | --- | --- | --- |
-| Phase 0 — Pre-Deployment Readiness | FAILED | - Phase 0 readiness run captured in `release_manifests/dd11-phase0/phase0_attestation.md` (FAILED). | - Resolve readiness errors before rerun. | Not yet satisfied (artifacts captured, gate failed). |
-| Phase 1 — Local / Developer Validation | NOT STARTED | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Requires Phase 0 pass + Phase 1 report/artifacts. | Not yet satisfied (blocked by Phase 0 failure). |
+| Phase 0 — Pre-Deployment Readiness | COMPLETE | - Phase 0 readiness run captured in `release_manifests/dd11-phase0/phase0_attestation.md` (PASSED). | - None. | Phase 0 gate satisfied; release bundle canonicalized and pinned. |
+| Phase 1 — Local / Developer Validation | READY TO START | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Phase 0 PASSED. | Awaiting execution of Phase 1 validation gates. |
 | Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Requires Phase 1 pass + integration run artifacts. | Not yet satisfied. |
 | Phase 3 — Staging (Pre-Production) | NOT STARTED | - No staging run artifacts or regression reports in repo. | - Requires Phase 2 pass + staging artifacts. | Not yet satisfied. |
 | Phase 4 — Production Rollout | NOT STARTED | - No production deployment artifacts in repo. | - Requires Phase 3 pass + production deployment artifacts. | Not yet satisfied. |
@@ -52,4 +52,4 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 
 ## Next Legitimate Step
 
-Run Phase 0 readiness + Phase 1 local validation gates to generate auditable artifacts (manifest verification, pytest reports, deterministic replay/hash baselines). Do **not** start integration or staging deployment until Phase 1 artifacts are captured.
+Run Phase 1 local validation gates to generate auditable artifacts (manifest verification, pytest reports, deterministic replay/hash baselines). Do **not** start integration or staging deployment until Phase 1 artifacts are captured.
