@@ -18,6 +18,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         "test_precedence_order.py",
         "test_phase1_report_determinism.py",
         "test_imp03_emission_and_thresholds.py",
+        "test_release_phase0.py",
     }
     for item in items:
         if item.path.name not in keep:

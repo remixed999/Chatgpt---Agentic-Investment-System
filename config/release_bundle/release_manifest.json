@@ -1,0 +1,12 @@
+{
+  "created_at_utc": "2025-02-06T00:00:00Z",
+  "files": {
+    "ConfigSnapshot_release.json": "3bc14a036ba933cfc97328f1d7228ce993c193312ec76960a0b8354c194bd707",
+    "RunConfig_DEEP.json": "404c0b726904b9377bb718bc6d9cd5a99bf9039c3bf2804d7ffed575327c8bf7",
+    "config_snapshot.json": "34982a4d08630a63d43801a50836a965a209f6598f4a00a471a770783bcf8cf9",
+    "portfolio_config.json": "ba69c4ac34a90c6994fb2d43ad5a25475f71519cbc50d65fa5de4eac867c3ecb",
+    "portfolio_snapshot.json": "8a71ee6ab0d804f997a17e0d8a0279a6e7a0962b65ae66e131ec5885d1c987f0",
+    "run_config.json": "8c4cd38609cf6ddc59b3cd83d522148dc3fd489a903362d8639c3c95cef78960"
+  },
+  "release_id": "release_bundle_v1"
+}
