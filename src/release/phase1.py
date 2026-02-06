@@ -5,15 +5,11 @@ import json
 import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.testing.replay import BundlePaths, FixturePaths, replay_n_times
 from tools.phase0_readiness import run_phase0_readiness
-
-
-UTC = timezone.utc
 
 
 @dataclass
@@ -61,6 +57,8 @@ def run_phase1(argv: List[str]) -> int:
     release_id = f"phase1_{bundle_dir.name or 'local'}"
     phase0_out_dir = out_dir / "phase0"
     phase0_out_dir.mkdir(parents=True, exist_ok=True)
+    fixture_map = _fixture_matrix(fixtures_dir)
+    report_timestamp = _deterministic_timestamp(fixture_map)
 
     phase0_result = run_phase0_readiness(
         [
@@ -89,10 +87,11 @@ def run_phase1(argv: List[str]) -> int:
             out_dir=out_dir,
             status="FAIL",
             runs=runs,
-            fixture_ids=[],
+            fixture_ids=sorted(fixture_map.keys()),
             checks=checks,
             hashes=hashes_report,
             failures=failures,
+            report_timestamp=report_timestamp,
         )
         return 1
 
@@ -133,7 +132,6 @@ def run_phase1(argv: List[str]) -> int:
             Phase1Failure(check="pytest_phase1_suites", error="pytest suites failed")
         )
 
-    fixture_map = _fixture_matrix(fixtures_dir)
     bundle_paths = BundlePaths()
     deterministic_pass = True
 
@@ -207,6 +205,7 @@ def run_phase1(argv: List[str]) -> int:
         checks=checks,
         hashes=hashes_report,
         failures=failures,
+        report_timestamp=report_timestamp,
     )
 
     return 0 if status == "PASS" else 1
@@ -237,6 +236,41 @@ def _fixture_matrix(fixtures_dir: Path) -> Dict[str, FixturePaths]:
             config_snapshot=fixtures_dir / "config" / "ConfigSnapshot_v1.json",
         ),
     }
+
+
+def _load_json(path: Path) -> Dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _extract_portfolio_as_of_date(path: Path) -> Optional[str]:
+    payload = _load_json(path).get("payload", {})
+    as_of_date = payload.get("as_of_date")
+    if isinstance(as_of_date, str) and as_of_date:
+        return as_of_date
+    return None
+
+
+def _extract_created_at(path: Path) -> Optional[str]:
+    created_at = _load_json(path).get("created_at_utc")
+    if isinstance(created_at, str) and created_at:
+        return created_at
+    return None
+
+
+def _deterministic_timestamp(fixture_map: Dict[str, FixturePaths]) -> str:
+    for fixture_id in sorted(fixture_map.keys()):
+        as_of_date = _extract_portfolio_as_of_date(fixture_map[fixture_id].portfolio_snapshot)
+        if as_of_date:
+            return as_of_date
+    for fixture_id in sorted(fixture_map.keys()):
+        created_at = _extract_created_at(fixture_map[fixture_id].run_config)
+        if created_at:
+            return created_at
+    for fixture_id in sorted(fixture_map.keys()):
+        created_at = _extract_created_at(fixture_map[fixture_id].config_snapshot)
+        if created_at:
+            return created_at
+    return "2025-01-01T00:00:00Z"
 
 
 def _detect_mismatch(baseline, candidates):
@@ -274,6 +308,7 @@ def _write_report(
     checks: List[Phase1Check],
     hashes: List[Dict[str, Any]],
     failures: List[Phase1Failure],
+    report_timestamp: str,
 ) -> None:
     report = {
         "phase": "1",
@@ -291,7 +326,7 @@ def _write_report(
         "# Phase 1 Local Validation Report",
         "",
         f"Status: **{status}**",
-        f"Generated at (UTC): {datetime.now(UTC).isoformat().replace('+00:00', 'Z')}",
+        f"Generated at (UTC): {report_timestamp}",
         "",
         "## Checks",
     ]

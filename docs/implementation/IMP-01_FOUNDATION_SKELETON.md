@@ -29,6 +29,6 @@ python -m src.cli.run_local --bundle ./config/release_bundle --out ./artifacts/r
 ```
 
 ## Notes
-- Run log timestamps are deterministic; no `datetime.now()` usage.
+- Runtime timestamps are forbidden; Phase 1 derives its time base deterministically from fixture inputs (PortfolioSnapshot `as_of_date` preferred).
 - Validation errors are classified into portfolio vetoes or holding failures per DD-08.
 - Fixtures remain DD-02-shaped (PortfolioSnapshot includes `cash_pct`, holdings include `identity` and `metrics`), even when metrics/agents are stubbed in IMP-01.
