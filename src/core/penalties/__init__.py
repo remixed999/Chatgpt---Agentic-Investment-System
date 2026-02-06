@@ -6,7 +6,7 @@ from src.core.penalties.models import (
     MissingField,
     StalenessFlag,
 )
-from src.core.penalties.penalty_engine import compute_penalty_breakdown
+from src.core.penalties.penalty_engine import compute_penalty_breakdown, compute_penalty_breakdown_with_cap_tracking
 
 __all__ = [
     "ContradictionRecord",
@@ -16,4 +16,5 @@ __all__ = [
     "MissingField",
     "StalenessFlag",
     "compute_penalty_breakdown",
+    "compute_penalty_breakdown_with_cap_tracking",
 ]

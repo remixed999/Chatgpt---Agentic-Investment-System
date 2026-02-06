@@ -22,7 +22,7 @@ from src.core.models import (
     RunOutcome,
     Scorecard,
 )
-from src.core.penalties import DIOOutput, FXExposureReport, compute_penalty_breakdown
+from src.core.penalties import DIOOutput, FXExposureReport, compute_penalty_breakdown_with_cap_tracking
 
 
 @dataclass
@@ -213,7 +213,7 @@ def _build_scorecard(
     base_score = compute_base_score(holding_ctx, rubric, agent_results)
     dio_output = _extract_dio_output(agent_results, holding_id)
     fx_report = _extract_fx_report(agent_results, holding_id)
-    penalty_breakdown = compute_penalty_breakdown(
+    penalty_breakdown, cap_applied = compute_penalty_breakdown_with_cap_tracking(
         holding_id=holding_id,
         run_config=run_config,
         config_snapshot=config_snapshot,
@@ -222,7 +222,10 @@ def _build_scorecard(
         portfolio_config=portfolio_config,
         pscc_output_optional=fx_report,
     )
-    return Scorecard(base_score=base_score, penalty_breakdown=penalty_breakdown)
+    scorecard = Scorecard(base_score=base_score, penalty_breakdown=penalty_breakdown)
+    if cap_applied:
+        scorecard.notes.append("penalty_cap_applied")
+    return scorecard
 
 
 def _extract_dio_output(agent_results: Sequence[AgentResult], holding_id: str) -> DIOOutput:

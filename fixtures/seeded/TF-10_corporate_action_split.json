@@ -1,0 +1,14 @@
+{
+  "fixture_id": "TF-10_corporate_action_split",
+  "version": "1.0",
+  "description": "Corporate action split within 90 days triggers Category F penalty.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "holding_id": "H1",
+    "dio_output": {
+      "corporate_action_risk": {
+        "split_days_ago": 60
+      }
+    }
+  }
+}

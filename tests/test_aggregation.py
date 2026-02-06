@@ -166,12 +166,14 @@ def test_tf12_penalty_caps_enforced_for_deep_and_fast():
     result_deep = Orchestrator().run(**inputs)
     holding = next(packet for packet in result_deep.holding_packets if packet.holding_id == "HOLDING-003")
     assert holding.scorecard.penalty_breakdown.total_penalties == -35.0
+    assert "penalty_cap_applied" in holding.scorecard.notes
 
     fast_inputs = deepcopy(inputs)
     fast_inputs["run_config_data"] = {**fast_inputs["run_config_data"], "run_mode": "FAST"}
     result_fast = Orchestrator().run(**fast_inputs)
     holding_fast = next(packet for packet in result_fast.holding_packets if packet.holding_id == "HOLDING-003")
     assert holding_fast.scorecard.penalty_breakdown.total_penalties >= -40.0
+    assert "penalty_cap_applied" not in holding_fast.scorecard.notes
 
     expected = _load_fixture("fixtures/expected/TF-12_expected_penalty_cap.json")
     assert canonical_json_dumps(result_deep.portfolio_committee_packet.model_dump()) == canonical_json_dumps(expected)
