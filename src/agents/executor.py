@@ -78,9 +78,10 @@ def _failed_result(agent: BaseAgent, context: object, reason: str) -> AgentResul
         scope=agent.scope,
         status="failed",
         confidence=0.0,
-        key_findings={"conformance_error": True, "error": reason},
+        key_findings={},
         metrics=[],
         suggested_penalties=[],
         veto_flags=[],
+        notes=reason,
         holding_id=holding_id,
     )

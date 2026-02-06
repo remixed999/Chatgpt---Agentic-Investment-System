@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, root_validator
 
@@ -102,9 +102,9 @@ class PenaltyItem(StrictBaseModel):
 
 class AgentResult(StrictBaseModel):
     agent_name: str
-    scope: str
-    status: str
-    confidence: float
+    scope: Literal["portfolio", "holding"]
+    status: Literal["completed", "failed", "skipped"]
+    confidence: float = Field(..., ge=0.0, le=1.0)
     key_findings: Dict[str, Any] = Field(default_factory=dict)
     metrics: List[MetricValue] = Field(default_factory=list)
     suggested_penalties: List[PenaltyItem] = Field(default_factory=list)

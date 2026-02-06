@@ -147,6 +147,8 @@ class GovernanceEngine:
             return False
         if dio_output.integrity_veto_triggered:
             return True
+        if dio_output.unsourced_numbers_detected:
+            return True
         if dio_output.missing_hard_stop_fields:
             return True
         if any(flag.hard_stop_triggered for flag in dio_output.staleness_flags):

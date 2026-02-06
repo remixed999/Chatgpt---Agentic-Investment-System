@@ -28,6 +28,27 @@ class MetricValue(StrictBaseModel):
     not_applicable: bool = False
 
 
+class PenaltyItem(StrictBaseModel):
+    category: str
+    reason: str
+    amount: float
+    source_agent: str
+
+
+class AgentResult(StrictBaseModel):
+    agent_name: str
+    scope: Literal["portfolio", "holding"]
+    status: Literal["completed", "failed", "skipped"]
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    key_findings: Dict[str, Any] = Field(default_factory=dict)
+    metrics: List[MetricValue] = Field(default_factory=list)
+    suggested_penalties: List[PenaltyItem] = Field(default_factory=list)
+    veto_flags: List[str] = Field(default_factory=list)
+    counter_case: Optional[str] = None
+    notes: Optional[str] = None
+    holding_id: Optional[str] = None
+
+
 class HoldingIdentity(StrictBaseModel):
     holding_id: Optional[str] = None
     ticker: Optional[str] = None

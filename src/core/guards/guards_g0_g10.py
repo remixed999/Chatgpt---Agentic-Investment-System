@@ -20,6 +20,7 @@ from src.core.models import (
     RunConfig,
     RunOutcome,
 )
+from src.schemas.models import AgentResult as AgentResultSchema
 from src.core.canonicalization import canonicalization_idempotent, detect_ordering_violations
 
 
@@ -137,6 +138,23 @@ class G5AgentConformanceGuard(Guard):
     def evaluate(self, *, context: GuardContext) -> GuardEvaluation:
         violations: List[GuardViolation] = []
         for agent in context.agent_results:
+            try:
+                validator = getattr(AgentResultSchema, "model_validate", AgentResultSchema.parse_obj)
+                validator(agent.dict())
+            except Exception:  # noqa: BLE001 - guard should classify schema violations deterministically
+                if agent.scope == "holding":
+                    violations.append(
+                        GuardViolation(
+                            scope=GuardScope.HOLDING,
+                            outcome=RunOutcome.FAILED,
+                            reason="agent_schema_invalid",
+                            holding_id=agent.holding_id,
+                        )
+                    )
+                    continue
+                return GuardEvaluation(
+                    result=fail_result(self.guard_id, RunOutcome.FAILED, ["agent_schema_invalid"]),
+                )
             if agent.scope not in {"portfolio", "holding"}:
                 outcome = RunOutcome.FAILED
                 reasons = ["agent_scope_invalid"]
