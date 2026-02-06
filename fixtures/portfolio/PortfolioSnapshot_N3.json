@@ -8,20 +8,33 @@
     "as_of_date": "2025-01-01T00:00:00Z",
     "holdings": [
       {
-        "holding_id": "HOLDING-001",
-        "identifier": "AAA-US",
-        "weight": 0.4
+        "identity": {
+          "holding_id": "HOLDING-001",
+          "ticker": "AAA",
+          "identifier": "AAA-US"
+        },
+        "weight": 0.4,
+        "metrics": {}
       },
       {
-        "holding_id": "HOLDING-002",
-        "identifier": "BBB-US",
-        "weight": 0.35
+        "identity": {
+          "holding_id": "HOLDING-002",
+          "ticker": "BBB",
+          "identifier": "BBB-US"
+        },
+        "weight": 0.35,
+        "metrics": {}
       },
       {
-        "holding_id": "HOLDING-003",
-        "identifier": "CCC-US",
-        "weight": 0.25
+        "identity": {
+          "holding_id": "HOLDING-003",
+          "ticker": "CCC",
+          "identifier": "CCC-US"
+        },
+        "weight": 0.25,
+        "metrics": {}
       }
-    ]
+    ],
+    "cash_pct": 0.05
   }
 }

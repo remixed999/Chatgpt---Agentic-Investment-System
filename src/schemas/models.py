@@ -15,16 +15,38 @@ class StrictBaseModel(BaseModel):
     }
 
 
-class PortfolioSnapshot(StrictBaseModel):
-    portfolio_id: str
-    as_of_date: str
-    holdings: List["HoldingInput"]
+class SourceRef(StrictBaseModel):
+    origin: Optional[str] = None
+    as_of_date: datetime
+    retrieval_timestamp: datetime
+
+
+class MetricValue(StrictBaseModel):
+    value: Optional[float] = None
+    source_ref: Optional[SourceRef] = None
+    missing_reason: Optional[str] = None
+    not_applicable: bool = False
+
+
+class HoldingIdentity(StrictBaseModel):
+    holding_id: Optional[str] = None
+    ticker: Optional[str] = None
+    identifier: Optional[str] = None
 
 
 class HoldingInput(StrictBaseModel):
-    holding_id: str
-    identifier: Optional[str] = None
-    weight: Optional[float] = None
+    identity: Optional[HoldingIdentity] = None
+    weight: float
+    currency: Optional[str] = None
+    metrics: Dict[str, MetricValue] = Field(default_factory=dict)
+
+
+class PortfolioSnapshot(StrictBaseModel):
+    portfolio_id: str
+    as_of_date: str
+    holdings: List[HoldingInput]
+    cash_pct: float
+    retrieval_timestamp: Optional[str] = None
 
 
 class PortfolioConfig(StrictBaseModel):

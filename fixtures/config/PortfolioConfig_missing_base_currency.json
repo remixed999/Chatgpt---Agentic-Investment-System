@@ -1,0 +1,7 @@
+{
+  "fixture_id": "PortfolioConfig_missing_base_currency",
+  "version": "1.0",
+  "description": "Portfolio config missing base_currency for TF-02.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {}
+}

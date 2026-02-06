@@ -8,15 +8,24 @@
     "as_of_date": "2025-01-01T00:00:00Z",
     "holdings": [
       {
-        "holding_id": "HOLDING-MISSING",
-        "identifier": null,
-        "weight": 0.5
+        "identity": {
+          "holding_id": "HOLDING-MISSING",
+          "ticker": null,
+          "identifier": "MISS-US"
+        },
+        "weight": 0.5,
+        "metrics": {}
       },
       {
-        "holding_id": "HOLDING-VALID",
-        "identifier": "VAL-US",
-        "weight": 0.5
+        "identity": {
+          "holding_id": "HOLDING-VALID",
+          "ticker": "VAL",
+          "identifier": "VAL-US"
+        },
+        "weight": 0.5,
+        "metrics": {}
       }
-    ]
+    ],
+    "cash_pct": 0.1
   }
 }
