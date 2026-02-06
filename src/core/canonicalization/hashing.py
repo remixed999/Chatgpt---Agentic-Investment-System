@@ -28,22 +28,27 @@ def sha256_text(payload: str) -> str:
 
 
 def hash_portfolio_snapshot(snapshot: PortfolioSnapshot) -> str:
+    # Hash input: canonical PortfolioSnapshot (decision-significant snapshot state).
     return _hash_payload(snapshot)
 
 
 def hash_portfolio_config(config: PortfolioConfig) -> str:
+    # Hash input: canonical PortfolioConfig (portfolio-level config inputs).
     return _hash_payload(config)
 
 
 def hash_run_config(run_config: RunConfig) -> str:
+    # Hash input: canonical RunConfig (runtime policy/config inputs).
     return _hash_payload(run_config)
 
 
 def hash_committee_packet(packet: PortfolioCommitteePacket) -> str:
+    # Hash input: canonical PortfolioCommitteePacket (ordered committee output packet).
     return _hash_payload(packet)
 
 
 def hash_decision_payload(payload: Any) -> str:
+    # Hash input: canonical decision payload (portfolio committee packet + holding packets).
     return _hash_payload(payload)
 
 
@@ -55,6 +60,7 @@ def compute_run_hashes(
     committee_packet: PortfolioCommitteePacket,
     decision_payload: Any,
 ) -> RunHashes:
+    # Hash inputs are the canonicalized decision-significant inputs and outputs defined by DD-07.
     snapshot_hash = hash_portfolio_snapshot(portfolio_snapshot)
     config_hash = hash_portfolio_config(portfolio_config)
     run_config_hash = hash_run_config(run_config)

@@ -26,6 +26,28 @@ def _load_fixture(path: str) -> dict:
     return payload.get("payload", payload)
 
 
+def _base_inputs() -> dict:
+    config_snapshot = _load_fixture("fixtures/config/ConfigSnapshot_v1.json")
+    seeded = _load_fixture("fixtures/seeded/SeededData_HappyPath.json")
+    return {
+        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
+        "portfolio_config_data": _load_fixture("fixtures/portfolio_config.json"),
+        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
+        "config_snapshot_data": {
+            **config_snapshot,
+            "registries": {
+                **config_snapshot["registries"],
+                **seeded,
+            },
+        },
+        "manifest_data": None,
+        "config_hashes": {
+            "run_config_hash": "placeholder",
+            "config_snapshot_hash": "placeholder",
+        },
+    }
+
+
 def test_snapshot_hash_stable_for_holdings_order():
     snapshot_a = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio_snapshot_order_a.json"))
     snapshot_b = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio_snapshot_order_b.json"))
@@ -59,17 +81,8 @@ def test_timestamp_exclusion_keeps_hashes_stable():
 
 
 def test_hash_gating_skips_failed_and_vetoed_runs():
-    inputs = {
-        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
-        "portfolio_config_data": {"base_currency": None},
-        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
-        "config_snapshot_data": _load_fixture("fixtures/config/ConfigSnapshot_v1.json"),
-        "manifest_data": None,
-        "config_hashes": {
-            "run_config_hash": "placeholder",
-            "config_snapshot_hash": "placeholder",
-        },
-    }
+    inputs = _base_inputs()
+    inputs["portfolio_config_data"] = {"base_currency": None}
 
     orchestrator = Orchestrator(now_func=lambda: FIXED_TIME)
     result = orchestrator.run(**inputs)
@@ -77,6 +90,35 @@ def test_hash_gating_skips_failed_and_vetoed_runs():
     assert result.outcome == RunOutcome.VETOED
     assert result.portfolio_committee_packet is not None
     assert result.portfolio_committee_packet.run_hash is None
+    assert result.portfolio_committee_packet.decision_hash is None
+
+
+def test_hash_gating_emits_hashes_for_completed_runs():
+    inputs = _base_inputs()
+
+    result = Orchestrator(now_func=lambda: FIXED_TIME).run(**inputs)
+
+    assert result.outcome == RunOutcome.COMPLETED
+    packet = result.portfolio_committee_packet
+    assert packet is not None
+    assert packet.snapshot_hash is not None
+    assert packet.config_hash is not None
+    assert packet.run_config_hash is not None
+    assert packet.decision_hash is not None
+    assert packet.run_hash is not None
+
+
+def test_hash_gating_skips_failed_runs():
+    inputs = _base_inputs()
+    inputs["portfolio_snapshot_data"] = {
+        "as_of_date": "2024-01-01T00:00:00+00:00",
+        "holdings": [],
+    }
+
+    result = Orchestrator(now_func=lambda: FIXED_TIME).run(**inputs)
+
+    assert result.outcome == RunOutcome.FAILED
+    assert result.portfolio_committee_packet is None
 
 
 def test_numeric_formatting_is_canonical():

@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from pydantic import BaseModel
 
-from src.core.canonicalization.rules import EXCLUDED_FIELDS, ORDERING_RULES
+from src.core.canonicalization.rules import EXCLUDED_FIELDS, ORDERING_RULES, TRIM_FIELDS
 
 
 class _ExcludeType:
@@ -31,6 +31,8 @@ def _canonicalize_value(value: Any, parent_key: Optional[str]) -> Any:
         return _canonicalize_list(value, parent_key)
     if isinstance(value, tuple):
         return _canonicalize_list(list(value), parent_key)
+    if isinstance(value, str) and parent_key in TRIM_FIELDS:
+        return value.strip()
     if isinstance(value, datetime):
         return value.isoformat()
     if isinstance(value, float):
@@ -68,6 +70,46 @@ def _canonicalize_list(values: Iterable[Any], parent_key: Optional[str]) -> List
         return [item for item in ordered]
 
     return normalized
+
+
+def canonicalization_idempotent(payload: Any) -> bool:
+    canonical = canonicalize_payload(payload)
+    return canonicalize_payload(canonical) == canonical
+
+
+def detect_ordering_violations(payload: Any) -> List[str]:
+    violations: List[str] = []
+
+    def _walk(value: Any, parent_key: Optional[str], path: str) -> None:
+        if isinstance(value, BaseModel):
+            _walk(value.model_dump(), parent_key, path)
+            return
+        if isinstance(value, dict):
+            for key, nested in value.items():
+                if key in EXCLUDED_FIELDS:
+                    continue
+                next_path = f"{path}.{key}" if path else key
+                _walk(nested, key, next_path)
+            return
+        if isinstance(value, (list, tuple)):
+            list_value = list(value)
+            if parent_key and parent_key in ORDERING_RULES:
+                if any(not isinstance(item, dict) for item in list_value):
+                    violations.append(path or parent_key)
+                else:
+                    normalized = [canonicalize_payload(item) for item in list_value]
+                    ordering = ORDERING_RULES[parent_key]
+                    ordered = ordering(normalized)
+                    if ordered is None:
+                        violations.append(path or parent_key)
+                    elif list(ordered) != normalized:
+                        violations.append(path or parent_key)
+            for index, item in enumerate(list_value):
+                next_path = f"{path}[{index}]" if path else f"[{index}]"
+                _walk(item, None, next_path)
+
+    _walk(payload, None, "")
+    return violations
 
 
 def canonical_json_dumps(payload: Any) -> str:
