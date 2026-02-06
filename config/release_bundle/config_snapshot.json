@@ -1,5 +1,8 @@
 {
   "rubric_version": "IMP-01",
-  "hard_stop_field_registry": {},
-  "penalty_critical_field_registry": {}
+  "registries": {
+    "hard_stop_field_registry": {},
+    "penalty_critical_field_registry": {}
+  },
+  "hash": "6783bf07f066a4a3f3be079c0246b58831018d27956bf329aaf75465bb06235a"
 }
