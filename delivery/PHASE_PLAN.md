@@ -1,49 +1,55 @@
 # Phase Plan
 
-## Current Status Assessment
+## Current State Assessment
 
-Based on the artefacts present in the repository, the high-level and detailed design phases are complete and have been formally reviewed. The design review and deployment readiness assessment classify the program as **READY_WITH_CONDITIONS**, with a small set of clarifications and one fixture/canonicalization mismatch to resolve before implementation progresses. Implementation work appears to be underway (core modules exist), while formal testing, release, and closure steps have not yet begun.
+Repository evidence indicates the IMP-01 through IMP-06 implementation scope is already delivered in code (orchestration, determinism/canonicalization, guards & governance, penalty engine, agents, and aggregation). Deployment phase tooling for Phase 0/Phase 1 exists, along with fixture-driven deterministic replay utilities and test suites, but there are **no captured run artifacts or executed test reports** in the repo. As a result, implementation is complete, while verification and deployment gating remain unexecuted.
 
-**Open design conditions from review:**
-- Clarify authoritative schema sources and align naming across DD-01/DD-02/DD-03.
-- Resolve the DD-09 TF-13 vs DD-07 canonicalization mismatch.
+**Acceptance-criteria signals already implemented in code:**
+- Deterministic canonicalization + hashing (canonical ordering/serialization and hash bundle computation). 
+- Determinism guard and ordering/serialization checks enforced at runtime. 
+- Intake validation and schema enforcement via guard G0 and schema parsing in orchestration.
+- Fixture-driven deterministic replay utilities and Phase 0/1 readiness tooling are present (but not executed).
 
-## Projects (Activities List)
+## Deployment Phases (DD-11)
 
-| Phase | Task ID | Task Name | Description | Owner | Status | Dependencies | Deliverable | Evidence/Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| High-Level Design | HLD-01 | Define Vision & Objectives | Define system vision, objectives, and success criteria | Andrew | Complete | - | Project Overview | HLD v1.0 covers vision, goals, and success criteria. |
-| High-Level Design | HLD-02 | Define Scope | Define in-scope and out-of-scope items | Andrew | Complete | HLD-01 | Scope Definition | Scope defined in HLD v1.0. |
-| High-Level Design | HLD-03 | Risks & Assumptions | Identify risks, assumptions, mitigations | Andrew | Complete | HLD-02 | Risk Register | Risks/assumptions documented. |
-| High-Level Design | HLD-04 | Produce HLD | Author and approve High Level Design | Andrew | Complete | HLD-03 | HLD v1.0 | HLD v1.0 present. |
-| Detailed Design | DD-01 | Schema Specifications | Define all schemas and invariants | Andrew | Complete (clarifications pending) | HLD-04 | SCHEMA_SPECIFICATIONS.md | Design review calls for schema source clarification. |
-| Detailed Design | DD-02 | Data Contracts | Define agent-to-agent data contracts | Andrew | Complete (clarifications pending) | DD-01 | DATA_CONTRACTS.md | Field naming alignment requested in review. |
-| Detailed Design | DD-03 | Agent Interfaces | Define agent inputs and outputs | Andrew | Complete (clarifications pending) | DD-01 | AGENT_INTERFACE_CONTRACTS.md | Field naming alignment requested in review. |
-| Detailed Design | DD-04 | Orchestration Flow & State Machine | Define orchestration flow and state transitions | Andrew | Complete (clarifications pending) | DD-02, DD-03 | ORCHESTRATION_FLOW.md | Review requests emission timing clarification. |
-| Detailed Design | DD-05 | Penalty Engine Specification | Define penalties, categories, scoring | Andrew | Complete | DD-01 | PENALTY_ENGINE_SPEC.md | - |
-| Detailed Design | DD-06 | Governance Rules | Define veto, overrides, escalation logic | Andrew | Complete | DD-05 | GOVERNANCE_RULES.md | - |
-| Detailed Design | DD-07 | Canonicalization Specification | Define deterministic hashing and equivalence | Andrew | Complete (clarifications pending) | DD-01 | CANONICALIZATION_SPEC.md | Fixture mismatch noted in review. |
-| Detailed Design | DD-08 | Orchestration Guards | Define safety rails and enforcement | Andrew | Complete | DD-04, DD-06 | ORCHESTRATION_GUARDS.md | - |
-| Detailed Design | DD-09 | Test Fixture Specifications | Define deterministic test fixtures | Andrew | Complete (clarifications pending) | DD-01–DD-08 | TEST_FIXTURE_SPECIFICATIONS.md | Fixture mismatch noted in review. |
-| Detailed Design | DD-10 | Test Strategy | Define overall testing approach and gates | Andrew | Complete | DD-01–DD-09 | TEST_STRATEGY.md | Added task (document exists). |
-| Detailed Design | DD-11 | Phased Deployment Plan | Define phased deployment and promotion gates | Andrew | Complete | DD-10 | PHASED_DEPLOYMENT_PLAN.md | Added task (document exists). |
-| Detailed Design | DD-12 | Deployment Risk Register | Identify deployment risks and mitigations | Andrew | Complete | DD-11 | DEPLOYMENT_RISK_REGISTER.md | Added task (document exists). |
-| Deployment Planning | DEP-01 | Design Readiness Review | Formal design-lead signoff | Andrew | Complete (ready with conditions) | DD Complete | Design Readiness Statement | Readiness assessment + design review completed. |
-| Deployment Planning | DEP-02 | Deployment Architecture | Define deployable units and environments | Andrew | Complete | DEP-01 | Deployment Architecture Summary | Documented in readiness assessment. |
-| Deployment Planning | DEP-03 | Phased Deployment Strategy | Define phased rollout | Andrew | Complete | DEP-02 | Deployment Strategy | Documented in DD-11. |
-| Deployment Planning | DEP-04 | Deployment Risk Register | Identify deployment risks | Andrew | Complete | DEP-03 | Deployment Risk Register | Documented in DD-12. |
-| Deployment Planning | DEP-05 | Deployment Readiness Checklist | Design-to-deployment handoff | Andrew | Complete | DEP-04 | Readiness Checklist | Checklist included in readiness assessment. |
-| Implementation | IMP-01 | Foundation Skeleton | Bootstrap core orchestration and configs | Engineering | In Progress | DEP-05 | Skeleton System | Core modules exist; completion status not yet confirmed. |
-| Implementation | IMP-02 | Determinism & Canonicalization | Implement hashing and ordering | Engineering | In Progress | IMP-01 | Canonicalization Engine | Canonicalization module exists; verify against DD-07. |
-| Implementation | IMP-03 | Governance & Guards | Implement vetoes, overrides, guards | Engineering | In Progress | IMP-02 | Governance Layer | Governance/guards modules exist; verify against DD-06/DD-08. |
-| Implementation | IMP-04 | Penalty Engine | Implement penalty computation | Engineering | In Progress | IMP-03 | Penalty Engine | Penalty module exists; verify against DD-05. |
-| Implementation | IMP-05 | Agent Enablement | Implement agents incrementally | Engineering | In Progress | IMP-04 | Agent Services | Agent interfaces exist; enablement status TBD. |
-| Implementation | IMP-06 | Portfolio Aggregation | Implement aggregation and scoring | Engineering | In Progress | IMP-05 | Aggregation Engine | Aggregation/orchestration modules exist; verify completeness. |
-| Testing | TST-01 | Unit Testing | Run unit tests against fixtures | Engineering | Not Started | IMP-06 | Unit Test Results | No executed test reports captured yet. |
-| Testing | TST-02 | Integration Testing | Full orchestration runs | Engineering | Not Started | TST-01 | Integration Test Report | Pending test execution. |
-| Testing | TST-03 | Replay & Determinism Testing | Validate hash stability | Engineering | Not Started | TST-02 | Replay Validation | Pending test execution. |
-| Release | REL-01 | Staging Deployment | Deploy to staging environment | Engineering | Not Started | TST-03 | Staging Deployment | Pending testing completion. |
-| Release | REL-02 | Production Deployment | Deploy to production | Engineering | Not Started | REL-01 | Production Release | Pending staging. |
-| Closure | CLS-01 | Post-Implementation Review | Review outcomes vs objectives | Andrew | Not Started | REL-02 | PIR Report | Pending release. |
-| Closure | CLS-02 | Documentation Finalization | Finalize all artefacts | Andrew | Not Started | CLS-01 | Final Docs | Pending PIR. |
-| Closure | CLS-03 | Project Closure | Formal project closeout | Andrew | Not Started | CLS-02 | Closure Sign-off | Pending documentation finalization. |
+| Phase | Status | Evidence Summary | Blocking Dependencies | Notes |
+| --- | --- | --- | --- | --- |
+| Phase 0 — Pre-Deployment Readiness | NOT STARTED | - Phase 0 readiness tool and report writer exist in `src/release/phase0.py`. <br>- Repository provides a release bundle with manifest and config inputs in `config/release_bundle/`. | - Phase 0 report/artifacts not present in repo. | Not yet satisfied (tooling exists, execution artifacts missing). |
+| Phase 1 — Local / Developer Validation | NOT STARTED | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Phase 1 report/artifacts not present in repo. | Not yet satisfied (tooling exists, execution artifacts missing). |
+| Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Requires Phase 1 pass + integration run artifacts. | Not yet satisfied. |
+| Phase 3 — Staging (Pre-Production) | NOT STARTED | - No staging run artifacts or regression reports in repo. | - Requires Phase 2 pass + staging artifacts. | Not yet satisfied. |
+| Phase 4 — Production Rollout | NOT STARTED | - No production deployment artifacts in repo. | - Requires Phase 3 pass + production deployment artifacts. | Not yet satisfied. |
+| Phase 5 — Post-Deployment Validation & Monitoring | NOT STARTED | - No post-deployment replay or monitoring artifacts in repo. | - Requires Phase 4 completion + monitoring artifacts. | Not yet satisfied. |
+
+## Implementation Tasks (IMP-01 through IMP-06)
+
+| Task | Status | Evidence Summary | Blocking Dependencies | Notes |
+| --- | --- | --- | --- | --- |
+| IMP-01 — Foundation Skeleton | COMPLETE | - Orchestrator performs deterministic run flow, intake validation, and guard gating. <br>- Config bundle loader and local CLI for deterministic runs are implemented. | - None. | Already satisfied. |
+| IMP-02 — Determinism & Canonicalization | COMPLETE | - Canonicalization rules and canonical JSON serialization implemented. <br>- Hash bundle computation implemented and used for completed outcomes. <br>- Determinism guard enforces ordering/idempotence checks. | - None. | Already satisfied. |
+| IMP-03 — Governance & Guards | COMPLETE | - Guard registry includes G0–G10 ordering. <br>- Governance engine enforces DIO veto, GRRA short-circuit, and Risk Officer veto precedence. | - None. | Already satisfied. |
+| IMP-04 — Penalty Engine | COMPLETE | - Penalty engine computes deterministic penalty items with caps and ordering rules. | - None. | Already satisfied. |
+| IMP-05 — Agent Enablement | COMPLETE | - Agent registry defines enabled agents and deterministic phase ordering. <br>- Agent executor and implementations are present in `src/agents/`. | - None. | Already satisfied. |
+| IMP-06 — Portfolio Aggregation | COMPLETE | - Aggregation builds holding/committee packets and emits hashes for COMPLETED outcomes. <br>- Deterministic ordering for holdings and governance trail enforced before hashing. | - None. | Already satisfied. |
+
+## Testing, Release, and Closure
+
+| Task | Status | Evidence Summary | Blocking Dependencies | Notes |
+| --- | --- | --- | --- | --- |
+| TST-01 — Unit Testing | NOT STARTED | - Unit/contract/determinism test suites exist under `tests/` but no execution artifacts captured. | - Execute tests and capture reports. | Not yet satisfied. |
+| TST-02 — Integration Testing | NOT STARTED | - No integration run artifacts or reports in repo. | - Requires TST-01 execution and integration environment runs. | Not yet satisfied. |
+| TST-03 — Replay & Determinism Testing | NOT STARTED | - Deterministic replay utilities exist but no replay artifacts are captured. | - Requires replay executions + captured hash baselines. | Not yet satisfied. |
+| REL-01 — Staging Deployment | NOT STARTED | - No staging deployment artifacts in repo. | - Requires TST-03 completion. | Not yet satisfied. |
+| REL-02 — Production Deployment | NOT STARTED | - No production deployment artifacts in repo. | - Requires REL-01 completion. | Not yet satisfied. |
+| CLS-01 — Post-Implementation Review | NOT STARTED | - No PIR artifacts in repo. | - Requires REL-02 completion. | Not yet satisfied. |
+| CLS-02 — Documentation Finalization | NOT STARTED | - No closure documentation artifacts in repo. | - Requires CLS-01 completion. | Not yet satisfied. |
+| CLS-03 — Project Closure | NOT STARTED | - No closure sign-off artifacts in repo. | - Requires CLS-02 completion. | Not yet satisfied. |
+
+## Conflict Detection (Plan vs. Reality)
+
+- **IMP-01 through IMP-06 are implemented in code but were previously marked “In Progress.”** The repository shows completed orchestration, determinism/canonicalization, governance, penalty engine, agent enablement, and aggregation modules. The plan has been updated to mark these as COMPLETE to avoid duplicate implementation work.
+- **Deployment phases and test executions remain unverified despite tooling existing.** The plan now marks DD-11 phases and testing tasks as NOT STARTED until actual execution artifacts exist, preventing premature promotion.
+
+## Next Legitimate Step
+
+Run Phase 0 readiness + Phase 1 local validation gates to generate auditable artifacts (manifest verification, pytest reports, deterministic replay/hash baselines). Do **not** start integration or staging deployment until Phase 1 artifacts are captured.
