@@ -101,8 +101,12 @@ class Orchestrator:
         holding_packets: List[HoldingPacket] = []
         seen_ids = set()
 
-        for holding in validation.valid_holdings:
-            holding_id = holding.holding_id
+        for index, holding in enumerate(validation.valid_holdings):
+            holding_id = (
+                holding.identity.holding_id
+                if holding.identity and holding.identity.holding_id
+                else f"holding_index_{index}"
+            )
             seen_ids.add(holding_id)
             if holding_id in validation.holding_errors:
                 runlog.add_event(

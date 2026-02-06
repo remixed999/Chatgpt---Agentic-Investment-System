@@ -30,7 +30,11 @@ def validate_or_raise(
         if not isinstance(holding_data, dict):
             holding_errors[f"holding_index_{index}"] = ["holding_not_object"]
             continue
-        holding_id = str(holding_data.get("holding_id") or f"holding_index_{index}")
+        identity_data = holding_data.get("identity")
+        identity_id = None
+        if isinstance(identity_data, dict):
+            identity_id = identity_data.get("holding_id")
+        holding_id = str(identity_id or f"holding_index_{index}")
         try:
             holding = HoldingInput.model_validate(holding_data)
         except ValidationError as exc:
@@ -44,6 +48,8 @@ def validate_or_raise(
                 "portfolio_id": portfolio_snapshot_data.get("portfolio_id"),
                 "as_of_date": portfolio_snapshot_data.get("as_of_date"),
                 "holdings": valid_holdings,
+                "cash_pct": portfolio_snapshot_data.get("cash_pct"),
+                "retrieval_timestamp": portfolio_snapshot_data.get("retrieval_timestamp"),
             }
         )
     except ValidationError as exc:
@@ -77,9 +83,19 @@ def validate_or_raise(
         portfolio_errors.append("base_currency_missing")
         portfolio_vetoed = True
 
-    for holding in valid_holdings:
-        if holding.identifier is None or str(holding.identifier).strip() == "":
-            holding_errors.setdefault(holding.holding_id, []).append("holding_identity_missing")
+    for index, holding in enumerate(valid_holdings):
+        holding_identity = holding.identity
+        holding_id = (
+            str(holding_identity.holding_id)
+            if holding_identity and holding_identity.holding_id
+            else f"holding_index_{index}"
+        )
+        if (
+            holding_identity is None
+            or not holding_identity.holding_id
+            or not holding_identity.ticker
+        ):
+            holding_errors.setdefault(holding_id, []).append("holding_identity_missing")
 
     return ValidationResult(
         portfolio_errors=portfolio_errors,

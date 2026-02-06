@@ -33,8 +33,8 @@ def test_tf01_happy_path_completed() -> None:
 
 def test_tf02_missing_base_currency_vetoed() -> None:
     result = Orchestrator().run(
-        portfolio_snapshot_data=_load_payload("fixtures/portfolio/PortfolioSnapshot_missing_base_currency.json"),
-        portfolio_config_data={"base_currency": None},
+        portfolio_snapshot_data=_load_payload("fixtures/portfolio/PortfolioSnapshot_N3.json"),
+        portfolio_config_data=_load_payload("fixtures/config/PortfolioConfig_missing_base_currency.json"),
         run_config_data=_load_payload("fixtures/config/RunConfig_DEEP.json"),
         config_snapshot_data=_load_payload("fixtures/config/ConfigSnapshot_BASE.json"),
     )

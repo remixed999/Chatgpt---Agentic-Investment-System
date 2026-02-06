@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 from src.core.config.loader import load_bundle
@@ -41,12 +40,11 @@ def main() -> None:
 
     summary_path = out_dir / "summary.json"
     summary_path.write_text(
-        json.dumps(
+        stable_json_dumps(
             {
                 "run_id": result.run_log.run_id,
                 "portfolio_outcome": result.packet.portfolio_run_outcome.value,
-            },
-            indent=2,
+            }
         ),
         encoding="utf-8",
     )
