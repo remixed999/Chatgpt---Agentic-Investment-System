@@ -1,0 +1,68 @@
+{
+  "fixture_id": "TF-01",
+  "hashes": {
+    "committee_packet_hash": null,
+    "config_hash": "95cf32ff2dae5d19766577eb70433439de4398b740c3cb4bef1782af3a8e2d6e",
+    "decision_hash": null,
+    "holding_packet_hashes": {},
+    "run_config_hash": "8d1081095f8da96d7b87221999ba17b10a0ace463a81b96ca02b7b3f60fa0c5e",
+    "run_hash": null,
+    "snapshot_hash": "681f209ce4750fbb3864aeef36688f39585f2505beac9fbe41fbbf4211efdc39"
+  },
+  "logs": {
+    "fixture_id": "TF-01",
+    "guard_results": [
+      {
+        "guard_id": "G0",
+        "outcome": "FAILED",
+        "reasons": [
+          "manifest_missing_run_config_hash",
+          "manifest_missing_config_snapshot_hash"
+        ],
+        "status": "failed"
+      },
+      {
+        "guard_id": "G1",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G10",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G2",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G3",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G4",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G8",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      }
+    ],
+    "run_index": 0,
+    "run_outcome": "FAILED"
+  },
+  "outcomes": {
+    "per_holding_outcomes": {},
+    "portfolio_run_outcome": "FAILED"
+  }
+}

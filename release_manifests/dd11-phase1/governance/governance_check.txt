@@ -1,0 +1,11 @@
+Expected guard order:
+G0, G1, G2, G3, G4, G5, G6, G7, G8, G9, G10
+
+Fixture TF-01: guard_ids=['G0', 'G1', 'G10', 'G2', 'G3', 'G4', 'G8']
+  -> Guard outcomes: {'FAILED': 1}
+Fixture TF-03: guard_ids=['G0', 'G1', 'G10', 'G2', 'G3', 'G4', 'G8']
+  -> Guard outcomes: {'FAILED': 1}
+Fixture TF-14: guard_ids=['G0', 'G1', 'G10', 'G2', 'G3', 'G4', 'G8']
+  -> Guard outcomes: {'FAILED': 1}
+
+Governance violations detected: NO
