@@ -6,7 +6,6 @@
   "payload": {
     "portfolio_id": "PORT-INVALID",
     "as_of_date": "2025-01-01T00:00:00Z",
-    "holdings": [],
-    "cash_pct": 0.0
+    "holdings": []
   }
 }
