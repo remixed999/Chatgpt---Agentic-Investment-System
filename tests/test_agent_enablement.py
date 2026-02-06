@@ -144,7 +144,7 @@ def test_dio_veto_stops_downstream_for_holding():
 
     holding_packet = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-001")
     assert holding_packet.holding_run_outcome == RunOutcome.VETOED
-    assert holding_packet.scorecard.final_score is None
+    assert holding_packet.scorecard is None
     outputs = result.portfolio_committee_packet.agent_outputs
     vetoed_holdings = {item.get("holding_id") for item in outputs if item["agent_name"] == "DIO"}
     assert "HOLDING-001" in vetoed_holdings

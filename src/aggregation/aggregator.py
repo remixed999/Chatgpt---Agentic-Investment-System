@@ -14,7 +14,6 @@ from src.core.models import (
     GuardResult,
     HoldingInput,
     HoldingPacket,
-    PenaltyBreakdown,
     PortfolioCommitteePacket,
     PortfolioConfig,
     PortfolioSnapshot,
@@ -47,12 +46,13 @@ def build_holding_packet(
     if governance_outcome != RunOutcome.COMPLETED:
         if governance_outcome == RunOutcome.FAILED:
             limitations = [f"error_classification:{reason}" for reason in limitations] or limitations
-        scorecard = Scorecard(penalty_breakdown=_zero_breakdown())
+        if governance_outcome == RunOutcome.SHORT_CIRCUITED and not limitations:
+            limitations = ["short_circuited"]
         return HoldingPacket(
             holding_id=holding_id,
             identity=holding_ctx.identity,
             holding_run_outcome=governance_outcome,
-            scorecard=scorecard,
+            scorecard=None,
             limitations=limitations,
         )
 
@@ -177,6 +177,7 @@ def build_portfolio_packet(
         summary=summary,
         governance_trail=governance_trail,
         agent_outputs=_sorted_agent_outputs(agent_results),
+        limitations=_portfolio_limitations(outcome, reasons),
     )
 
     if outcome == RunOutcome.COMPLETED:
@@ -194,6 +195,7 @@ def build_portfolio_packet(
         portfolio_packet.snapshot_hash = hashes.snapshot_hash
         portfolio_packet.config_hash = hashes.config_hash
         portfolio_packet.run_config_hash = hashes.run_config_hash
+        portfolio_packet.committee_packet_hash = hashes.committee_packet_hash
         portfolio_packet.decision_hash = hashes.decision_hash
         portfolio_packet.run_hash = hashes.run_hash
 
@@ -299,21 +301,20 @@ def _build_summary(
 
 
 def _sorted_agent_outputs(agent_results: Sequence[AgentResult]) -> List[Dict[str, Any]]:
-    return [agent.model_dump() for agent in sorted(agent_results, key=lambda agent: agent.agent_name)]
+    return [
+        agent.model_dump()
+        for agent in sorted(
+            agent_results,
+            key=lambda agent: (agent.agent_name, agent.scope, agent.holding_id or ""),
+        )
+    ]
 
 
 def _clamp_score(value: float) -> float:
     return max(0.0, min(100.0, value))
 
 
-def _zero_breakdown() -> PenaltyBreakdown:
-    return PenaltyBreakdown(
-        category_A_missing_critical=0.0,
-        category_B_staleness=0.0,
-        category_C_contradictions_integrity=0.0,
-        category_D_confidence=0.0,
-        category_E_fx_exposure_risk=0.0,
-        category_F_data_validity=0.0,
-        total_penalties=0.0,
-        details=[],
-    )
+def _portfolio_limitations(outcome: RunOutcome, reasons: List[str]) -> List[str]:
+    if outcome in {RunOutcome.VETOED, RunOutcome.SHORT_CIRCUITED}:
+        return list(reasons)
+    return []

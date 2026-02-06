@@ -15,6 +15,12 @@ EXCLUDED_FIELDS = {
     "disclaimers",
     "limitations",
     "recovery_suggestions",
+    "snapshot_hash",
+    "config_hash",
+    "run_config_hash",
+    "committee_packet_hash",
+    "decision_hash",
+    "run_hash",
 }
 
 TRIM_FIELDS = {
