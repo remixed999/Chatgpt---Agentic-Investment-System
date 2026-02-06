@@ -3,20 +3,10 @@
   "description": "Expected failed run packet for schema validation failure.",
   "fixture_id": "TF-15_expected_failed_packet",
   "payload": {
-    "as_of_date": null,
-    "base_currency": null,
-    "config_hashes": {
-      "config_snapshot_hash": "placeholder",
-      "run_config_hash": "placeholder"
-    },
-    "failure_reason": "portfolio_snapshot_portfolio_id:Field required",
-    "portfolio_id": null,
-    "portfolio_run_outcome": "FAILED",
-    "reasons": [
-      "portfolio_snapshot_portfolio_id:Field required"
-    ],
     "run_id": "local-run",
-    "run_mode": null
+    "portfolio_id": "PORT-INVALID",
+    "portfolio_run_outcome": "FAILED",
+    "holdings": []
   },
   "version": "1.0"
 }

@@ -1,5 +1,12 @@
 {
-  "portfolio_id": "PORT-N3",
-  "portfolio_run_outcome": "VETOED",
-  "reason": "portfolio_vetoed"
+  "fixture_id": "TF02_missing_base_currency_expected",
+  "version": "1.0",
+  "description": "Expected portfolio committee packet when base currency is missing.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "run_id": "local-run",
+    "portfolio_id": "PORT-N3",
+    "portfolio_run_outcome": "VETOED",
+    "holdings": []
+  }
 }
