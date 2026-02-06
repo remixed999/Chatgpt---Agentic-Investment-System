@@ -1,0 +1,284 @@
+{
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "description": "Expected portfolio committee packet for GRRA short-circuit run.",
+  "fixture_id": "TF-03_expected_short_circuit",
+  "payload": {
+    "agent_outputs": [
+      {
+        "agent_name": "DIO",
+        "confidence": 1.0,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.95,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "GRRA",
+        "confidence": 1.0,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "do_not_trade_flag": true,
+          "missing_reason": "macro_regime_input_missing",
+          "regime_confidence": null,
+          "regime_label": "unknown"
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      }
+    ],
+    "config_hash": null,
+    "decision_hash": null,
+    "governance_trail": [
+      {
+        "guard_id": "G0",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G1",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G2",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G3",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G4",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G6",
+        "outcome": "SHORT_CIRCUITED",
+        "reasons": [
+          "grra_do_not_trade"
+        ],
+        "status": "short_circuited"
+      },
+      {
+        "guard_id": "G7",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      }
+    ],
+    "holdings": [
+      {
+        "holding_id": "HOLDING-001",
+        "holding_run_outcome": "SHORT_CIRCUITED",
+        "identity": {
+          "holding_id": "HOLDING-001",
+          "identifier": "AAA-US",
+          "ticker": "AAA"
+        },
+        "limitations": [
+          "short_circuited"
+        ],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": null,
+          "final_score": null,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      },
+      {
+        "holding_id": "HOLDING-002",
+        "holding_run_outcome": "SHORT_CIRCUITED",
+        "identity": {
+          "holding_id": "HOLDING-002",
+          "identifier": "BBB-US",
+          "ticker": "BBB"
+        },
+        "limitations": [
+          "short_circuited"
+        ],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": null,
+          "final_score": null,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      },
+      {
+        "holding_id": "HOLDING-003",
+        "holding_run_outcome": "SHORT_CIRCUITED",
+        "identity": {
+          "holding_id": "HOLDING-003",
+          "identifier": "CCC-US",
+          "ticker": "CCC"
+        },
+        "limitations": [
+          "short_circuited"
+        ],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": null,
+          "final_score": null,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      }
+    ],
+    "per_holding_outcomes": {
+      "HOLDING-001": "SHORT_CIRCUITED",
+      "HOLDING-002": "SHORT_CIRCUITED",
+      "HOLDING-003": "SHORT_CIRCUITED"
+    },
+    "portfolio_id": "PORT-N3",
+    "portfolio_run_outcome": "SHORT_CIRCUITED",
+    "run_config_hash": null,
+    "run_hash": null,
+    "run_id": "46a30b02-3c98-46ca-a3c0-28bff113bd3d",
+    "snapshot_hash": null,
+    "summary": {
+      "counts_by_outcome": {
+        "COMPLETED": 0,
+        "FAILED": 0,
+        "SHORT_CIRCUITED": 3,
+        "VETOED": 0
+      },
+      "short_circuit_reasons": [
+        "grra_do_not_trade"
+      ]
+    }
+  },
+  "version": "1.0"
+}

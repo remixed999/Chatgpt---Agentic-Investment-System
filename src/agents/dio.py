@@ -30,9 +30,9 @@ class DIOAgent(BaseAgent):
         }
         try:
             dio_output = DIOOutput.parse_obj(payload)
-            key_findings = dio_output.dict()
+            key_findings = dio_output.model_dump()
         except ValidationError:
-            key_findings = DIOOutput().dict()
+            key_findings = DIOOutput().model_dump()
         confidence = float(seed.get("confidence", 1.0))
         return self._build_result(
             status="completed",

@@ -1,0 +1,574 @@
+{
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "description": "Expected portfolio committee packet for canonical hash stability.",
+  "fixture_id": "TF-13_expected_canonical_hash_stability",
+  "payload": {
+    "agent_outputs": [
+      {
+        "agent_name": "DIO",
+        "confidence": 1.0,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.95,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DevilsAdvocate",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "narrative_limitations": "",
+          "risk_flags": [],
+          "unresolved_fatal_risk": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DevilsAdvocate",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "narrative_limitations": "",
+          "risk_flags": [],
+          "unresolved_fatal_risk": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DevilsAdvocate",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "narrative_limitations": "",
+          "risk_flags": [],
+          "unresolved_fatal_risk": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Fundamentals",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "fundamental_metrics": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Fundamentals",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "fundamental_metrics": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Fundamentals",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "fundamental_metrics": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "GRRA",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "do_not_trade_flag": false,
+          "missing_reason": "macro_regime_input_missing",
+          "regime_confidence": null,
+          "regime_label": "unknown"
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "LEFO",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "exit_risk_warnings": [],
+          "hard_override_triggered": false,
+          "liquidity_grade": 3
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "LEFO",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "exit_risk_warnings": [],
+          "hard_override_triggered": false,
+          "liquidity_grade": 2
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "LEFO",
+        "confidence": 0.85,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "exit_risk_warnings": [],
+          "hard_override_triggered": false,
+          "liquidity_grade": 4
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "PSCC",
+        "confidence": 0.9,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "concentration_breaches": [],
+          "fx_exposure_by_currency": {
+            "USD": 1.0
+          },
+          "portfolio_liquidity_risk": "low",
+          "position_caps_applied": [
+            {
+              "holding_id": "HOLDING-002",
+              "score_cap": 65.0
+            }
+          ]
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "RiskOfficer",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "risk_summary": "neutral",
+          "veto_recommended": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "RiskOfficer",
+        "confidence": 0.75,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "risk_summary": "neutral",
+          "veto_recommended": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "RiskOfficer",
+        "confidence": 0.78,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "risk_summary": "neutral",
+          "veto_recommended": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Technical",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-001",
+        "key_findings": {
+          "technical_signals": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Technical",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-002",
+        "key_findings": {
+          "technical_signals": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "Technical",
+        "confidence": 0.8,
+        "counter_case": null,
+        "holding_id": "HOLDING-003",
+        "key_findings": {
+          "technical_signals": {}
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      }
+    ],
+    "config_hash": "95cf32ff2dae5d19766577eb70433439de4398b740c3cb4bef1782af3a8e2d6e",
+    "decision_hash": "ee64b87e66fbd6194f83b8ed9e762e99f3571fbb8ada16b657241f0a0dd1fae2",
+    "governance_trail": [
+      {
+        "guard_id": "G0",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G1",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G10",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G2",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G3",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G4",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G5",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G6",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G7",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G8",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      },
+      {
+        "guard_id": "G9",
+        "outcome": null,
+        "reasons": [],
+        "status": "passed"
+      }
+    ],
+    "holdings": [
+      {
+        "holding_id": "HOLDING-001",
+        "holding_run_outcome": "COMPLETED",
+        "identity": {
+          "holding_id": "HOLDING-001",
+          "identifier": "AAA-US",
+          "ticker": "AAA"
+        },
+        "limitations": [],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": 76.0,
+          "final_score": 76.0,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      },
+      {
+        "holding_id": "HOLDING-002",
+        "holding_run_outcome": "COMPLETED",
+        "identity": {
+          "holding_id": "HOLDING-002",
+          "identifier": "BBB-US",
+          "ticker": "BBB"
+        },
+        "limitations": [],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": 63.0,
+          "final_score": 63.0,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      },
+      {
+        "holding_id": "HOLDING-003",
+        "holding_run_outcome": "COMPLETED",
+        "identity": {
+          "holding_id": "HOLDING-003",
+          "identifier": "CCC-US",
+          "ticker": "CCC"
+        },
+        "limitations": [],
+        "scorecard": {
+          "applied_caps": [],
+          "base_score": 52.0,
+          "final_score": 52.0,
+          "notes": [],
+          "penalty_breakdown": {
+            "category_A_missing_critical": 0.0,
+            "category_B_staleness": 0.0,
+            "category_C_contradictions_integrity": 0.0,
+            "category_D_confidence": 0.0,
+            "category_E_fx_exposure_risk": 0.0,
+            "category_F_data_validity": 0.0,
+            "details": [],
+            "total_penalties": 0.0
+          }
+        }
+      }
+    ],
+    "per_holding_outcomes": {
+      "HOLDING-001": "COMPLETED",
+      "HOLDING-002": "COMPLETED",
+      "HOLDING-003": "COMPLETED"
+    },
+    "portfolio_id": "PORT-N3",
+    "portfolio_run_outcome": "COMPLETED",
+    "run_config_hash": "2d72dc15b0d2a933c2f773b17bbd0ede628e0c2f8b8b43e199d7e735c98d8c51",
+    "run_hash": "a78baa7477b2ba5ec25d72dbb40a54bff668851faaa78495efc6d84381f8c82e",
+    "run_id": "75c17364-3082-49dc-a7d7-4d9350f3b2fc",
+    "snapshot_hash": "fd63764efb272b4ea25acf3d23a358b1c75cbdcf4851996103f6ef6b33670688",
+    "summary": {
+      "counts_by_outcome": {
+        "COMPLETED": 3,
+        "FAILED": 0,
+        "SHORT_CIRCUITED": 0,
+        "VETOED": 0
+      }
+    }
+  },
+  "version": "1.0"
+}

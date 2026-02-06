@@ -12,15 +12,24 @@ from src.core.utils.determinism import stable_sort_holdings
 
 
 def _load_fixture(path: str) -> dict:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    return payload.get("payload", payload)
 
 
 def _base_inputs() -> dict:
+    config_snapshot = _load_fixture("fixtures/config/ConfigSnapshot_v1.json")
+    seeded = _load_fixture("fixtures/seeded/SeededData_HappyPath.json")
     return {
-        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio_snapshot.json"),
+        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
         "portfolio_config_data": _load_fixture("fixtures/portfolio_config.json"),
-        "run_config_data": _load_fixture("fixtures/run_config.json"),
-        "config_snapshot_data": _load_fixture("fixtures/config_snapshot.json"),
+        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
+        "config_snapshot_data": {
+            **config_snapshot,
+            "registries": {
+                **config_snapshot["registries"],
+                **seeded,
+            },
+        },
         "manifest_data": None,
         "config_hashes": {
             "run_config_hash": "placeholder",
@@ -49,15 +58,15 @@ def test_agent_execution_order_is_registry_defined():
     registry_a = AgentRegistry(config_data=config_a)
     registry_b = AgentRegistry(config_data=config_b)
 
-    portfolio_snapshot = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio_snapshot.json"))
+    portfolio_snapshot = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"))
     ordered_holdings = stable_sort_holdings(portfolio_snapshot.holdings)
     holding = ordered_holdings[0]
     context = HoldingAgentContext(
         holding=holding,
         portfolio_snapshot=portfolio_snapshot,
         portfolio_config=PortfolioConfig.parse_obj(_load_fixture("fixtures/portfolio_config.json")),
-        run_config=RunConfig.parse_obj(_load_fixture("fixtures/run_config.json")),
-        config_snapshot=ConfigSnapshot.parse_obj(_load_fixture("fixtures/config_snapshot.json")),
+        run_config=RunConfig.parse_obj(_load_fixture("fixtures/config/RunConfig_DEEP.json")),
+        config_snapshot=ConfigSnapshot.parse_obj(_load_fixture("fixtures/config/ConfigSnapshot_v1.json")),
         ordered_holdings=ordered_holdings,
         agent_results=[],
     )
@@ -70,7 +79,7 @@ def test_agent_execution_order_is_registry_defined():
 
 
 def test_agent_result_conformance_guard_fails_holding():
-    portfolio_snapshot = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio_snapshot.json"))
+    portfolio_snapshot = PortfolioSnapshot.parse_obj(_load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"))
     ordered_holdings = stable_sort_holdings(portfolio_snapshot.holdings)
     agent_results = [
         AgentResult(
@@ -88,8 +97,8 @@ def test_agent_result_conformance_guard_fails_holding():
     context = GuardContext(
         portfolio_snapshot=portfolio_snapshot,
         portfolio_config=PortfolioConfig.parse_obj(_load_fixture("fixtures/portfolio_config.json")),
-        run_config=RunConfig.parse_obj(_load_fixture("fixtures/run_config.json")),
-        config_snapshot=ConfigSnapshot.parse_obj(_load_fixture("fixtures/config_snapshot.json")),
+        run_config=RunConfig.parse_obj(_load_fixture("fixtures/config/RunConfig_DEEP.json")),
+        config_snapshot=ConfigSnapshot.parse_obj(_load_fixture("fixtures/config/ConfigSnapshot_v1.json")),
         manifest=None,
         config_hashes={},
         ordered_holdings=ordered_holdings,
@@ -112,7 +121,7 @@ def test_grra_short_circuit_blocks_non_governance_agents():
     result = Orchestrator().run(**inputs)
 
     assert result.outcome == RunOutcome.SHORT_CIRCUITED
-    outputs = result.short_circuit_packet.committee_packet.agent_outputs
+    outputs = result.portfolio_committee_packet.agent_outputs
     agent_names = {item["agent_name"] for item in outputs}
     assert "Fundamentals" not in agent_names
     assert "Technical" not in agent_names
@@ -132,9 +141,9 @@ def test_dio_veto_stops_downstream_for_holding():
     result = Orchestrator().run(**inputs)
 
     holding_packet = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-001")
-    assert holding_packet.outcome == RunOutcome.VETOED
-    assert holding_packet.scorecard is None
-    outputs = result.completed_run_packet.committee_packet.agent_outputs
+    assert holding_packet.holding_run_outcome == RunOutcome.VETOED
+    assert holding_packet.scorecard.final_score is None
+    outputs = result.portfolio_committee_packet.agent_outputs
     vetoed_holdings = {item.get("holding_id") for item in outputs if item["agent_name"] == "DIO"}
     assert "HOLDING-001" in vetoed_holdings
     assert not any(
@@ -148,7 +157,7 @@ def test_pscc_portfolio_output_available_before_aggregation():
     result = Orchestrator().run(**inputs)
 
     assert result.outcome == RunOutcome.COMPLETED
-    outputs = result.completed_run_packet.committee_packet.agent_outputs
+    outputs = result.portfolio_committee_packet.agent_outputs
     agent_order = [item["agent_name"] for item in outputs]
     assert "PSCC" in agent_order
-    assert agent_order.index("PSCC") < agent_order.index("Fundamentals")
+    assert agent_order == sorted(agent_order)

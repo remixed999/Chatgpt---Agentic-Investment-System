@@ -24,7 +24,7 @@ def canonicalize_payload(payload: Any) -> Any:
 
 def _canonicalize_value(value: Any, parent_key: Optional[str]) -> Any:
     if isinstance(value, BaseModel):
-        return _canonicalize_value(value.dict(), parent_key=parent_key)
+        return _canonicalize_value(value.model_dump(), parent_key=parent_key)
     if isinstance(value, dict):
         return _canonicalize_dict(value)
     if isinstance(value, list):
