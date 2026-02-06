@@ -15,7 +15,14 @@ from src.core.canonicalization import (
     hash_run_hash,
 )
 from src.core.config.loader import load_json_file, load_manifest, sha256_digest
-from src.core.models import ConfigSnapshot, OrchestrationResult, PortfolioConfig, PortfolioSnapshot, RunConfig
+from src.core.models import (
+    ConfigSnapshot,
+    OrchestrationResult,
+    PortfolioConfig,
+    PortfolioSnapshot,
+    RunConfig,
+    RunOutcome,
+)
 from src.core.orchestration import Orchestrator
 
 
@@ -73,6 +80,17 @@ def compute_all_hashes(packet: OrchestrationResult, inputs: Dict[str, Any]) -> D
             holding_packet_hashes[key] = sha256_digest(holding_packet_hashes[key].encode("utf-8"))
 
     if committee_packet is None:
+        return {
+            "snapshot_hash": snapshot_hash,
+            "config_hash": config_hash,
+            "run_config_hash": run_config_hash,
+            "committee_packet_hash": None,
+            "decision_hash": None,
+            "run_hash": None,
+            "holding_packet_hashes": holding_packet_hashes,
+        }
+
+    if packet.outcome != RunOutcome.COMPLETED:
         return {
             "snapshot_hash": snapshot_hash,
             "config_hash": config_hash,

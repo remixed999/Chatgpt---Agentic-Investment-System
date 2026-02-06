@@ -20,6 +20,7 @@ from src.core.models import (
     RunConfig,
     RunOutcome,
 )
+from src.core.canonicalization import canonicalization_idempotent, detect_ordering_violations
 
 
 @dataclass
@@ -220,15 +221,29 @@ class G7DeterminismGuard(Guard):
     guard_id = "G7"
 
     def evaluate(self, *, context: GuardContext) -> GuardEvaluation:
-        holding_ids = [
-            holding.identity.holding_id
-            for holding in context.ordered_holdings
-            if holding.identity and holding.identity.holding_id
-        ]
-        if holding_ids != sorted(holding_ids):
+        violations: List[str] = []
+        snapshot_payload = context.portfolio_snapshot.model_dump()
+        snapshot_ordering = detect_ordering_violations(snapshot_payload)
+        if snapshot_ordering:
+            violations.append("determinism_order_violation")
+
+        agent_payload = {"agent_outputs": [agent.model_dump() for agent in context.agent_results]}
+        agent_ordering = detect_ordering_violations(agent_payload)
+        if agent_ordering:
+            violations.append("determinism_order_violation")
+
+        if not canonicalization_idempotent(snapshot_payload):
+            violations.append("determinism_hash_instability")
+        if not canonicalization_idempotent(context.portfolio_config.model_dump()):
+            violations.append("determinism_hash_instability")
+        if not canonicalization_idempotent(context.run_config.model_dump()):
+            violations.append("determinism_hash_instability")
+
+        if violations:
             return GuardEvaluation(
-                result=fail_result(self.guard_id, RunOutcome.FAILED, ["determinism_order_violation"]),
+                result=fail_result(self.guard_id, RunOutcome.FAILED, sorted(set(violations))),
             )
+
         return GuardEvaluation(result=pass_result(self.guard_id))
 
 

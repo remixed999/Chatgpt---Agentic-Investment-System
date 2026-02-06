@@ -1,4 +1,9 @@
-from src.core.canonicalization.canonicalize import canonical_json_dumps, canonicalize_payload
+from src.core.canonicalization.canonicalize import (
+    canonical_json_dumps,
+    canonicalization_idempotent,
+    canonicalize_payload,
+    detect_ordering_violations,
+)
 from src.core.canonicalization.hashing import (
     RunHashes,
     compute_run_hashes,
@@ -16,8 +21,10 @@ from src.core.canonicalization.hashing import (
 __all__ = [
     "RunHashes",
     "canonical_json_dumps",
+    "canonicalization_idempotent",
     "canonicalize_payload",
     "compute_run_hashes",
+    "detect_ordering_violations",
     "hash_committee_packet",
     "hash_decision_payload",
     "hash_portfolio_config",
