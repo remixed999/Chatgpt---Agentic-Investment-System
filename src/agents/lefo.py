@@ -20,6 +20,10 @@ class LEFOAgent(BaseAgent):
             "exit_risk_warnings": seed.get("exit_risk_warnings", []),
             "hard_override_triggered": seed.get("hard_override_triggered", False),
         }
+        if "score_cap" in seed:
+            key_findings["score_cap"] = seed["score_cap"]
+        if "max_score" in seed:
+            key_findings["max_score"] = seed["max_score"]
         if "max_position_cap_pct" in seed:
             key_findings["max_position_cap_pct"] = seed["max_position_cap_pct"]
         if "time_to_exit_estimate" in seed:

@@ -1,0 +1,16 @@
+{
+  "fixture_id": "SeededData_GRRA_DoNotTrade",
+  "version": "1.0",
+  "description": "Agent fixtures with GRRA do-not-trade flag enabled.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "agent_fixtures": {
+      "GRRA": {
+        "portfolio": {
+          "do_not_trade_flag": true,
+          "confidence": 1.0
+        }
+      }
+    }
+  }
+}
