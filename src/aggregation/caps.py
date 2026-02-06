@@ -6,13 +6,13 @@ from src.core.models import CapOverride, Scorecard
 
 
 def apply_lefo_caps(scorecard: Scorecard, lefo_output: Optional[Dict[str, Any]]) -> Scorecard:
-    if scorecard.base_score is None or not lefo_output:
+    if not lefo_output:
         return scorecard
     cap_value = _extract_cap_value(lefo_output)
     if cap_value is None:
         return scorecard
 
-    if scorecard.base_score > cap_value:
+    if scorecard.base_score is None or scorecard.base_score > cap_value:
         scorecard.base_score = cap_value
         scorecard.applied_caps.append(
             CapOverride(
@@ -29,13 +29,13 @@ def apply_pscc_caps(
     pscc_output: Optional[Dict[str, Any]],
     holding_id: Optional[str],
 ) -> Scorecard:
-    if scorecard.base_score is None or not pscc_output or not holding_id:
+    if not pscc_output or not holding_id:
         return scorecard
     cap_value = _extract_pscc_cap(pscc_output, holding_id)
     if cap_value is None:
         return scorecard
 
-    if scorecard.base_score > cap_value:
+    if scorecard.base_score is None or scorecard.base_score > cap_value:
         scorecard.base_score = cap_value
         scorecard.applied_caps.append(
             CapOverride(
