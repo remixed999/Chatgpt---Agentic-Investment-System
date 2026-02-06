@@ -8,57 +8,15 @@
     "as_of_date": "2025-01-01T00:00:00Z",
     "holdings": [
       {
-        "identity": null,
-        "weight": 0.5,
-        "currency": "USD",
-        "metrics": {
-          "fundamental_quality": {
-            "value": 75.0,
-            "source_ref": {
-              "origin": "seeded",
-              "as_of_date": "2024-12-31T00:00:00Z",
-              "retrieval_timestamp": "2025-01-01T00:00:00Z"
-            }
-          },
-          "technical_momentum": {
-            "value": 65.0,
-            "source_ref": {
-              "origin": "seeded",
-              "as_of_date": "2024-12-31T00:00:00Z",
-              "retrieval_timestamp": "2025-01-01T00:00:00Z"
-            }
-          }
-        }
+        "holding_id": "HOLDING-MISSING",
+        "identifier": null,
+        "weight": 0.5
       },
       {
-        "identity": {
-          "holding_id": "HOLDING-VALID",
-          "ticker": "VAL",
-          "identifier": "VAL-US"
-        },
-        "weight": 0.5,
-        "currency": "USD",
-        "metrics": {
-          "fundamental_quality": {
-            "value": 82.0,
-            "source_ref": {
-              "origin": "seeded",
-              "as_of_date": "2024-12-31T00:00:00Z",
-              "retrieval_timestamp": "2025-01-01T00:00:00Z"
-            }
-          },
-          "technical_momentum": {
-            "value": 70.0,
-            "source_ref": {
-              "origin": "seeded",
-              "as_of_date": "2024-12-31T00:00:00Z",
-              "retrieval_timestamp": "2025-01-01T00:00:00Z"
-            }
-          }
-        }
+        "holding_id": "HOLDING-VALID",
+        "identifier": "VAL-US",
+        "weight": 0.5
       }
-    ],
-    "cash_pct": 0.05,
-    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+    ]
   }
 }
