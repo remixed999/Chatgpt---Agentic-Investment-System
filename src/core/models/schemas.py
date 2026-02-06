@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field, root_validator
 class StrictBaseModel(BaseModel):
     class Config:
         extra = "forbid"
+        validate_by_name = True
+        populate_by_name = True
 
 
 class RunMode(str, Enum):
@@ -123,10 +125,18 @@ class PenaltyBreakdown(StrictBaseModel):
     details: List[PenaltyItem] = Field(default_factory=list)
 
 
+class CapOverride(StrictBaseModel):
+    source: str
+    cap_value: float
+    reason: str
+
+
 class Scorecard(StrictBaseModel):
     base_score: Optional[float] = None
     final_score: Optional[float] = None
     penalty_breakdown: Optional[PenaltyBreakdown] = None
+    applied_caps: List[CapOverride] = Field(default_factory=list)
+    notes: List[str] = Field(default_factory=list)
 
 
 class RunLog(StrictBaseModel):
@@ -141,7 +151,8 @@ class RunLog(StrictBaseModel):
 
 class FailedRunPacket(StrictBaseModel):
     run_id: str
-    outcome: RunOutcome
+    portfolio_run_outcome: RunOutcome
+    failure_reason: str
     reasons: List[str]
     portfolio_id: Optional[str] = None
     as_of_date: Optional[datetime] = None
@@ -181,10 +192,26 @@ class HashBundle(StrictBaseModel):
 
 class HoldingPacket(StrictBaseModel):
     holding_id: Optional[str] = None
-    outcome: RunOutcome
-    reasons: List[str] = Field(default_factory=list)
+    holding_run_outcome: RunOutcome = Field(..., alias="outcome")
     identity: Optional[HoldingIdentity] = None
     scorecard: Optional[Scorecard] = None
+    limitations: List[str] = Field(default_factory=list)
+
+
+class PortfolioCommitteePacket(StrictBaseModel):
+    run_id: str
+    portfolio_id: str
+    portfolio_run_outcome: RunOutcome
+    holdings: List[HoldingPacket] = Field(default_factory=list)
+    per_holding_outcomes: Dict[str, str] = Field(default_factory=dict)
+    summary: Dict[str, Any] = Field(default_factory=dict)
+    governance_trail: List[Dict[str, Any]] = Field(default_factory=list)
+    agent_outputs: List[Dict[str, Any]] = Field(default_factory=list)
+    snapshot_hash: Optional[str] = None
+    config_hash: Optional[str] = None
+    run_config_hash: Optional[str] = None
+    decision_hash: Optional[str] = None
+    run_hash: Optional[str] = None
 
 
 class CompletedRunPacket(StrictBaseModel):
@@ -225,7 +252,6 @@ class OrchestrationResult(StrictBaseModel):
     outcome: RunOutcome
     guard_results: List[GuardResult]
     failed_run_packet: Optional[FailedRunPacket] = None
-    completed_run_packet: Optional[CompletedRunPacket] = None
-    short_circuit_packet: Optional[ShortCircuitRunPacket] = None
+    portfolio_committee_packet: Optional[PortfolioCommitteePacket] = None
     holding_packets: List[HoldingPacket] = Field(default_factory=list)
     ordered_holdings: List[HoldingInput] = Field(default_factory=list)

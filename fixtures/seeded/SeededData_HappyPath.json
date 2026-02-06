@@ -1,0 +1,123 @@
+{
+  "fixture_id": "SeededData_HappyPath",
+  "version": "1.0",
+  "description": "Agent fixture payloads for happy-path aggregation tests.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "agent_fixtures": {
+      "DIO": {
+        "holdings": {
+          "HOLDING-001": {
+            "staleness_flags": [],
+            "missing_hard_stop_fields": [],
+            "missing_penalty_critical_fields": [],
+            "contradictions": [],
+            "unsourced_numbers_detected": false,
+            "low_source_reliability": false,
+            "integrity_veto_triggered": false,
+            "confidence": 0.95
+          },
+          "HOLDING-002": {
+            "staleness_flags": [],
+            "missing_hard_stop_fields": [],
+            "missing_penalty_critical_fields": [],
+            "contradictions": [],
+            "unsourced_numbers_detected": false,
+            "low_source_reliability": false,
+            "integrity_veto_triggered": false,
+            "confidence": 0.9
+          },
+          "HOLDING-003": {
+            "staleness_flags": [],
+            "missing_hard_stop_fields": [],
+            "missing_penalty_critical_fields": [],
+            "contradictions": [],
+            "unsourced_numbers_detected": false,
+            "low_source_reliability": false,
+            "integrity_veto_triggered": false,
+            "confidence": 0.9
+          }
+        }
+      },
+      "GRRA": {
+        "portfolio": {
+          "do_not_trade_flag": false,
+          "risk_budget_multiplier": 1.0,
+          "confidence": 0.9
+        }
+      },
+      "LEFO": {
+        "holdings": {
+          "HOLDING-001": {
+            "liquidity_grade": 3,
+            "hard_override_triggered": false,
+            "score_cap": 90.0,
+            "confidence": 0.8
+          },
+          "HOLDING-002": {
+            "liquidity_grade": 2,
+            "hard_override_triggered": false,
+            "score_cap": 70.0,
+            "confidence": 0.8
+          },
+          "HOLDING-003": {
+            "liquidity_grade": 4,
+            "hard_override_triggered": false,
+            "score_cap": 95.0,
+            "confidence": 0.85
+          }
+        }
+      },
+      "PSCC": {
+        "portfolio": {
+          "position_caps_applied": [
+            {"holding_id": "HOLDING-002", "score_cap": 65.0}
+          ],
+          "fx_exposure_by_currency": {"USD": 1.0},
+          "portfolio_liquidity_risk": "low",
+          "confidence": 0.9
+        }
+      },
+      "RiskOfficer": {
+        "holdings": {
+          "HOLDING-001": {
+            "veto_flags": [],
+            "risk_summary": "neutral",
+            "confidence": 0.8
+          },
+          "HOLDING-002": {
+            "veto_flags": [],
+            "risk_summary": "neutral",
+            "confidence": 0.75
+          },
+          "HOLDING-003": {
+            "veto_flags": [],
+            "risk_summary": "neutral",
+            "confidence": 0.78
+          }
+        }
+      },
+      "Fundamentals": {
+        "holdings": {
+          "HOLDING-001": {"confidence": 0.8},
+          "HOLDING-002": {"confidence": 0.8},
+          "HOLDING-003": {"confidence": 0.8}
+        }
+      },
+      "Technical": {
+        "holdings": {
+          "HOLDING-001": {"confidence": 0.8},
+          "HOLDING-002": {"confidence": 0.8},
+          "HOLDING-003": {"confidence": 0.8}
+        }
+      },
+      "DevilsAdvocate": {
+        "holdings": {
+          "HOLDING-001": {"confidence": 0.8},
+          "HOLDING-002": {"confidence": 0.8},
+          "HOLDING-003": {"confidence": 0.8}
+        }
+      }
+    }
+  }
+}

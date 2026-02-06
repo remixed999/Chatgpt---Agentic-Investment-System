@@ -6,9 +6,8 @@ from typing import Any, Dict
 
 from src.core.canonicalization.canonicalize import canonical_json_dumps, canonicalize_payload
 from src.core.models import (
-    CommitteePacket,
-    DecisionPacket,
     PortfolioConfig,
+    PortfolioCommitteePacket,
     PortfolioSnapshot,
     RunConfig,
 )
@@ -40,12 +39,12 @@ def hash_run_config(run_config: RunConfig) -> str:
     return _hash_payload(run_config)
 
 
-def hash_committee_packet(packet: CommitteePacket) -> str:
+def hash_committee_packet(packet: PortfolioCommitteePacket) -> str:
     return _hash_payload(packet)
 
 
-def hash_decision_packet(packet: DecisionPacket) -> str:
-    return _hash_payload(packet)
+def hash_decision_payload(payload: Any) -> str:
+    return _hash_payload(payload)
 
 
 def compute_run_hashes(
@@ -53,14 +52,14 @@ def compute_run_hashes(
     portfolio_snapshot: PortfolioSnapshot,
     portfolio_config: PortfolioConfig,
     run_config: RunConfig,
-    committee_packet: CommitteePacket,
-    decision_packet: DecisionPacket,
+    committee_packet: PortfolioCommitteePacket,
+    decision_payload: Any,
 ) -> RunHashes:
     snapshot_hash = hash_portfolio_snapshot(portfolio_snapshot)
     config_hash = hash_portfolio_config(portfolio_config)
     run_config_hash = hash_run_config(run_config)
     committee_packet_hash = hash_committee_packet(committee_packet)
-    decision_hash = hash_decision_packet(decision_packet)
+    decision_hash = hash_decision_payload(decision_payload)
     run_hash = hash_run_hash(
         snapshot_hash=snapshot_hash,
         config_hash=config_hash,

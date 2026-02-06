@@ -13,7 +13,8 @@ FIXED_TIME = datetime(2024, 1, 1, tzinfo=timezone.utc)
 
 
 def _load_fixture(path: str) -> dict:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    return payload.get("payload", payload)
 
 
 def _hash_fixture(path: str) -> str:
@@ -21,15 +22,23 @@ def _hash_fixture(path: str) -> str:
 
 
 def _base_inputs():
+    config_snapshot = _load_fixture("fixtures/config/ConfigSnapshot_v1.json")
+    seeded = _load_fixture("fixtures/seeded/SeededData_HappyPath.json")
     return {
-        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio_snapshot.json"),
+        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
         "portfolio_config_data": _load_fixture("fixtures/portfolio_config.json"),
-        "run_config_data": _load_fixture("fixtures/run_config.json"),
-        "config_snapshot_data": _load_fixture("fixtures/config_snapshot.json"),
+        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
+        "config_snapshot_data": {
+            **config_snapshot,
+            "registries": {
+                **config_snapshot["registries"],
+                **seeded,
+            },
+        },
         "manifest_data": _load_fixture("config/release_manifest.json"),
         "config_hashes": {
-            "run_config_hash": _hash_fixture("fixtures/run_config.json"),
-            "config_snapshot_hash": _hash_fixture("fixtures/config_snapshot.json"),
+            "run_config_hash": _hash_fixture("fixtures/config/RunConfig_DEEP.json"),
+            "config_snapshot_hash": _hash_fixture("fixtures/config/ConfigSnapshot_v1.json"),
         },
     }
 
@@ -42,8 +51,8 @@ def test_missing_base_currency_vetoes_run():
     result = orchestrator.run(**inputs)
 
     assert result.outcome == RunOutcome.VETOED
-    assert result.completed_run_packet is None
-    assert result.failed_run_packet is not None
+    assert result.failed_run_packet is None
+    assert result.portfolio_committee_packet is not None
     assert result.run_log.outcome == RunOutcome.VETOED
     assert result.run_log.started_at_utc == FIXED_TIME
     assert result.run_log.ended_at_utc == FIXED_TIME

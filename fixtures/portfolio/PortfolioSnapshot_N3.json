@@ -1,0 +1,95 @@
+{
+  "fixture_id": "PortfolioSnapshot_N3",
+  "version": "1.0",
+  "description": "Three-holding portfolio snapshot for aggregation tests.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "portfolio_id": "PORT-N3",
+    "as_of_date": "2025-01-01T00:00:00Z",
+    "holdings": [
+      {
+        "identity": {
+          "holding_id": "HOLDING-001",
+          "ticker": "AAA",
+          "identifier": "AAA-US"
+        },
+        "weight": 0.4,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 80.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 70.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      },
+      {
+        "identity": {
+          "holding_id": "HOLDING-002",
+          "ticker": "BBB",
+          "identifier": "BBB-US"
+        },
+        "weight": 0.35,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 65.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 60.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      },
+      {
+        "identity": {
+          "holding_id": "HOLDING-003",
+          "ticker": "CCC",
+          "identifier": "CCC-US"
+        },
+        "weight": 0.25,
+        "currency": "USD",
+        "metrics": {
+          "fundamental_quality": {
+            "value": 50.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          },
+          "technical_momentum": {
+            "value": 55.0,
+            "source_ref": {
+              "origin": "seeded",
+              "as_of_date": "2024-12-31T00:00:00Z",
+              "retrieval_timestamp": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      }
+    ],
+    "cash_pct": 0.05,
+    "retrieval_timestamp": "2025-01-01T00:00:00Z"
+  }
+}

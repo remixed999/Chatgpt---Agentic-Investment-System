@@ -22,7 +22,8 @@ FIXED_TIME = datetime(2024, 1, 1, tzinfo=timezone.utc)
 
 
 def _load_fixture(path: str) -> dict:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    return payload.get("payload", payload)
 
 
 def test_snapshot_hash_stable_for_holdings_order():
@@ -59,10 +60,10 @@ def test_timestamp_exclusion_keeps_hashes_stable():
 
 def test_hash_gating_skips_failed_and_vetoed_runs():
     inputs = {
-        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio_snapshot_order_a.json"),
+        "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
         "portfolio_config_data": {"base_currency": None},
-        "run_config_data": _load_fixture("fixtures/run_config.json"),
-        "config_snapshot_data": _load_fixture("fixtures/config_snapshot.json"),
+        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
+        "config_snapshot_data": _load_fixture("fixtures/config/ConfigSnapshot_v1.json"),
         "manifest_data": None,
         "config_hashes": {
             "run_config_hash": "placeholder",
@@ -74,7 +75,8 @@ def test_hash_gating_skips_failed_and_vetoed_runs():
     result = orchestrator.run(**inputs)
 
     assert result.outcome == RunOutcome.VETOED
-    assert result.completed_run_packet is None
+    assert result.portfolio_committee_packet is not None
+    assert result.portfolio_committee_packet.run_hash is None
 
 
 def test_numeric_formatting_is_canonical():

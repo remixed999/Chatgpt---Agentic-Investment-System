@@ -43,7 +43,7 @@ def main() -> None:
         run_id=args.run_id,
     )
 
-    print(stable_json_dumps(result.dict()))
+    print(stable_json_dumps(result.model_dump()))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
@@ -13,18 +12,15 @@ from src.agents.executor import (
     run_holding_agents,
     run_portfolio_agents,
 )
-from src.core.canonicalization.hashing import RunHashes, compute_run_hashes
+from src.aggregation.aggregator import HoldingState as AggregationHoldingState, build_portfolio_packet
 from src.core.guards.base import GuardEvaluation, GuardScope
 from src.core.guards.guards_g0_g10 import GuardContext
 from src.core.guards.registry import build_guard_registry
 from src.core.models import (
     AgentResult,
-    CommitteePacket,
-    CompletedRunPacket,
     ConfigSnapshot,
-    DecisionPacket,
     FailedRunPacket,
-    HashBundle,
+    GuardResult,
     HoldingInput,
     HoldingPacket,
     OrchestrationResult,
@@ -33,28 +29,8 @@ from src.core.models import (
     RunConfig,
     RunLog,
     RunOutcome,
-    Scorecard,
-    ShortCircuitRunPacket,
 )
-from src.core.penalties import DIOOutput, FXExposureReport, compute_penalty_breakdown
 from src.core.utils.determinism import stable_sort_holdings
-
-
-@dataclass
-class HoldingState:
-    holding: HoldingInput
-    outcome: RunOutcome = RunOutcome.COMPLETED
-    reasons: List[str] = field(default_factory=list)
-    scorecard: Optional[Scorecard] = None
-
-    def to_packet(self) -> HoldingPacket:
-        return HoldingPacket(
-            holding_id=self.holding.identity.holding_id if self.holding.identity else None,
-            outcome=self.outcome,
-            reasons=self.reasons,
-            identity=self.holding.identity,
-            scorecard=self.scorecard,
-        )
 
 
 class Orchestrator:
@@ -99,7 +75,10 @@ class Orchestrator:
             )
 
         ordered_holdings = stable_sort_holdings(portfolio_snapshot.holdings)
-        holding_states = [HoldingState(holding=holding) for holding in ordered_holdings]
+        holding_states = [
+            AggregationHoldingState(holding=holding, outcome=RunOutcome.COMPLETED, reasons=[])
+            for holding in ordered_holdings
+        ]
         agent_results = self._parse_agent_results(agent_results_data)
 
         context = GuardContext(
@@ -497,7 +476,7 @@ class Orchestrator:
         guard_id: str,
         context: GuardContext,
         guard_results: List[Any],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
         holding_outcomes: List[RunOutcome],
     ) -> Optional[GuardEvaluation]:
         guard = self._guards_by_id[guard_id]
@@ -540,7 +519,7 @@ class Orchestrator:
         run_config: RunConfig,
         config_snapshot: ConfigSnapshot,
         agent_results: List[AgentResult],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
     ) -> List[AgentResult]:
         portfolio_context = PortfolioAgentContext(
             portfolio_snapshot=portfolio_snapshot,
@@ -593,7 +572,7 @@ class Orchestrator:
         run_config: RunConfig,
         config_snapshot: ConfigSnapshot,
         agent_results: List[AgentResult],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
     ) -> List[AgentResult]:
         results: List[AgentResult] = []
         for state in holding_states:
@@ -629,7 +608,7 @@ class Orchestrator:
         run_config: RunConfig,
         config_snapshot: ConfigSnapshot,
         agent_results: List[AgentResult],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
     ) -> List[AgentResult]:
         results: List[AgentResult] = []
         for state in holding_states:
@@ -656,7 +635,7 @@ class Orchestrator:
         run_config: RunConfig,
         config_snapshot: ConfigSnapshot,
         agent_results: List[AgentResult],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
     ) -> List[AgentResult]:
         results: List[AgentResult] = []
         for state in holding_states:
@@ -675,7 +654,10 @@ class Orchestrator:
         return results
 
     @staticmethod
-    def _apply_dio_vetoes(agent_results: List[AgentResult], holding_states: List[HoldingState]) -> List[str]:
+    def _apply_dio_vetoes(
+        agent_results: List[AgentResult],
+        holding_states: List[AggregationHoldingState],
+    ) -> List[str]:
         portfolio_reasons: List[str] = []
         for agent in agent_results:
             if agent.agent_name != "DIO":
@@ -697,7 +679,10 @@ class Orchestrator:
         return portfolio_reasons
 
     @staticmethod
-    def _apply_risk_officer_vetoes(agent_results: List[AgentResult], holding_states: List[HoldingState]) -> None:
+    def _apply_risk_officer_vetoes(
+        agent_results: List[AgentResult],
+        holding_states: List[AggregationHoldingState],
+    ) -> None:
         for agent in agent_results:
             if agent.agent_name != "RiskOfficer" or agent.scope != "holding":
                 continue
@@ -727,7 +712,7 @@ class Orchestrator:
                 return True
         return False
 
-    def _apply_violations(self, holding_states: List[HoldingState], evaluation: GuardEvaluation) -> None:
+    def _apply_violations(self, holding_states: List[AggregationHoldingState], evaluation: GuardEvaluation) -> None:
         for violation in evaluation.violations:
             if violation.scope != GuardScope.HOLDING:
                 continue
@@ -748,7 +733,7 @@ class Orchestrator:
             state.reasons.append(violation.reason)
 
     @staticmethod
-    def _apply_short_circuit(holding_states: List[HoldingState]) -> None:
+    def _apply_short_circuit(holding_states: List[AggregationHoldingState]) -> None:
         for state in holding_states:
             if state.outcome == RunOutcome.COMPLETED:
                 state.outcome = RunOutcome.SHORT_CIRCUITED
@@ -768,93 +753,51 @@ class Orchestrator:
         config_snapshot: ConfigSnapshot,
         guard_results: List[Any],
         ordered_holdings: List[HoldingInput],
-        holding_states: List[HoldingState],
+        holding_states: List[AggregationHoldingState],
         agent_results: List[AgentResult],
     ) -> OrchestrationResult:
-        if outcome == RunOutcome.COMPLETED:
-            self._attach_penalties(
-                holding_states=holding_states,
-                run_config=run_config,
-                config_snapshot=config_snapshot,
-                portfolio_config=portfolio_config,
-                agent_results=agent_results,
-            )
-            committee_packet = CommitteePacket(
-                portfolio_id=portfolio_snapshot.portfolio_id,
-                as_of_date=portfolio_snapshot.as_of_date,
-                base_currency=portfolio_config.base_currency,
-                holdings=ordered_holdings,
-                agent_outputs=[agent.dict() for agent in agent_results],
-                penalty_items=[],
-                veto_logs=None,
-            )
-            decision_packet = DecisionPacket(
-                portfolio_id=portfolio_snapshot.portfolio_id,
-                as_of_date=portfolio_snapshot.as_of_date,
-                base_currency=portfolio_config.base_currency,
-                decision_summary={"status": "skeleton"},
-            )
-            hashes = compute_run_hashes(
-                portfolio_snapshot=portfolio_snapshot,
-                portfolio_config=portfolio_config,
-                run_config=run_config,
-                committee_packet=committee_packet,
-                decision_packet=decision_packet,
-            )
-            holding_packets = [state.to_packet() for state in holding_states]
-            return self._build_completed_result(
-                run_id=run_id,
-                started_at=started_at,
-                config_hashes=config_hashes,
-                portfolio_snapshot=portfolio_snapshot,
-                portfolio_config=portfolio_config,
-                run_config=run_config,
-                guard_results=guard_results,
-                ordered_holdings=ordered_holdings,
-                committee_packet=committee_packet,
-                holding_packets=holding_packets,
-                decision_packet=decision_packet,
-                hashes=hashes,
-            )
-
-        if outcome == RunOutcome.SHORT_CIRCUITED:
-            holding_packets = [state.to_packet() for state in holding_states]
-            committee_packet = CommitteePacket(
-                portfolio_id=portfolio_snapshot.portfolio_id,
-                as_of_date=portfolio_snapshot.as_of_date,
-                base_currency=portfolio_config.base_currency,
-                holdings=ordered_holdings,
-                agent_outputs=[agent.dict() for agent in agent_results],
-                penalty_items=[],
-                veto_logs=None,
-            )
-            return self._build_short_circuit_result(
-                run_id=run_id,
-                started_at=started_at,
-                reasons=reasons,
-                config_hashes=config_hashes,
-                portfolio_snapshot=portfolio_snapshot,
-                portfolio_config=portfolio_config,
-                run_config=run_config,
-                guard_results=guard_results,
-                ordered_holdings=ordered_holdings,
-                committee_packet=committee_packet,
-                holding_packets=holding_packets,
-            )
-
-        holding_packets = [state.to_packet() for state in holding_states if state.outcome != RunOutcome.COMPLETED]
-        return self._build_failure_result(
+        ended_at = self._now_func()
+        run_log = RunLog(
             run_id=run_id,
-            started_at=started_at,
+            started_at_utc=started_at,
+            ended_at_utc=ended_at,
+            status="terminal",
             outcome=outcome,
             reasons=reasons,
             config_hashes=config_hashes,
+        )
+
+        packet_or_failure = build_portfolio_packet(
+            run_id=run_id,
             portfolio_snapshot=portfolio_snapshot,
             portfolio_config=portfolio_config,
             run_config=run_config,
+            config_snapshot=config_snapshot,
+            outcome=outcome,
+            reasons=reasons,
+            holding_states=holding_states,
+            agent_results=agent_results,
             guard_results=guard_results,
-            ordered_holdings=ordered_holdings,
+        )
+
+        if isinstance(packet_or_failure, FailedRunPacket):
+            return OrchestrationResult(
+                run_log=run_log,
+                outcome=outcome,
+                guard_results=guard_results,
+                failed_run_packet=packet_or_failure,
+                holding_packets=[],
+                ordered_holdings=ordered_holdings,
+            )
+
+        holding_packets = list(packet_or_failure.holdings)
+        return OrchestrationResult(
+            run_log=run_log,
+            outcome=outcome,
+            guard_results=guard_results,
+            portfolio_committee_packet=packet_or_failure,
             holding_packets=holding_packets,
+            ordered_holdings=ordered_holdings,
         )
 
     def _build_failure_result(
@@ -870,7 +813,6 @@ class Orchestrator:
         run_config: Optional[RunConfig],
         guard_results: Optional[List[Any]] = None,
         ordered_holdings: Optional[List[Any]] = None,
-        holding_packets: Optional[List[HoldingPacket]] = None,
     ) -> OrchestrationResult:
         ended_at = self._now_func()
         run_log = RunLog(
@@ -884,7 +826,8 @@ class Orchestrator:
         )
         failed_run_packet = FailedRunPacket(
             run_id=run_id,
-            outcome=outcome,
+            portfolio_run_outcome=outcome,
+            failure_reason=reasons[0] if reasons else "unknown_failure",
             reasons=reasons,
             portfolio_id=portfolio_snapshot.portfolio_id if portfolio_snapshot else None,
             as_of_date=portfolio_snapshot.as_of_date if portfolio_snapshot else None,
@@ -897,163 +840,8 @@ class Orchestrator:
             outcome=outcome,
             guard_results=guard_results or [],
             failed_run_packet=failed_run_packet,
-            holding_packets=holding_packets or [],
+            holding_packets=[],
             ordered_holdings=ordered_holdings or [],
-        )
-
-    def _build_short_circuit_result(
-        self,
-        *,
-        run_id: str,
-        started_at: datetime,
-        reasons: List[str],
-        config_hashes: Dict[str, str],
-        portfolio_snapshot: PortfolioSnapshot,
-        portfolio_config: PortfolioConfig,
-        run_config: RunConfig,
-        guard_results: List[Any],
-        ordered_holdings: List[Any],
-        committee_packet: CommitteePacket,
-        holding_packets: List[HoldingPacket],
-    ) -> OrchestrationResult:
-        ended_at = self._now_func()
-        run_log = RunLog(
-            run_id=run_id,
-            started_at_utc=started_at,
-            ended_at_utc=ended_at,
-            status="terminal",
-            outcome=RunOutcome.SHORT_CIRCUITED,
-            reasons=reasons,
-            config_hashes=config_hashes,
-        )
-        short_circuit_packet = ShortCircuitRunPacket(
-            run_id=run_id,
-            outcome=RunOutcome.SHORT_CIRCUITED,
-            reasons=reasons,
-            portfolio_id=portfolio_snapshot.portfolio_id,
-            as_of_date=portfolio_snapshot.as_of_date,
-            base_currency=portfolio_config.base_currency,
-            run_mode=run_config.run_mode,
-            committee_packet=committee_packet,
-            holding_packets=holding_packets,
-            config_hashes=config_hashes,
-        )
-        return OrchestrationResult(
-            run_log=run_log,
-            outcome=RunOutcome.SHORT_CIRCUITED,
-            guard_results=guard_results,
-            short_circuit_packet=short_circuit_packet,
-            holding_packets=holding_packets,
-            ordered_holdings=ordered_holdings,
-        )
-
-    def _attach_penalties(
-        self,
-        *,
-        holding_states: List[HoldingState],
-        run_config: RunConfig,
-        config_snapshot: ConfigSnapshot,
-        portfolio_config: PortfolioConfig,
-        agent_results: List[AgentResult],
-    ) -> None:
-        for state in holding_states:
-            if state.outcome != RunOutcome.COMPLETED:
-                continue
-            holding_id = state.holding.identity.holding_id if state.holding.identity else ""
-            dio_output = self._extract_dio_output(agent_results, holding_id)
-            fx_report = self._extract_fx_report(agent_results, holding_id)
-            penalty_breakdown = compute_penalty_breakdown(
-                holding_id=holding_id,
-                run_config=run_config,
-                config_snapshot=config_snapshot,
-                dio_output=dio_output,
-                agent_results=agent_results,
-                portfolio_config=portfolio_config,
-                pscc_output_optional=fx_report,
-            )
-            state.scorecard = Scorecard(penalty_breakdown=penalty_breakdown)
-
-    @staticmethod
-    def _extract_dio_output(agent_results: List[AgentResult], holding_id: str) -> DIOOutput:
-        for agent in agent_results:
-            if agent.agent_name != "DIO":
-                continue
-            if agent.scope != "holding" or agent.holding_id != holding_id:
-                continue
-            try:
-                return DIOOutput.parse_obj(agent.key_findings)
-            except ValidationError:
-                return DIOOutput()
-        return DIOOutput()
-
-    @staticmethod
-    def _extract_fx_report(agent_results: List[AgentResult], holding_id: str) -> Optional[FXExposureReport]:
-        for agent in agent_results:
-            if agent.agent_name != "PSCC":
-                continue
-            if agent.scope == "holding" and agent.holding_id == holding_id:
-                payload = agent.key_findings.get("fx_exposure_report")
-                if payload is None:
-                    continue
-                try:
-                    return FXExposureReport.parse_obj(payload)
-                except ValidationError:
-                    return None
-            if agent.scope == "portfolio":
-                payload = agent.key_findings.get("fx_exposure_reports", {}).get(holding_id)
-                if payload is None:
-                    continue
-                try:
-                    return FXExposureReport.parse_obj(payload)
-                except ValidationError:
-                    return None
-        return None
-
-    def _build_completed_result(
-        self,
-        *,
-        run_id: str,
-        started_at: datetime,
-        config_hashes: Dict[str, str],
-        portfolio_snapshot: PortfolioSnapshot,
-        portfolio_config: PortfolioConfig,
-        run_config: RunConfig,
-        guard_results: List[Any],
-        ordered_holdings: List[Any],
-        committee_packet: CommitteePacket,
-        holding_packets: List[HoldingPacket],
-        decision_packet: DecisionPacket,
-        hashes: RunHashes,
-    ) -> OrchestrationResult:
-        ended_at = self._now_func()
-        run_log = RunLog(
-            run_id=run_id,
-            started_at_utc=started_at,
-            ended_at_utc=ended_at,
-            status="terminal",
-            outcome=RunOutcome.COMPLETED,
-            reasons=[],
-            config_hashes=config_hashes,
-        )
-        completed_run_packet = CompletedRunPacket(
-            run_id=run_id,
-            outcome=RunOutcome.COMPLETED,
-            portfolio_id=portfolio_snapshot.portfolio_id,
-            as_of_date=portfolio_snapshot.as_of_date,
-            base_currency=portfolio_config.base_currency,
-            run_mode=run_config.run_mode,
-            committee_packet=committee_packet,
-            holding_packets=holding_packets,
-            decision_packet=decision_packet,
-            hashes=HashBundle(**asdict(hashes)),
-        )
-        return OrchestrationResult(
-            run_log=run_log,
-            outcome=RunOutcome.COMPLETED,
-            guard_results=guard_results,
-            completed_run_packet=completed_run_packet,
-            holding_packets=holding_packets,
-            ordered_holdings=ordered_holdings,
         )
 
     @staticmethod

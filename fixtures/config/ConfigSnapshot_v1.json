@@ -1,0 +1,37 @@
+{
+  "fixture_id": "ConfigSnapshot_v1",
+  "version": "1.0",
+  "description": "Config snapshot with scoring rubric for aggregation tests.",
+  "created_at_utc": "2025-01-01T00:00:00Z",
+  "payload": {
+    "rubric_version": "v1.0",
+    "registries": {
+      "agent_registry": {
+        "path": "config/agent_registry.json",
+        "hash": "61a37244cc674a0417afa365d90b999949749f8709399cd6f4f43e9c3850ae48"
+      },
+      "scoring_rubric": {
+        "dimensions": [
+          {
+            "name": "fundamental_quality",
+            "metric_key": "fundamental_quality",
+            "weight": 60.0,
+            "scale_min": 0.0,
+            "scale_max": 100.0,
+            "higher_is_better": true
+          },
+          {
+            "name": "technical_momentum",
+            "metric_key": "technical_momentum",
+            "weight": 40.0,
+            "scale_min": 0.0,
+            "scale_max": 100.0,
+            "higher_is_better": true
+          }
+        ]
+      },
+      "agent_fixtures": {}
+    },
+    "hash": "config_snapshot_v1_hash"
+  }
+}
