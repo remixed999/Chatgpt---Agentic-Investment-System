@@ -104,6 +104,7 @@ def test_hash_gating_emits_hashes_for_completed_runs():
     assert packet.snapshot_hash is not None
     assert packet.config_hash is not None
     assert packet.run_config_hash is not None
+    assert packet.committee_packet_hash is not None
     assert packet.decision_hash is not None
     assert packet.run_hash is not None
 

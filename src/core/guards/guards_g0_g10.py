@@ -286,7 +286,7 @@ class G9PartialFailureGuard(Guard):
         context: GuardContext,
         holding_outcomes: List[RunOutcome],
     ) -> GuardEvaluation:
-        total_holdings = len(holding_outcomes)
+        total_holdings = len(context.portfolio_snapshot.holdings)
         if total_holdings == 0:
             return GuardEvaluation(
                 result=fail_result(self.guard_id, RunOutcome.FAILED, ["no_holdings_provided"]),

@@ -6,28 +6,6 @@
     "agent_outputs": [
       {
         "agent_name": "DIO",
-        "confidence": 1.0,
-        "counter_case": null,
-        "holding_id": null,
-        "key_findings": {
-          "contradictions": [],
-          "corporate_action_risk": null,
-          "integrity_veto_triggered": false,
-          "low_source_reliability": false,
-          "missing_hard_stop_fields": [],
-          "missing_penalty_critical_fields": [],
-          "staleness_flags": [],
-          "unsourced_numbers_detected": false
-        },
-        "metrics": [],
-        "notes": null,
-        "scope": "portfolio",
-        "status": "completed",
-        "suggested_penalties": [],
-        "veto_flags": []
-      },
-      {
-        "agent_name": "DIO",
         "confidence": 0.95,
         "counter_case": null,
         "holding_id": "HOLDING-001",
@@ -88,6 +66,28 @@
         "metrics": [],
         "notes": null,
         "scope": "holding",
+        "status": "completed",
+        "suggested_penalties": [],
+        "veto_flags": []
+      },
+      {
+        "agent_name": "DIO",
+        "confidence": 1.0,
+        "counter_case": null,
+        "holding_id": null,
+        "key_findings": {
+          "contradictions": [],
+          "corporate_action_risk": null,
+          "integrity_veto_triggered": false,
+          "low_source_reliability": false,
+          "missing_hard_stop_fields": [],
+          "missing_penalty_critical_fields": [],
+          "staleness_flags": [],
+          "unsourced_numbers_detected": false
+        },
+        "metrics": [],
+        "notes": null,
+        "scope": "portfolio",
         "status": "completed",
         "suggested_penalties": [],
         "veto_flags": []
@@ -214,7 +214,8 @@
         "key_findings": {
           "exit_risk_warnings": [],
           "hard_override_triggered": false,
-          "liquidity_grade": 3
+          "liquidity_grade": 3,
+          "score_cap": 90.0
         },
         "metrics": [],
         "notes": null,
@@ -231,7 +232,8 @@
         "key_findings": {
           "exit_risk_warnings": [],
           "hard_override_triggered": false,
-          "liquidity_grade": 2
+          "liquidity_grade": 2,
+          "score_cap": 70.0
         },
         "metrics": [],
         "notes": null,
@@ -248,7 +250,8 @@
         "key_findings": {
           "exit_risk_warnings": [],
           "hard_override_triggered": false,
-          "liquidity_grade": 4
+          "liquidity_grade": 4,
+          "score_cap": 95.0
         },
         "metrics": [],
         "notes": null,
@@ -376,8 +379,9 @@
         "veto_flags": []
       }
     ],
+    "committee_packet_hash": "910f22af9cd1731c48ad4cb596626c5febc23c55d531d84a5b21d9f4165354cc",
     "config_hash": "95cf32ff2dae5d19766577eb70433439de4398b740c3cb4bef1782af3a8e2d6e",
-    "decision_hash": "ee64b87e66fbd6194f83b8ed9e762e99f3571fbb8ada16b657241f0a0dd1fae2",
+    "decision_hash": "ed666532c7b4aace0ee716b063305db0e92ede8ad02f617cb2059eb889ca8464",
     "governance_trail": [
       {
         "guard_id": "G0",
@@ -387,12 +391,6 @@
       },
       {
         "guard_id": "G1",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
-        "guard_id": "G10",
         "outcome": null,
         "reasons": [],
         "status": "passed"
@@ -422,30 +420,6 @@
         "status": "passed"
       },
       {
-        "guard_id": "G5",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
-        "guard_id": "G5",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
-        "guard_id": "G5",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
-        "guard_id": "G5",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
         "guard_id": "G6",
         "outcome": null,
         "reasons": [],
@@ -453,12 +427,6 @@
       },
       {
         "guard_id": "G7",
-        "outcome": null,
-        "reasons": [],
-        "status": "passed"
-      },
-      {
-        "guard_id": "G8",
         "outcome": null,
         "reasons": [],
         "status": "passed"
@@ -481,9 +449,15 @@
         },
         "limitations": [],
         "scorecard": {
-          "applied_caps": [],
-          "base_score": 76.0,
-          "final_score": 76.0,
+          "applied_caps": [
+            {
+              "cap_value": 90.0,
+              "reason": "lefo_liquidity_cap",
+              "source": "LEFO"
+            }
+          ],
+          "base_score": 90.0,
+          "final_score": 90.0,
           "notes": [],
           "penalty_breakdown": {
             "category_A_missing_critical": 0.0,
@@ -507,9 +481,20 @@
         },
         "limitations": [],
         "scorecard": {
-          "applied_caps": [],
-          "base_score": 63.0,
-          "final_score": 63.0,
+          "applied_caps": [
+            {
+              "cap_value": 70.0,
+              "reason": "lefo_liquidity_cap",
+              "source": "LEFO"
+            },
+            {
+              "cap_value": 65.0,
+              "reason": "pscc_position_cap",
+              "source": "PSCC"
+            }
+          ],
+          "base_score": 65.0,
+          "final_score": 65.0,
           "notes": [],
           "penalty_breakdown": {
             "category_A_missing_critical": 0.0,
@@ -533,9 +518,15 @@
         },
         "limitations": [],
         "scorecard": {
-          "applied_caps": [],
-          "base_score": 52.0,
-          "final_score": 52.0,
+          "applied_caps": [
+            {
+              "cap_value": 95.0,
+              "reason": "lefo_liquidity_cap",
+              "source": "LEFO"
+            }
+          ],
+          "base_score": 95.0,
+          "final_score": 95.0,
           "notes": [],
           "penalty_breakdown": {
             "category_A_missing_critical": 0.0,
@@ -550,6 +541,7 @@
         }
       }
     ],
+    "limitations": [],
     "per_holding_outcomes": {
       "HOLDING-001": "COMPLETED",
       "HOLDING-002": "COMPLETED",
@@ -557,10 +549,10 @@
     },
     "portfolio_id": "PORT-N3",
     "portfolio_run_outcome": "COMPLETED",
-    "run_config_hash": "2d72dc15b0d2a933c2f773b17bbd0ede628e0c2f8b8b43e199d7e735c98d8c51",
-    "run_hash": "a78baa7477b2ba5ec25d72dbb40a54bff668851faaa78495efc6d84381f8c82e",
-    "run_id": "75c17364-3082-49dc-a7d7-4d9350f3b2fc",
-    "snapshot_hash": "fd63764efb272b4ea25acf3d23a358b1c75cbdcf4851996103f6ef6b33670688",
+    "run_config_hash": "8d1081095f8da96d7b87221999ba17b10a0ace463a81b96ca02b7b3f60fa0c5e",
+    "run_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "run_id": "local-run",
+    "snapshot_hash": "681f209ce4750fbb3864aeef36688f39585f2505beac9fbe41fbbf4211efdc39",
     "summary": {
       "counts_by_outcome": {
         "COMPLETED": 3,

@@ -205,11 +205,13 @@ class PortfolioCommitteePacket(StrictBaseModel):
     holdings: List[HoldingPacket] = Field(default_factory=list)
     per_holding_outcomes: Dict[str, str] = Field(default_factory=dict)
     summary: Dict[str, Any] = Field(default_factory=dict)
+    limitations: List[str] = Field(default_factory=list)
     governance_trail: List[Dict[str, Any]] = Field(default_factory=list)
     agent_outputs: List[Dict[str, Any]] = Field(default_factory=list)
     snapshot_hash: Optional[str] = None
     config_hash: Optional[str] = None
     run_config_hash: Optional[str] = None
+    committee_packet_hash: Optional[str] = None
     decision_hash: Optional[str] = None
     run_hash: Optional[str] = None
 

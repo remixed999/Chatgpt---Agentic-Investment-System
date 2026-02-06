@@ -64,8 +64,7 @@ def test_dio_veto_excludes_penalties_and_scores():
 
     holding_packet = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-001")
     assert holding_packet.holding_run_outcome == RunOutcome.VETOED
-    assert holding_packet.scorecard.final_score is None
-    assert holding_packet.scorecard.penalty_breakdown.total_penalties == 0.0
+    assert holding_packet.scorecard is None
 
 
 def test_tf03_grra_short_circuit_no_hashes():
@@ -100,7 +99,7 @@ def test_tf05_burn_rate_veto_emits_minimal_packet():
 
     holding_packet = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-002")
     assert holding_packet.holding_run_outcome == RunOutcome.VETOED
-    assert holding_packet.scorecard.penalty_breakdown.total_penalties == 0.0
+    assert holding_packet.scorecard is None
 
     expected = _load_fixture("fixtures/expected/TF-05_expected_burn_rate_veto.json")
     assert canonical_json_dumps(result.portfolio_committee_packet.model_dump()) == canonical_json_dumps(expected)
@@ -215,3 +214,18 @@ def test_tf14_partial_failure_threshold_boundary():
 
     expected = _load_fixture("fixtures/expected/TF-14_expected_partial_failure_threshold.json")
     assert canonical_json_dumps(result_equal.portfolio_committee_packet.model_dump()) == canonical_json_dumps(expected)
+
+
+def test_tf15_failed_run_emits_failed_packet_only():
+    inputs = _base_inputs()
+    inputs["portfolio_snapshot_data"] = _load_fixture(
+        "fixtures/portfolio/PortfolioSnapshot_TF15_invalid.json"
+    )
+
+    result = Orchestrator().run(**inputs)
+
+    assert result.outcome == RunOutcome.FAILED
+    assert result.portfolio_committee_packet is None
+    expected = _load_fixture("fixtures/expected/TF-15_expected_failed_packet.json")
+    assert result.failed_run_packet is not None
+    assert canonical_json_dumps(result.failed_run_packet.model_dump()) == canonical_json_dumps(expected)

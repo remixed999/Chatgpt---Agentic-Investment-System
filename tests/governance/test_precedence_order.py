@@ -59,9 +59,7 @@ def test_grra_short_circuit_prevents_penalties_and_caps() -> None:
     assert result.outcome == RunOutcome.SHORT_CIRCUITED
     for packet in result.holding_packets:
         assert packet.holding_run_outcome == RunOutcome.SHORT_CIRCUITED
-        assert packet.scorecard is not None
-        assert packet.scorecard.penalty_breakdown.total_penalties == 0.0
-        assert packet.scorecard.applied_caps == []
+        assert packet.scorecard is None
 
 
 def test_risk_officer_veto_skips_penalties_and_caps() -> None:
@@ -75,9 +73,7 @@ def test_risk_officer_veto_skips_penalties_and_caps() -> None:
 
     vetoed = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-002")
     assert vetoed.holding_run_outcome == RunOutcome.VETOED
-    assert vetoed.scorecard is not None
-    assert vetoed.scorecard.penalty_breakdown.total_penalties == 0.0
-    assert vetoed.scorecard.applied_caps == []
+    assert vetoed.scorecard is None
 
 
 def test_caps_applied_before_penalties() -> None:
@@ -121,6 +117,4 @@ def test_penalties_not_applied_to_dio_vetoed_holding() -> None:
     vetoed = next(packet for packet in result.holding_packets if packet.holding_id == "HOLDING-003")
 
     assert vetoed.holding_run_outcome == RunOutcome.VETOED
-    assert vetoed.scorecard is not None
-    assert vetoed.scorecard.penalty_breakdown.total_penalties == 0.0
-    assert vetoed.scorecard.applied_caps == []
+    assert vetoed.scorecard is None

@@ -665,13 +665,29 @@ class Orchestrator:
         elif outcome == RunOutcome.COMPLETED:
             if committee_packet is None:
                 reasons.append("committee_packet_missing")
-            elif committee_packet.run_hash is None:
-                reasons.append("run_hash_missing")
+            else:
+                if committee_packet.snapshot_hash is None:
+                    reasons.append("snapshot_hash_missing")
+                if committee_packet.config_hash is None:
+                    reasons.append("config_hash_missing")
+                if committee_packet.run_config_hash is None:
+                    reasons.append("run_config_hash_missing")
+                if committee_packet.committee_packet_hash is None:
+                    reasons.append("committee_packet_hash_missing")
+                if committee_packet.decision_hash is None:
+                    reasons.append("decision_hash_missing")
+                if committee_packet.run_hash is None:
+                    reasons.append("run_hash_missing")
         else:
             if committee_packet is None:
                 reasons.append("committee_packet_missing")
-            elif committee_packet.run_hash is not None:
-                reasons.append("hashes_not_allowed")
+            else:
+                if committee_packet.committee_packet_hash is not None:
+                    reasons.append("hashes_not_allowed")
+                if committee_packet.decision_hash is not None:
+                    reasons.append("hashes_not_allowed")
+                if committee_packet.run_hash is not None:
+                    reasons.append("hashes_not_allowed")
         if reasons:
             return fail_result("G10", RunOutcome.FAILED, reasons)
         return pass_result("G10")
