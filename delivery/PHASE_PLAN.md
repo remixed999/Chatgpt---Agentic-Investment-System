@@ -14,8 +14,8 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 
 | Phase | Status | Evidence Summary | Blocking Dependencies | Notes |
 | --- | --- | --- | --- | --- |
-| Phase 0 — Pre-Deployment Readiness | NOT STARTED | - Phase 0 readiness tool and report writer exist in `src/release/phase0.py`. <br>- Repository provides a release bundle with manifest and config inputs in `config/release_bundle/`. | - Phase 0 report/artifacts not present in repo. | Not yet satisfied (tooling exists, execution artifacts missing). |
-| Phase 1 — Local / Developer Validation | NOT STARTED | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Phase 1 report/artifacts not present in repo. | Not yet satisfied (tooling exists, execution artifacts missing). |
+| Phase 0 — Pre-Deployment Readiness | FAILED | - Phase 0 readiness run captured in `release_manifests/dd11-phase0/phase0_attestation.md` (FAILED). | - Resolve readiness errors before rerun. | Not yet satisfied (artifacts captured, gate failed). |
+| Phase 1 — Local / Developer Validation | NOT STARTED | - Phase 1 gate script exists and runs Phase 0 readiness, pytest suites, and deterministic replay checks. | - Requires Phase 0 pass + Phase 1 report/artifacts. | Not yet satisfied (blocked by Phase 0 failure). |
 | Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Requires Phase 1 pass + integration run artifacts. | Not yet satisfied. |
 | Phase 3 — Staging (Pre-Production) | NOT STARTED | - No staging run artifacts or regression reports in repo. | - Requires Phase 2 pass + staging artifacts. | Not yet satisfied. |
 | Phase 4 — Production Rollout | NOT STARTED | - No production deployment artifacts in repo. | - Requires Phase 3 pass + production deployment artifacts. | Not yet satisfied. |
