@@ -1,0 +1,21 @@
+{
+  "failures": [
+    "release manifest hash mismatch",
+    "forbidden runtime pattern usage detected",
+    "integration test suites include skipped determinism/canonicalization/governance tests"
+  ],
+  "paths": {
+    "attestation": "release_manifests/dd11-phase2/attestation.md",
+    "canonicalization": "release_manifests/dd11-phase2/canonicalization",
+    "checklist": "release_manifests/dd11-phase2/checklist.md",
+    "determinism": "release_manifests/dd11-phase2/determinism",
+    "environment": "release_manifests/dd11-phase2/environment",
+    "governance": "release_manifests/dd11-phase2/governance",
+    "guards": "release_manifests/dd11-phase2/guards",
+    "outputs": "release_manifests/dd11-phase2/outputs",
+    "runs": "release_manifests/dd11-phase2/runs",
+    "tests": "release_manifests/dd11-phase2/tests"
+  },
+  "phase": "dd11-phase2",
+  "status": "FAILED"
+}
