@@ -1,0 +1,47 @@
+{
+  "portfolio_id": "PORTFOLIO-IMAGE-001",
+  "as_of_date": "2024-01-01T00:00:00+00:00",
+  "holdings": [
+    {
+      "identity": {
+        "holding_id": "HOLDING-CGNT",
+        "ticker": "CGNT"
+      },
+      "weight": 0.8185,
+      "currency": "CAD"
+    },
+    {
+      "identity": {
+        "holding_id": "HOLDING-MOS",
+        "ticker": "MOS"
+      },
+      "weight": 0.0821,
+      "currency": "USD"
+    },
+    {
+      "identity": {
+        "holding_id": "HOLDING-SLB",
+        "ticker": "SLB"
+      },
+      "weight": 0.073,
+      "currency": "USD"
+    },
+    {
+      "identity": {
+        "holding_id": "HOLDING-STEX",
+        "ticker": "STEX"
+      },
+      "weight": 0.0237,
+      "currency": "USD"
+    },
+    {
+      "identity": {
+        "holding_id": "HOLDING-TEA",
+        "ticker": "TEA"
+      },
+      "weight": 0.0032,
+      "currency": "CAD"
+    }
+  ],
+  "cash_pct": 0.1061
+}
