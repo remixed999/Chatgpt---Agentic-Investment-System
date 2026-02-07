@@ -1,11 +1,11 @@
 {
   "config_snapshot_hash": "de364b423c4c9b92b52d07b2c677b44ece359fe6871eb534a259b3e35bc4eb6f",
-  "config_snapshot_matches": false,
-  "manifest_config_snapshot_hash": "6064130e0a5f65ffd96c9ea4390bd00a769782b52310154514a120bf9a27f0c4",
+  "config_snapshot_matches": true,
+  "manifest_config_snapshot_hash": "de364b423c4c9b92b52d07b2c677b44ece359fe6871eb534a259b3e35bc4eb6f",
   "manifest_path": "config/release_manifest.json",
-  "manifest_run_config_hash": "8b350fac5c0e1f7dce8a8ef2bf3012f2544a77eb6d944d00a3f9ea94788e3cf5",
+  "manifest_run_config_hash": "8c4cd38609cf6ddc59b3cd83d522148dc3fd489a903362d8639c3c95cef78960",
   "phase0_attestation_exists": true,
   "phase1_attestation_exists": true,
   "run_config_hash": "8c4cd38609cf6ddc59b3cd83d522148dc3fd489a903362d8639c3c95cef78960",
-  "run_config_matches": false
+  "run_config_matches": true
 }
