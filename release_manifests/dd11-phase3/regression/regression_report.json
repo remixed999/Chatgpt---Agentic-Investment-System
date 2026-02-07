@@ -1,0 +1,15 @@
+{
+  "deterministic_replay_match": true,
+  "governance_match": {
+    "guard_results": true,
+    "per_holding_outcomes": true,
+    "portfolio_outcome": true
+  },
+  "hashes_match": true,
+  "ordering_match": {
+    "agent_outputs": true,
+    "governance_trail": true,
+    "holdings": true
+  },
+  "phase2_baseline_path": "release_manifests/dd11-phase2/determinism"
+}

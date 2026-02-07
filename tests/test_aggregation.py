@@ -17,10 +17,14 @@ def _load_fixture(path: str) -> dict:
 def _base_inputs() -> dict:
     config_snapshot = _load_fixture("fixtures/config/ConfigSnapshot_v1.json")
     seeded = _load_fixture("fixtures/seeded/SeededData_HappyPath.json")
+    run_config = _load_fixture("fixtures/config/RunConfig_DEEP.json")
+    run_config.setdefault("burn_rate_classification", {})
+    run_config.setdefault("penalty_caps", {})
+    run_config.setdefault("staleness_thresholds", {})
     return {
         "portfolio_snapshot_data": _load_fixture("fixtures/portfolio/PortfolioSnapshot_N3.json"),
         "portfolio_config_data": _load_fixture("fixtures/portfolio_config.json"),
-        "run_config_data": _load_fixture("fixtures/config/RunConfig_DEEP.json"),
+        "run_config_data": run_config,
         "config_snapshot_data": {
             **config_snapshot,
             "registries": {

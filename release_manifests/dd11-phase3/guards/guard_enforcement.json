@@ -1,0 +1,108 @@
+{
+  "all_guards": [
+    {
+      "guard_id": "G0",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G1",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G10",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G2",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G3",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G4",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G5",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G6",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G7",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G8",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    {
+      "guard_id": "G9",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    }
+  ],
+  "required_guards": {
+    "G0": {
+      "guard_id": "G0",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    "G10": {
+      "guard_id": "G10",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    "G2": {
+      "guard_id": "G2",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    "G5": {
+      "guard_id": "G5",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    "G7": {
+      "guard_id": "G7",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    },
+    "G9": {
+      "guard_id": "G9",
+      "outcome": null,
+      "reasons": [],
+      "status": "passed"
+    }
+  }
+}

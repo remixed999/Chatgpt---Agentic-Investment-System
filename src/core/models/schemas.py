@@ -257,3 +257,7 @@ class OrchestrationResult(StrictBaseModel):
     portfolio_committee_packet: Optional[PortfolioCommitteePacket] = None
     holding_packets: List[HoldingPacket] = Field(default_factory=list)
     ordered_holdings: List[HoldingInput] = Field(default_factory=list)
+
+    @property
+    def packet(self) -> PortfolioCommitteePacket | FailedRunPacket | None:
+        return self.portfolio_committee_packet or self.failed_run_packet

@@ -131,7 +131,12 @@ def compute_penalty_breakdown_with_cap_tracking(
 
     items.extend(_fx_items(portfolio_config, pscc_output_optional))
 
-    items.extend(_data_validity_items(dio_output))
+    data_validity_items = _data_validity_items(dio_output)
+    if run_config.run_mode == RunMode.FAST:
+        data_validity_items = [
+            item for item in data_validity_items if item.reason == "recent_split_or_reverse_split"
+        ]
+    items.extend(data_validity_items)
 
     items = _dedupe_items(items)
     capped_by_category = _apply_category_caps(items, _resolve_category_caps(run_config))

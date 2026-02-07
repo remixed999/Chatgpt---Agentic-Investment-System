@@ -1,0 +1,12 @@
+{
+  "governance_match": {
+    "guard_results": true,
+    "per_holding_outcomes": true,
+    "portfolio_outcome": true
+  },
+  "ordering_match": {
+    "agent_outputs": true,
+    "governance_trail": true,
+    "holdings": true
+  }
+}

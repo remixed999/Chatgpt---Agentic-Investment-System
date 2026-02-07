@@ -303,6 +303,7 @@ class Orchestrator:
             return None, errors
 
         ordered_holdings = stable_sort_holdings(portfolio_snapshot.holdings)
+        portfolio_snapshot = portfolio_snapshot.model_copy(update={"holdings": ordered_holdings})
         return (
             _ParsedInputs(
                 portfolio_snapshot=portfolio_snapshot,
