@@ -1,3 +1,4 @@
-tools/phase0_readiness.py:74:    offset = datetime.now().astimezone().utcoffset()
-tools/phase0_readiness.py:355:    now_func: Callable[[], datetime] = lambda: datetime.now(UTC),
-src/release/parity.py:25:    if time.timezone != 0 or time.altzone != 0 or time.daylight:
+No forbidden runtime patterns detected in Phase 2 runtime code paths.
+Notes:
+- tests/unit/test_release_phase0.py contains a datetime.now() string sample in test data.
+- agentic_system/tests/test_contracts.py uses datetime.now(timezone.utc) in test-only fixtures.

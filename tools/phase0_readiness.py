@@ -71,7 +71,7 @@ def _ensure_locale_invariant(errors: List[str]) -> None:
 
 
 def _ensure_timezone_utc(errors: List[str]) -> None:
-    offset = datetime.now().astimezone().utcoffset()
+    offset = datetime.utcnow().replace(tzinfo=UTC).astimezone().utcoffset()
     if offset is None or offset.total_seconds() != 0:
         errors.append("Timezone is not UTC; set TZ=UTC for Phase 0 readiness.")
 
@@ -352,7 +352,7 @@ def _format_attestation(
 def run_phase0_readiness(
     argv: Sequence[str],
     *,
-    now_func: Callable[[], datetime] = lambda: datetime.now(UTC),
+    now_func: Callable[[], datetime] = lambda: datetime.utcnow().replace(tzinfo=UTC),
 ) -> Phase0Result:
     args = _parse_args(argv)
     repo_root = _resolve_repo_root(Path.cwd())
