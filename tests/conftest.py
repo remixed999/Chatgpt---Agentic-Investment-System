@@ -1,16 +1,23 @@
 from __future__ import annotations
 
+import os
 import sys
+import warnings
 from pathlib import Path
 
 import pytest
+from pydantic import PydanticDeprecatedSince20
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+warnings.filterwarnings("ignore", category=PydanticDeprecatedSince20)
+
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if os.environ.get("DD11_FULL_TESTS") == "1":
+        return
     keep = {
         "test_orchestrator.py",
         "test_guards_and_governance.py",

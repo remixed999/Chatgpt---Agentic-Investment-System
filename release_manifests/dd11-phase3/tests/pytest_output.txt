@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0
+rootdir: /workspace/Chatgpt---Agentic-Investment-System
+collected 85 items
+
+agentic_system/tests/test_contracts.py ....                              [  4%]
+tests/canonicalization/test_determinism_guard.py .                       [  5%]
+tests/canonicalization/test_determinism_replay.py .                      [  7%]
+tests/canonicalization/test_hash_stability.py ....                       [ 11%]
+tests/contract/test_contracts.py ..                                      [ 14%]
+tests/determinism/test_phase1_report_determinism.py .                    [ 15%]
+tests/determinism/test_replay_determinism.py .                           [ 16%]
+tests/governance/test_precedence_order.py .....                          [ 22%]
+tests/outcomes/test_portfolio_outcomes.py .....                          [ 28%]
+tests/outcomes/test_skeleton_outcomes.py ...                             [ 31%]
+tests/test_agent_enablement.py .......                                   [ 40%]
+tests/test_aggregation.py .........                                      [ 50%]
+tests/test_determinism.py .                                              [ 51%]
+tests/test_guards_and_governance.py ......                               [ 58%]
+tests/test_hashing.py .......                                            [ 67%]
+tests/test_imp03_emission_and_thresholds.py ....                         [ 71%]
+tests/test_orchestrator.py ...                                           [ 75%]
+tests/test_penalty_engine.py .......                                     [ 83%]
+tests/test_penalty_engine_fixtures.py .....                              [ 89%]
+tests/test_phase0_readiness.py ......                                    [ 96%]
+tests/unit/test_phase1_unit.py .                                         [ 97%]
+tests/unit/test_release_phase0.py ..                                     [100%]
+
+- generated xml file: /workspace/Chatgpt---Agentic-Investment-System/release_manifests/dd11-phase3/tests/pytest.xml -
+============================== 85 passed in 0.88s ==============================

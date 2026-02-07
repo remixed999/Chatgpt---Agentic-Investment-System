@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from src.core.models import PortfolioCommitteePacket, RunOutcome
 from src.core.orchestration import Orchestrator
-from src.schemas.models import PortfolioCommitteePacket, PortfolioRunOutcome
 
 
 def _load_payload(path: str) -> dict:
@@ -24,7 +24,7 @@ def test_tf01_happy_path_completed() -> None:
     packet = result.packet
 
     assert isinstance(packet, PortfolioCommitteePacket)
-    assert packet.portfolio_run_outcome == PortfolioRunOutcome.COMPLETED
+    assert packet.portfolio_run_outcome == RunOutcome.COMPLETED
     assert packet.portfolio_id == expected["portfolio_id"]
     assert [holding.holding_run_outcome.value for holding in packet.holdings] == [
         holding["holding_run_outcome"] for holding in expected["holdings"]
@@ -56,6 +56,6 @@ def test_tf04_identity_missing_holding_failed() -> None:
 
     packet = result.packet
 
-    assert packet.portfolio_run_outcome == PortfolioRunOutcome.COMPLETED
+    assert packet.portfolio_run_outcome == RunOutcome.COMPLETED
     failed = [holding for holding in packet.holdings if holding.holding_run_outcome.value == "FAILED"]
     assert failed

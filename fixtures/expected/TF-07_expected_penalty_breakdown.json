@@ -1,12 +1,16 @@
 {
-  "fixture_id": "TF-07_expected_penalty_breakdown",
-  "version": "1.0",
-  "description": "Expected zero penalties when cash/runway is not applicable.",
   "created_at_utc": "2025-01-01T00:00:00Z",
+  "description": "Expected zero penalties when cash/runway is not applicable.",
+  "fixture_id": "TF-07_expected_penalty_breakdown",
   "payload": {
-    "run_id": "local-run",
-    "portfolio_id": "PORT-N3",
-    "portfolio_run_outcome": "COMPLETED",
-    "holdings": []
-  }
+    "category_A_missing_critical": 0.0,
+    "category_B_staleness": 0.0,
+    "category_C_contradictions_integrity": 0.0,
+    "category_D_confidence": 0.0,
+    "category_E_fx_exposure_risk": 0.0,
+    "category_F_data_validity": 0.0,
+    "details": [],
+    "total_penalties": 0.0
+  },
+  "version": "1.0"
 }

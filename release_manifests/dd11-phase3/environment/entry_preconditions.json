@@ -1,0 +1,20 @@
+{
+  "config_snapshot_file_hash": "de364b423c4c9b92b52d07b2c677b44ece359fe6871eb534a259b3e35bc4eb6f",
+  "config_snapshot_file_matches_manifest": true,
+  "config_snapshot_payload_hash": "c46ee59da910ddb1f3568dbc08816491429b4feebc6fbc75ce8bdc79e3372b8b",
+  "config_snapshot_payload_matches_phase0": true,
+  "local_env_override_present": false,
+  "manifest_config_snapshot_hash": "de364b423c4c9b92b52d07b2c677b44ece359fe6871eb534a259b3e35bc4eb6f",
+  "manifest_run_config_hash": "8c4cd38609cf6ddc59b3cd83d522148dc3fd489a903362d8639c3c95cef78960",
+  "phase0_manifest_path": "release_manifests/dd11-phase0/manifest.json",
+  "phase1_release_bundle_hashes_path": "release_manifests/dd11-phase1/config/release_bundle_hashes.txt",
+  "phase2_attestation_passed": true,
+  "phase2_attestation_path": "release_manifests/dd11-phase2/attestation.md",
+  "registry_bundle_hash": "5bfddfb7a899947fd3d37583c78cd1b97db9d04a5bcc24e297d98f805fd555ee",
+  "registry_bundle_matches_phase0": true,
+  "release_manifest_hash": "5209ed0d2a098d100d8bcbb34e1f7663e976a3802bc55c002dfa026b969063cd",
+  "release_manifest_matches_phase1": true,
+  "release_manifest_path": "config/release_bundle/release_manifest.json",
+  "run_config_file_hash": "8c4cd38609cf6ddc59b3cd83d522148dc3fd489a903362d8639c3c95cef78960",
+  "run_config_file_matches_manifest": true
+}

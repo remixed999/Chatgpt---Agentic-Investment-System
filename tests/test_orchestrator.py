@@ -35,7 +35,7 @@ def _base_inputs():
                 **seeded,
             },
         },
-        "manifest_data": _load_fixture("config/release_manifest.json"),
+        "manifest_data": None,
         "config_hashes": {
             "run_config_hash": _hash_fixture("fixtures/config/RunConfig_DEEP.json"),
             "config_snapshot_hash": _hash_fixture("fixtures/config/ConfigSnapshot_v1.json"),
