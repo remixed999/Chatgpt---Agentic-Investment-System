@@ -37,3 +37,25 @@ To run hash stability/replay validation tests:
 ```bash
 pytest
 ```
+
+## How to run a production-style evaluation
+
+Step 1: Ensure you are at the repo root.
+
+Step 2: Run the production wrapper with a portfolio snapshot:
+
+```bash
+python -m src.cli.run_prod --portfolio fixtures/portfolio_snapshot_prod_example.json --out artifacts/prod_run_001
+```
+
+Optional flags:
+
+- `--run_mode DEEP|FAST` to override the configured run mode.
+- `--prod` to add an execution profile marker to `summary.json`.
+
+Step 3: Inspect the artifacts directory. The wrapper always writes:
+
+- `summary.json`: run_id, portfolio_id, outcome, counts by holding outcome, and any errors.
+- `runlog.json`: full run log emitted by the orchestrator.
+- `output_packet.json`: the portfolio packet (when the run reaches packet emission).
+- `failure_report.md`: present only if the run fails, with step-by-step diagnostics.
