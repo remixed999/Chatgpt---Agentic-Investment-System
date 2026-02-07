@@ -1,0 +1,12 @@
+[
+  {
+    "checks": {
+      "guard_counter_population": true,
+      "guard_results_present": true,
+      "hashes_present": true,
+      "output_packet_present": true,
+      "runlog_present": true
+    },
+    "run_id": "prod-run"
+  }
+]

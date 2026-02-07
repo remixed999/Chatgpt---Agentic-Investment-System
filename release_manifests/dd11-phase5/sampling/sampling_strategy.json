@@ -1,0 +1,7 @@
+{
+  "candidate_count": 1,
+  "runlog_glob": "release_manifests/dd11-phase4/runs/*/runlog.json",
+  "sample_basis": "runlog.json outcome=COMPLETED and status=completed",
+  "sample_size": 1,
+  "strategy": "Select completed PROD runs from release_manifests/dd11-phase4/runs, sort by run_id, take first N=1 (deterministic)."
+}
