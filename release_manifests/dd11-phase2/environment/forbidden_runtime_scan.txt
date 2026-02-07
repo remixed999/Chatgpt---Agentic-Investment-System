@@ -1,0 +1,3 @@
+tools/phase0_readiness.py:74:    offset = datetime.now().astimezone().utcoffset()
+tools/phase0_readiness.py:355:    now_func: Callable[[], datetime] = lambda: datetime.now(UTC),
+src/release/parity.py:25:    if time.timezone != 0 or time.altzone != 0 or time.daylight:

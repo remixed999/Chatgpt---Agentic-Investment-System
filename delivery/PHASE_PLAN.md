@@ -2,7 +2,7 @@
 
 ## Current State Assessment
 
-Repository evidence indicates the IMP-01 through IMP-06 implementation scope is already delivered in code (orchestration, determinism/canonicalization, guards & governance, penalty engine, agents, and aggregation). Phase 0 readiness artifacts are now captured, while Phase 1 and beyond remain unexecuted. As a result, implementation is complete, Phase 0 gating is satisfied, and verification beyond Phase 0 remains unexecuted.
+Repository evidence indicates the IMP-01 through IMP-06 implementation scope is already delivered in code (orchestration, determinism/canonicalization, guards & governance, penalty engine, agents, and aggregation). Phase 0 and Phase 1 readiness artifacts are captured, and Phase 2 integration validation has been executed but failed. As a result, implementation is complete, Phase 0/1 gating is satisfied, and Phase 2 verification is incomplete due to blocking failures.
 
 **Acceptance-criteria signals already implemented in code:**
 - Deterministic canonicalization + hashing (canonical ordering/serialization and hash bundle computation). 
@@ -16,7 +16,7 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 | --- | --- | --- | --- | --- |
 | Phase 0 — Pre-Deployment Readiness | COMPLETE | - Phase 0 readiness run captured in `release_manifests/dd11-phase0/phase0_attestation.md` (PASSED). | - None. | Phase 0 gate satisfied; release bundle canonicalized and pinned. |
 | Phase 1 — Local / Developer Validation | PASSED | - Phase 1 evidence captured in `release_manifests/dd11-phase1/` (attestation, tests, determinism, governance, environment). | - Phase 0 PASSED. | Phase 1 gates executed and passed. Phase 2 is **UNBLOCKED** but not started. |
-| Phase 2 — Integration Environment | NOT STARTED | - No integration run artifacts or logs in repo. | - Phase 1 PASSED; integration run artifacts required. | Phase 2 is **UNBLOCKED** but not started. |
+| Phase 2 — Integration Environment | FAILED | - Phase 2 evidence captured in `release_manifests/dd11-phase2/` (attestation, tests, determinism, governance, environment). | - Phase 1 PASSED; Phase 2 failures must be remediated. | Phase 2 executed but failed due to hash mismatches, forbidden runtime patterns, and skipped determinism/governance tests. |
 | Phase 3 — Staging (Pre-Production) | NOT STARTED | - No staging run artifacts or regression reports in repo. | - Requires Phase 2 pass + staging artifacts. | Not yet satisfied. |
 | Phase 4 — Production Rollout | NOT STARTED | - No production deployment artifacts in repo. | - Requires Phase 3 pass + production deployment artifacts. | Not yet satisfied. |
 | Phase 5 — Post-Deployment Validation & Monitoring | NOT STARTED | - No post-deployment replay or monitoring artifacts in repo. | - Requires Phase 4 completion + monitoring artifacts. | Not yet satisfied. |
@@ -37,7 +37,7 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 | Task | Status | Evidence Summary | Blocking Dependencies | Notes |
 | --- | --- | --- | --- | --- |
 | TST-01 — Unit Testing | COMPLETE | - Phase 1 pytest execution captured in `release_manifests/dd11-phase1/tests/pytest_output.txt` and `pytest.xml`. | - None. | Satisfied as part of Phase 1. |
-| TST-02 — Integration Testing | NOT STARTED | - No integration run artifacts or reports in repo. | - Requires TST-01 execution and integration environment runs. | Not yet satisfied. |
+| TST-02 — Integration Testing | FAILED | - Phase 2 pytest execution captured in `release_manifests/dd11-phase2/tests/pytest_output.txt` and `pytest.xml` (skipped determinism/governance suites). | - Requires re-run with determinism/governance suites unskipped. | Not yet satisfied. |
 | TST-03 — Replay & Determinism Testing | COMPLETE | - Deterministic replay artifacts captured in `release_manifests/dd11-phase1/determinism/`. | - None. | Satisfied as part of Phase 1. |
 | REL-01 — Staging Deployment | NOT STARTED | - No staging deployment artifacts in repo. | - Requires TST-03 completion. | Not yet satisfied. |
 | REL-02 — Production Deployment | NOT STARTED | - No production deployment artifacts in repo. | - Requires REL-01 completion. | Not yet satisfied. |
@@ -52,4 +52,4 @@ Repository evidence indicates the IMP-01 through IMP-06 implementation scope is 
 
 ## Next Legitimate Step
 
-Phase 2 is **UNBLOCKED** but must not start until integration environment readiness is confirmed and new Phase 2 artifacts are captured.
+Phase 2 remains **BLOCKED** until hash mismatches, forbidden runtime patterns, and skipped determinism/governance tests are remediated and Phase 2 is re-executed to PASS.
