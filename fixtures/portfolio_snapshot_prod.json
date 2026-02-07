@@ -1,1 +1,31 @@
-{}
+{
+  "portfolio_id": "PORTFOLIO-IMAGE-001",
+  "as_of_date": "2024-01-01T00:00:00Z",
+  "holdings": [
+    {
+      "holding_id": "HOLDING-CGNT",
+      "identifier": "CGNT",
+      "weight": 0.8185
+    },
+    {
+      "holding_id": "HOLDING-MOS",
+      "identifier": "MOS",
+      "weight": 0.0821
+    },
+    {
+      "holding_id": "HOLDING-SLB",
+      "identifier": "SLB",
+      "weight": 0.0730
+    },
+    {
+      "holding_id": "HOLDING-STEX",
+      "identifier": "STEX",
+      "weight": 0.0237
+    },
+    {
+      "holding_id": "HOLDING-TEA",
+      "identifier": "TEA",
+      "weight": 0.0032
+    }
+  ]
+}
