@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-02-07T03:30:42.971601+00:00",
+  "runs": [
+    {
+      "governance_trail_entries": [
+        {
+          "guard_id": "G0",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G1",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G2",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G3",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G4",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G5",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G6",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G7",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        },
+        {
+          "guard_id": "G9",
+          "outcome": null,
+          "reasons": [],
+          "status": "passed"
+        }
+      ],
+      "guard_ids": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G9"
+      ],
+      "precedence_reference": "DD-11 precedence: DIO VETO -> GRRA SHORT_CIRCUIT -> Risk Officer VETO -> LEFO caps -> PSCC caps -> Penalties -> Chair aggregation",
+      "precedence_stack": [
+        "DIO_VETO",
+        "GRRA_SHORT_CIRCUIT",
+        "RISK_OFFICER_VETO",
+        "LEFO_CAPS",
+        "PSCC_CAPS",
+        "PENALTIES",
+        "CHAIR_AGGREGATION"
+      ],
+      "run_id": "prod-run",
+      "trail_complete": true
+    }
+  ]
+}

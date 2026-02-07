@@ -1,0 +1,42 @@
+[
+  {
+    "all_match": true,
+    "baseline_hashes": {
+      "committee_packet_hash": "d72cd2c5e464e98864fa53b6e4ce3e4e6a61d996ebda72b6ef81887c4cde6ea7",
+      "config_hash": "95cf32ff2dae5d19766577eb70433439de4398b740c3cb4bef1782af3a8e2d6e",
+      "decision_hash": "46ddf4b199d6ac3fcb07b37f21fe0c022ddccdd1b5fa1e18c17c89047989f30b",
+      "holding_packet_hashes": {
+        "HOLDING-001": "f4e7491e294bc869193b15a8892bd30b13dbde75c31a1b4a9d436455f5bfa564",
+        "HOLDING-002": "654d8fdfc42900b1fbdcb917baa75893ab438ac114cf1a083dcf2ba10123ef28",
+        "HOLDING-003": "0f01b916ce9b3134f3afd5fe87ae10fcc3bc56151bdc8e0f4e52fb3fdcfcea2a"
+      },
+      "run_config_hash": "8d1081095f8da96d7b87221999ba17b10a0ace463a81b96ca02b7b3f60fa0c5e",
+      "run_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "snapshot_hash": "681f209ce4750fbb3864aeef36688f39585f2505beac9fbe41fbbf4211efdc39"
+    },
+    "baseline_path": "release_manifests/dd11-phase4/runs/prod_run/hashes.json",
+    "matches": {
+      "committee_packet_hash": true,
+      "config_hash": true,
+      "decision_hash": true,
+      "holding_packet_hashes": true,
+      "run_config_hash": true,
+      "run_hash": true,
+      "snapshot_hash": true
+    },
+    "recomputed_hashes": {
+      "committee_packet_hash": "d72cd2c5e464e98864fa53b6e4ce3e4e6a61d996ebda72b6ef81887c4cde6ea7",
+      "config_hash": "95cf32ff2dae5d19766577eb70433439de4398b740c3cb4bef1782af3a8e2d6e",
+      "decision_hash": "46ddf4b199d6ac3fcb07b37f21fe0c022ddccdd1b5fa1e18c17c89047989f30b",
+      "holding_packet_hashes": {
+        "HOLDING-001": "f4e7491e294bc869193b15a8892bd30b13dbde75c31a1b4a9d436455f5bfa564",
+        "HOLDING-002": "654d8fdfc42900b1fbdcb917baa75893ab438ac114cf1a083dcf2ba10123ef28",
+        "HOLDING-003": "0f01b916ce9b3134f3afd5fe87ae10fcc3bc56151bdc8e0f4e52fb3fdcfcea2a"
+      },
+      "run_config_hash": "8d1081095f8da96d7b87221999ba17b10a0ace463a81b96ca02b7b3f60fa0c5e",
+      "run_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "snapshot_hash": "681f209ce4750fbb3864aeef36688f39585f2505beac9fbe41fbbf4211efdc39"
+    },
+    "run_id": "prod-run"
+  }
+]
