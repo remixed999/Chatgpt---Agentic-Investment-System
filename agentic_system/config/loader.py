@@ -7,10 +7,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
+from agentic_system.canonicalization.ordering import canonicalize_payload
 from agentic_system.schemas.contracts import ConfigSnapshot, RunConfig
 
 
-# DD-11: preflight loader + hash placeholder
+# DD-11: preflight loader + hash generation
 
 def _to_primitive(value: Any) -> Any:
     if is_dataclass(value):
@@ -26,7 +27,8 @@ def _to_primitive(value: Any) -> Any:
 
 def compute_hash(payload: Any) -> str:
     normalized = _to_primitive(payload)
-    encoded = json.dumps(normalized, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    canonical_json = canonicalize_payload(normalized)
+    encoded = canonical_json.encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
@@ -56,3 +58,4 @@ def preflight(run_config_path: Path, config_snapshot_path: Path) -> tuple[RunCon
     run_config_hash = compute_hash(run_config)
     config_snapshot_hash = compute_hash(config_snapshot)
     return run_config, config_snapshot, run_config_hash, config_snapshot_hash
+
